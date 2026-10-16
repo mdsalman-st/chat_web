@@ -1,0 +1,873 @@
+/* ==========================================================================
+   NEXUS — Welcome / Intro Page
+   ==========================================================================
+   Table of Contents:
+   1. Reset & Base
+   2. Background Grid
+   3. Floating Orbs
+   4. Particles
+   5. Floating Role Pills
+   6. Hero Layout
+   7. Brand Badge
+   8. Tagline Badge
+   9. Hero Title (Gradient Text)
+   10. Hero Subtitle
+   11. Stats Row
+   12. Premium CTA Button
+   13. Footnote
+   14. Scroll Cue
+   15. Entrance Animations
+   16. Reduced Motion
+   17. Responsive
+   ========================================================================== */
+
+
+/* --------------------------------------------------------------------------
+   1. RESET & BASE
+   -------------------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: #05070d;
+  color: #e5e7eb;
+  font-family: 'Inter', system-ui, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  position: relative;
+}
+
+a { text-decoration: none; color: inherit; }
+
+
+/* --------------------------------------------------------------------------
+   2. BACKGROUND GRID
+   -------------------------------------------------------------------------- */
+.bg-grid {
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(34, 211, 238, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+
+/* --------------------------------------------------------------------------
+   3. FLOATING ORBS
+   -------------------------------------------------------------------------- */
+.orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.orb-1 {
+  width: 520px;
+  height: 520px;
+  background: radial-gradient(circle, #06b6d4, transparent 70%);
+  top: -120px;
+  left: 10%;
+  animation: float1 18s ease-in-out infinite;
+}
+
+.orb-2 {
+  width: 460px;
+  height: 460px;
+  background: radial-gradient(circle, #6366f1, transparent 70%);
+  bottom: -100px;
+  right: 8%;
+  animation: float2 22s ease-in-out infinite;
+}
+
+.orb-3 {
+  width: 380px;
+  height: 380px;
+  background: radial-gradient(circle, #8b5cf6, transparent 70%);
+  top: 40%;
+  left: -8%;
+  animation: float3 20s ease-in-out infinite;
+}
+
+@keyframes float1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(60px, 40px) scale(1.1); }
+}
+@keyframes float2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(-70px, -50px) scale(1.15); }
+}
+@keyframes float3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(50px, -30px) scale(0.95); }
+}
+
+
+/* --------------------------------------------------------------------------
+   4. PARTICLES
+   -------------------------------------------------------------------------- */
+.particles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: rgba(34, 211, 238, 0.7);
+  box-shadow: 0 0 10px rgba(34, 211, 238, 1);
+  animation: rise linear infinite;
+}
+
+@keyframes rise {
+  0%   { transform: translateY(0); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateY(-110vh); opacity: 0; }
+}
+
+
+/* --------------------------------------------------------------------------
+   5. FLOATING ROLE PILLS
+   -------------------------------------------------------------------------- */
+.role-pill {
+  position: fixed;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(226, 232, 240, 0.7);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.role-pill-1 { top: 18%; left: 6%;  animation: driftY 6s   ease-in-out infinite; }
+.role-pill-2 { top: 28%; right: 7%; animation: driftY 7s   0.5s ease-in-out infinite; }
+.role-pill-3 { bottom: 24%; left: 9%;  animation: driftY 5.5s 1s ease-in-out infinite; }
+.role-pill-4 { bottom: 18%; right: 10%; animation: driftY 6.5s 1.5s ease-in-out infinite; }
+
+@keyframes driftY {
+  0%, 100% { transform: translateY(0); opacity: 0.6; }
+  50%      { transform: translateY(-14px); opacity: 1; }
+}
+
+
+/* --------------------------------------------------------------------------
+   6. HERO LAYOUT
+   -------------------------------------------------------------------------- */
+.hero {
+  position: relative;
+  z-index: 10;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+
+
+/* --------------------------------------------------------------------------
+   7. BRAND BADGE
+   -------------------------------------------------------------------------- */
+.brand-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 2rem;
+}
+
+.brand-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #06b6d4, #2563eb);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.brand-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.02em;
+}
+
+.brand-tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  padding: 0.15rem 0.55rem;
+  border-radius: 9999px;
+  background: rgba(34, 211, 238, 0.15);
+  color: #67e8f9;
+  border: 1px solid rgba(34, 211, 238, 0.3);
+}
+
+.logo-pulse {
+  animation: logoGlow 2.5s ease-in-out infinite;
+}
+
+@keyframes logoGlow {
+  0%, 100% { box-shadow: 0 0 25px rgba(34, 211, 238, 0.4); }
+  50%      { box-shadow: 0 0 45px rgba(34, 211, 238, 0.8); }
+}
+
+
+/* --------------------------------------------------------------------------
+   8. TAGLINE BADGE
+   -------------------------------------------------------------------------- */
+.tagline-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  background: rgba(34, 211, 238, 0.1);
+  border: 1px solid rgba(34, 211, 238, 0.25);
+  color: #67e8f9;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+}
+
+.tagline-text { position: relative; z-index: 1; }
+
+.badge-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.badge-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 30%, rgba(34, 211, 238, 0.35) 50%, transparent 70%);
+  transform: translateX(-100%);
+  animation: badgeSweep 3.5s infinite;
+}
+
+@keyframes badgeSweep {
+  0%   { transform: translateX(-100%); }
+  60%  { transform: translateX(100%); }
+  100% { transform: translateX(100%); }
+}
+
+
+/* --------------------------------------------------------------------------
+   9. HERO TITLE
+   -------------------------------------------------------------------------- */
+.hero-title {
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  font-size: clamp(2.2rem, 7vw, 4.5rem);
+  max-width: 60rem;
+  margin-bottom: 1.5rem;
+  color: #ffffff;
+}
+
+.grad-text {
+  background: linear-gradient(90deg, #22d3ee, #3b82f6, #8b5cf6, #22d3ee);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 6s ease infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+
+/* --------------------------------------------------------------------------
+   10. HERO SUBTITLE
+   -------------------------------------------------------------------------- */
+.hero-sub {
+  color: #94a3b8;
+  font-size: clamp(0.95rem, 1.8vw, 1.1rem);
+  max-width: 40rem;
+  margin: 0 auto 3rem;
+  line-height: 1.65;
+}
+
+
+/* --------------------------------------------------------------------------
+   11. STATS ROW
+   -------------------------------------------------------------------------- */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin: 0 auto 3.5rem;
+  max-width: 34rem;
+  width: 100%;
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat-mid {
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0 1rem;
+}
+
+.stat-value {
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.stat-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: #64748b;
+  margin-top: 0.35rem;
+}
+
+
+/* --------------------------------------------------------------------------
+   12. PREMIUM CTA BUTTON
+   -------------------------------------------------------------------------- */
+.cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2.5rem;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, #06b6d4, #3b82f6 50%, #8b5cf6);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: clamp(1rem, 1.8vw, 1.15rem);
+  overflow: hidden;
+  isolation: isolate;
+  box-shadow: 0 15px 40px -10px rgba(34, 211, 238, 0.5);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.4s ease;
+}
+
+.cta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.4) 50%, transparent 70%);
+  transform: translateX(-150%);
+  transition: transform 0.8s ease;
+  z-index: 1;
+}
+
+.cta:hover::before { transform: translateX(150%); }
+
+.cta:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 25px 60px -15px rgba(34, 211, 238, 0.7),
+              0 0 60px rgba(99, 102, 241, 0.5);
+}
+
+.cta:active { transform: translateY(-1px) scale(1); }
+
+.cta-text,
+.cta-icon { position: relative; z-index: 2; }
+
+.cta-icon {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.3s ease;
+}
+
+.cta:hover .cta-icon { transform: translateX(4px); }
+
+.pulse-ring { position: relative; }
+
+.pulse-ring::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  border: 2px solid rgba(34, 211, 238, 0.5);
+  animation: pulseRing 2.5s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes pulseRing {
+  0%   { transform: scale(1);    opacity: 0.8; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+
+
+/* --------------------------------------------------------------------------
+   13. FOOTNOTE
+   -------------------------------------------------------------------------- */
+.hero-footnote {
+  font-size: 0.75rem;
+  color: #64748b;
+  letter-spacing: 0.03em;
+}
+
+
+/* --------------------------------------------------------------------------
+   14. SCROLL CUE
+   -------------------------------------------------------------------------- */
+.scroll-cue {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  color: #475569;
+  font-size: 0.75rem;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+.scroll-label {
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  font-size: 0.6rem;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translate(-50%, 0);  opacity: 0.5; }
+  50%      { transform: translate(-50%, 10px); opacity: 1; }
+}
+
+
+/* --------------------------------------------------------------------------
+   15. ENTRANCE ANIMATIONS
+   -------------------------------------------------------------------------- */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.anim {
+  opacity: 0;
+  animation-fill-mode: forwards;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.anim-badge    { animation: fadeUp 0.9s 0.2s forwards; }
+.anim-title    { animation: fadeUp 1s   0.4s forwards; }
+.anim-sub      { animation: fadeUp 1s   0.6s forwards; }
+.anim-stats    { animation: fadeUp 1s   0.8s forwards; }
+.anim-btn      { animation: scaleIn 0.8s 1s  forwards; }
+.anim-footnote { animation: fadeUp 0.8s 1.3s forwards; }
+
+
+/* --------------------------------------------------------------------------
+   16. REDUCED MOTION
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+/* --------------------------------------------------------------------------
+   17. RESPONSIVE
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .role-pill { display: none; }
+
+  .hero { padding: 2rem 1.25rem; }
+
+  .stats-row { gap: 0.75rem; }
+  .stat-mid  { padding: 0 0.5rem; }
+
+  .cta { padding: 0.9rem 2rem; }
+
+  .scroll-cue { bottom: 1.25rem; }
+}
+
+@media (max-width: 480px) {
+  .brand-name { font-size: 0.8rem; }
+  .brand-tag  { font-size: 0.6rem; }
+  .tagline-badge { font-size: 0.72rem; padding: 0.4rem 0.85rem; }
+  .hero-sub { margin-bottom: 2.25rem; }
+  .stats-row { margin-bottom: 2.5rem; }
+}
+/* ==========================================================================
+   PART G: PROFESSION PAGE
+   ==========================================================================
+   Table of Contents:
+   G1. Page Base
+   G2. Back Button
+   G3. Step Indicator
+   G4. Title & Subtitle
+   G5. Profession Grid
+   G6. Profession Card
+   G7. Custom Role Input
+   G8. Continue Button Area
+   G9. Responsive
+   ========================================================================== */
+
+
+/* --------------------------------------------------------------------------
+   G1. PAGE BASE
+   -------------------------------------------------------------------------- */
+.page-profession .profession-hero {
+  justify-content: flex-start;
+  padding-top: 5rem;
+  gap: 0;
+}
+
+
+/* --------------------------------------------------------------------------
+   G2. BACK BUTTON
+   -------------------------------------------------------------------------- */
+.back-btn {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.25s ease;
+  z-index: 20;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border-color: rgba(34, 211, 238, 0.4);
+  transform: translateX(-3px);
+}
+
+
+/* --------------------------------------------------------------------------
+   G3. STEP INDICATOR
+   -------------------------------------------------------------------------- */
+.steps {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.step-dot {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  color: #64748b;
+  transition: all 0.3s ease;
+}
+
+.step-dot.active {
+  background: linear-gradient(135deg, #06b6d4, #3b82f6);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 0 20px rgba(34, 211, 238, 0.5);
+}
+
+.step-line {
+  width: 32px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+
+/* --------------------------------------------------------------------------
+   G4. TITLE & SUBTITLE
+   -------------------------------------------------------------------------- */
+.profession-title {
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  font-size: clamp(2rem, 5.5vw, 3.5rem);
+  margin-bottom: 1rem;
+  color: #fff;
+}
+
+.profession-sub {
+  color: #94a3b8;
+  font-size: clamp(0.9rem, 1.7vw, 1.05rem);
+  max-width: 34rem;
+  margin: 0 auto 3rem;
+  line-height: 1.65;
+}
+
+
+/* --------------------------------------------------------------------------
+   G5. PROFESSION GRID
+   -------------------------------------------------------------------------- */
+.prof-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  max-width: 52rem;
+  width: 100%;
+  margin: 0 auto 2rem;
+}
+
+
+/* --------------------------------------------------------------------------
+   G6. PROFESSION CARD
+   -------------------------------------------------------------------------- */
+.prof-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  padding: 1.35rem 1.25rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  font-family: inherit;
+  color: inherit;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+.prof-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(34, 211, 238, 0.08), rgba(99, 102, 241, 0.05));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.prof-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(34, 211, 238, 0.35);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 20px 40px -15px rgba(34, 211, 238, 0.25);
+}
+
+.prof-card:hover::before { opacity: 1; }
+
+.prof-card.active {
+  border-color: #22d3ee;
+  background: rgba(34, 211, 238, 0.08);
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.15),
+              0 20px 40px -15px rgba(34, 211, 238, 0.4);
+}
+
+.prof-card.active::before { opacity: 1; }
+
+.prof-icon {
+  font-size: 1.85rem;
+  margin-bottom: 0.75rem;
+  transition: transform 0.3s ease;
+}
+
+.prof-card:hover .prof-icon { transform: scale(1.12); }
+
+.prof-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.3rem;
+  letter-spacing: -0.01em;
+}
+
+.prof-desc {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  line-height: 1.45;
+}
+
+.prof-check {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #06b6d4, #3b82f6);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.prof-card.active .prof-check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+
+/* --------------------------------------------------------------------------
+   G7. CUSTOM ROLE INPUT
+   -------------------------------------------------------------------------- */
+.custom-role-wrap {
+  max-width: 32rem;
+  width: 100%;
+  margin: 0 auto 1.5rem;
+  animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.custom-role-input {
+  width: 100%;
+  padding: 0.95rem 1.2rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 0.95rem;
+  font-family: inherit;
+  outline: none;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.custom-role-input::placeholder { color: #64748b; }
+
+.custom-role-input:focus {
+  border-color: #22d3ee;
+  background: rgba(34, 211, 238, 0.05);
+  box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.12);
+}
+
+
+/* --------------------------------------------------------------------------
+   G8. CONTINUE BUTTON AREA
+   -------------------------------------------------------------------------- */
+.profession-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.cta:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+  transform: none !important;
+  box-shadow: none;
+}
+
+.cta:disabled::before { display: none; }
+
+.cta:disabled.pulse-ring::after { display: none; }
+
+
+/* --------------------------------------------------------------------------
+   G9. RESPONSIVE
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .back-btn {
+    top: 1.25rem;
+    left: 1.25rem;
+    padding: 0.45rem 0.85rem;
+    font-size: 0.78rem;
+  }
+
+  .profession-hero { padding-top: 4.5rem; }
+
+  .prof-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .prof-card { padding: 1.1rem 1rem; }
+  .prof-icon { font-size: 1.6rem; margin-bottom: 0.55rem; }
+  .prof-name { font-size: 0.92rem; }
+  .prof-desc { font-size: 0.72rem; }
+
+  .steps { margin-bottom: 1.75rem; }
+  .step-line { width: 22px; }
+}
+
+@media (max-width: 420px) {
+  .prof-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+  }
+
+  .prof-card { padding: 0.95rem 0.85rem; }
+  .prof-icon { font-size: 1.4rem; }
+  .prof-name { font-size: 0.85rem; }
+  .prof-desc { font-size: 0.68rem; }
+
+  .profession-sub { margin-bottom: 2rem; }
+}

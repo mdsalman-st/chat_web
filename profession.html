@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Choose your profession — Nexus adapts to you.">
+  <title>Choose Your Role — Nexus</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="page-profession">
+
+  <!-- Background Layers -->
+  <div class="bg-grid"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="particles" id="particles"></div>
+
+  <!-- ================================
+       MAIN CONTENT
+       ================================ -->
+  <main class="hero profession-hero">
+
+    <!-- Back Button (top left) -->
+    <a href="index.html" class="back-btn anim anim-badge" aria-label="Go back">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12"/>
+      </svg>
+      <span>Back</span>
+    </a>
+
+    <!-- Step Indicator -->
+    <div class="steps anim anim-badge">
+      <span class="step-dot active">1</span>
+      <span class="step-line"></span>
+      <span class="step-dot">2</span>
+      <span class="step-line"></span>
+      <span class="step-dot">3</span>
+      <span class="step-line"></span>
+      <span class="step-dot">4</span>
+    </div>
+
+    <!-- Heading -->
+    <h1 class="anim anim-title profession-title">
+      Who are <span class="grad-text">you?</span>
+    </h1>
+
+    <!-- Subheading -->
+    <p class="anim anim-sub profession-sub">
+      Pick the role that fits you best. We'll build a custom workspace around it —
+      you can always switch later.
+    </p>
+
+    <!-- ================================
+         PROFESSION GRID
+         ================================ -->
+    <div class="prof-grid anim anim-stats" id="profGrid">
+
+      <!-- Student -->
+      <button type="button" class="prof-card" data-role="student">
+        <div class="prof-icon">🎓</div>
+        <h3 class="prof-name">Student</h3>
+        <p class="prof-desc">School, college, exams & self-study</p>
+        <span class="prof-check">✓</span>
+      </button>
+
+      <!-- Employee -->
+      <button type="button" class="prof-card" data-role="employee">
+        <div class="prof-icon">💼</div>
+        <h3 class="prof-name">Employee</h3>
+        <p class="prof-desc">Office work, projects & productivity</p>
+        <span class="prof-check">✓</span>
+      </button>
+
+      <!-- Trader -->
+      <button type="button" class="prof-card" data-role="trader">
+        <div class="prof-icon">📈</div>
+        <h3 class="prof-name">Trader</h3>
+        <p class="prof-desc">Markets, charts & portfolio tracking</p>
+        <span class="prof-check">✓</span>
+      </button>
+
+      <!-- Creator -->
+      <button type="button" class="prof-card" data-role="creator">
+        <div class="prof-icon">🎨</div>
+        <h3 class="prof-name">Creator</h3>
+        <p class="prof-desc">Content, design, video & writing</p>
+        <span class="prof-check">✓</span>
+      </button>
+
+      <!-- Developer -->
+      <button type="button" class="prof-card" data-role="developer">
+        <div class="prof-icon">💻</div>
+        <h3 class="prof-name">Developer</h3>
+        <p class="prof-desc">Code, projects, bugs & documentation</p>
+        <span class="prof-check">✓</span>
+      </button>
+
+      <!-- Freelancer -->
+      <button type="button" class="prof-card" data-role="freelancer">
+        <div class="prof-icon">🧑‍💻</div>
+        <h3 class="prof-name">Freelancer</h3>
+        <p class="prof-desc">Clients, gigs, invoices & time tracking</p>
+        <span class="prof-check">✓</span>
+      </button>
+
+      <!-- Teacher -->
+      <button type="button" class="prof-card" data-role="teacher">
+        <div class="prof-icon">📚</div>
+        <h3 class="prof-name">Teacher</h3>
+        <p class="prof-desc">Lessons, students, assignments</p>
+        <span class="prof-check">✓</span>
+      </button>
+
+      <!-- Doctor -->
+      <button type="button" class="prof-card" data-role="doctor">
+        <div class="prof-icon">🩺</div>
+        <h3 class="prof-name">Doctor</h3>
+        <p class="prof-desc">Patients, notes & medical records</p>
+        <span class="prof-check">✓</span>
+      </button>
+
+      <!-- Other -->
+      <button type="button" class="prof-card" data-role="other">
+        <div class="prof-icon">✨</div>
+        <h3 class="prof-name">Something Else</h3>
+        <p class="prof-desc">Tell us your role, we'll adapt</p>
+        <span class="prof-check">✓</span>
+      </button>
+
+    </div>
+
+    <!-- Custom role input (only for "other") -->
+    <div class="custom-role-wrap" id="customRoleWrap" hidden>
+      <input type="text"
+             id="customRoleInput"
+             class="custom-role-input"
+             placeholder="e.g. Photographer, Lawyer, Chef…"
+             autocomplete="off"
+             maxlength="40">
+    </div>
+
+    <!-- Continue Button -->
+    <div class="anim anim-btn profession-actions">
+      <button type="button"
+              id="continueBtn"
+              class="cta pulse-ring"
+              disabled>
+        <span class="cta-text">Continue</span>
+        <svg class="cta-icon" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Footnote -->
+    <p class="anim anim-footnote hero-footnote">
+      You can switch your role anytime from settings
+    </p>
+
+  </main>
+
+  <!-- Script -->
+  <script src="index.js"></script>
+  <script src="profession.js"></script>
+</body>
+</html>

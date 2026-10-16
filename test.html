@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Test — Nexus</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; }
+    .log { font-family: ui-monospace, monospace; font-size: 12px; }
+  </style>
+</head>
+<body class="bg-slate-900 text-white p-6">
+
+  <h1 class="text-2xl font-bold mb-2">🧪 Nexus API Test</h1>
+  <p class="text-slate-400 text-sm mb-6">Backend: <span id="backendUrl" class="text-cyan-400"></span></p>
+
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+    <button onclick="testSignup()" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 rounded font-semibold text-sm">Signup</button>
+    <button onclick="testLogin()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded font-semibold text-sm">Login</button>
+    <button onclick="testMe()" class="px-4 py-2 bg-violet-600 hover:bg-violet-500 rounded font-semibold text-sm">Get Me</button>
+    <button onclick="clearLog()" class="px-4 py-2 bg-red-600 hover:bg-red-500 rounded font-semibold text-sm">Clear Log</button>
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+    <button onclick="testCreateTask()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded font-semibold text-sm">Create Task</button>
+    <button onclick="testListTasks()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded font-semibold text-sm">List Tasks</button>
+    <button onclick="testTaskStats()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded font-semibold text-sm">Task Stats</button>
+    <button onclick="testDeleteAllTasks()" class="px-4 py-2 bg-red-700 hover:bg-red-600 rounded font-semibold text-sm">Delete All Tasks</button>
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+    <button onclick="testCreateNote()" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 rounded font-semibold text-sm">Create Note</button>
+    <button onclick="testListNotes()" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 rounded font-semibold text-sm">List Notes</button>
+    <button onclick="testNoteStats()" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 rounded font-semibold text-sm">Note Stats</button>
+    <button onclick="testCreateRoom()" class="px-4 py-2 bg-pink-600 hover:bg-pink-500 rounded font-semibold text-sm">Create Room</button>
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+    <button onclick="testListRooms()" class="px-4 py-2 bg-pink-600 hover:bg-pink-500 rounded font-semibold text-sm">List Rooms</button>
+    <button onclick="testSocketConnect()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded font-semibold text-sm">Socket Connect</button>
+    <button onclick="testLogout()" class="px-4 py-2 bg-slate-600 hover:bg-slate-500 rounded font-semibold text-sm">Logout</button>
+    <button onclick="testHealth()" class="px-4 py-2 bg-teal-600 hover:bg-teal-500 rounded font-semibold text-sm">Health</button>
+  </div>
+
+  <div class="mb-3 flex items-center gap-3 text-sm">
+    <span>Token:</span>
+    <span id="tokenStatus" class="px-2 py-0.5 rounded bg-red-500/20 text-red-300 font-mono text-xs">none</span>
+    <span>User:</span>
+    <span id="userStatus" class="px-2 py-0.5 rounded bg-red-500/20 text-red-300 font-mono text-xs">none</span>
+  </div>
+
+  <div id="log" class="log bg-black/50 rounded p-4 h-96 overflow-y-auto border border-white/10"></div>
+
+  <script src="api.js"></script>
+  <script src="socket-client.js"></script>
+
+  <script>
+    const logEl = document.getElementById('log');
+    document.getElementById('backendUrl').textContent = API.base;
+
+    function log(label, data, isError = false) {
+      const time = new Date().toLocaleTimeString();
+      const div = document.createElement('div');
+      div.className = 'mb-2 ' + (isError ? 'text-red-400' : 'text-green-300');
+      div.textContent = `[${time}] ${label}`;
+      logEl.appendChild(div);
+      if (data !== undefined) {
+        const pre = document.createElement('pre');
+        pre.className = 'text-slate-400 text-xs whitespace-pre-wrap mb-2 pl-4';
+        pre.textContent = JSON.stringify(data, null, 2);
+        logEl.appendChild(pre);
+      }
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function clearLog() {
+      logEl.innerHTML = '';
+    }
+
+    function updateStatus() {
+      const token = API.Token.get();
+      const user = API.User.get();
+      const t = document.getElementById('tokenStatus');
+      const u = document.getElementById('userStatus');
+      t.textContent = token ? token.slice(0, 20) + '...' : 'none';
+      t.className = 'px-2 py-0.5 rounded font-mono text-xs ' + (token ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300');
+      u.textContent = user ? user.name + ' (' + user.email + ')' : 'none';
+      u.className = 'px-2 py-0.5 rounded font-mono text-xs ' + (user ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300');
+    }
+
+    /* ---------------- AUTH ---------------- */
+    async function testSignup() {
+      try {
+        const email = 'user' + Date.now() + '@nexus.app';
+        log('Signup → ' + email);
+        const res = await API.auth.signup({
+          name: 'Test User',
+          email,
+          phone: '9876543210',
+          password: 'Test@12345',
+          role: 'student'
+        });
+        log('✅ Signup OK', res);
+        updateStatus();
+      } catch (e) {
+        log('❌ Signup failed: ' + e.message, e.data, true);
+      }
+    }
+
+    async function testLogin() {
+      try {
+        const email = prompt('Email:', 'test@nexus.app');
+        if (!email) return;
+        const password = prompt('Password:', 'Test@12345');
+        if (!password) return;
+
+        log('Login → ' + email);
+        const res = await API.auth.login(email, password);
+        log('✅ Login OK', res);
+        updateStatus();
+      } catch (e) {
+        log('❌ Login failed: ' + e.message, e.data, true);
+      }
+    }
+
+    async function testMe() {
+      try {
+        log('Get Me...');
+        const res = await API.auth.me();
+        log('✅ Me OK', res);
+      } catch (e) {
+        log('❌ Me failed: ' + e.message, e.data, true);
+      }
+    }
+
+    function testLogout() {
+      API.auth.logout();
+      log('Logged out');
+      updateStatus();
+    }
+
+    async function testHealth() {
+      try {
+        const res = await API.health.check();
+        log('✅ Health OK', res);
+      } catch (e) {
+        log('❌ Health failed: ' + e.message, e.data, true);
+      }
+    }
+
+    /* ---------------- TASKS ---------------- */
+    async function testCreateTask() {
+      try {
+        log('Creating task...');
+        const res = await API.tasks.create({
+          title: 'Test task ' + new Date().toLocaleTimeString(),
+          description: 'Created from test page',
+          priority: 'high',
+          dueDate: new Date(Date.now() + 86400000).toISOString().split('T')[0],
+          roleValue: 'Physics'
+        });
+        log('✅ Task created', res);
+      } catch (e) {
+        log('❌ Task failed: ' + e.message, e.data, true);
+      }
+    }
+
+    async function testListTasks() {
+      try {
+        const res = await API.tasks.list();
+        log('✅ Tasks (' + res.count + ')', res);
+      } catch (e) {
+        log('❌ List failed: ' + e.message, e.data, true);
+      }
+    }
+
+    async function testTaskStats() {
+      try {
+        const res = await API.tasks.stats();
+        log('✅ Task Stats', res);
+      } catch (e) {
+        log('❌ Stats failed: ' + e.message, e.data, true);
+      }
+    }
+
+    async function testDeleteAllTasks() {
+      try {
+        const res = await API.tasks.list();
+        if (!res.tasks.length) return log('No tasks to delete');
+        log('Deleting ' + res.tasks.length + ' tasks...');
+        for (const t of res.tasks) {
+          await API.tasks.remove(t._id);
+        }
+        log('✅ All tasks deleted');
+      } catch (e) {
+        log('❌ Delete failed: ' + e.message, e.data, true);
+      }
+    }
+
+    /* ---------------- NOTES ---------------- */
+    async function testCreateNote() {
+      try {
+        log('Creating note...');
+        const res = await API.notes.create({
+          title: 'Test note ' + new Date().toLocaleTimeString(),
+          content: 'Created from test page. Lorem ipsum...',
+          color: 'blue',
+          roleTag: 'Physics'
+        });
+        log('✅ Note created', res);
+      } catch (e) {
+        log('❌ Note failed: ' + e.message, e.data, true);
+      }
+    }
+
+    async function testListNotes() {
+      try {
+        const res = await API.notes.list();
+        log('✅ Notes (' + res.count + ')', res);
+      } catch (e) {
+        log('❌ List failed: ' + e.message, e.data, true);
+      }
+    }
+
+    async function testNoteStats() {
+      try {
+        const res = await API.notes.stats();
+        log('✅ Note Stats', res);
+      } catch (e) {
+        log('❌ Stats failed: ' + e.message, e.data, true);
+      }
+    }
+
+    /* ---------------- ROOMS ---------------- */
+    async function testCreateRoom() {
+      try {
+        log('Creating room...');
+        const res = await API.rooms.create('Test Room');
+        log('✅ Room created: ' + res.room.code, res);
+      } catch (e) {
+        log('❌ Room failed: ' + e.message, e.data, true);
+      }
+    }
+
+    async function testListRooms() {
+      try {
+        const res = await API.rooms.list();
+        log('✅ Rooms (' + res.count + ')', res);
+      } catch (e) {
+        log('❌ List failed: ' + e.message, e.data, true);
+      }
+    }
+
+    /* ---------------- SOCKET ---------------- */
+    async function testSocketConnect() {
+      try {
+        log('Connecting socket...');
+        const s = await SocketClient.init();
+        if (s) {
+          log('✅ Socket connected: ' + s.id);
+          SocketClient.on('newMessage', (msg) => {
+            log('📨 New message (live)', msg);
+          });
+          SocketClient.on('typingStart', (data) => log('✍️ ' + data.name + ' is typing...'));
+          SocketClient.on('typingStop', () => log('✍️ stopped typing'));
+        } else {
+          log('❌ No token — please signup/login first', null, true);
+        }
+      } catch (e) {
+        log('❌ Socket failed: ' + e.message, null, true);
+      }
+    }
+
+    /* ---------------- INIT ---------------- */
+    updateStatus();
+    log('🧪 Test page ready. Backend: ' + API.base);
+    log('👉 Start with: Signup → Get Me → Create Task → List Tasks → Socket Connect');
+  </script>
+
+</body>
+</html>
