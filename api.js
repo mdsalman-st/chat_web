@@ -9,7 +9,7 @@
 (function (window) {
   'use strict';
 
-  const API_BASE = 'http://localhost:5000';
+  const API_BASE = 'https://chat-web-backend-1-8wgm.onrender.com';
   const TOKEN_KEY = 'nexus_token';
   const USER_KEY = 'nexus_user';
 
