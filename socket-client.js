@@ -9,7 +9,7 @@
 (function (window) {
   'use strict';
 
-  const SOCKET_URL = 'http://localhost:5000';
+  const SOCKET_URL = 'https://chat-web-backend-1-8wgm.onrender.com';
   let socket = null;
   let currentRoomId = null;
 
