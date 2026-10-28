@@ -9,7 +9,16 @@
 (function (window) {
   'use strict';
 
-  const API_BASE = 'https://chat-web-backend-1-8wgm.onrender.com';
+  const API_BASE = (function() {
+    try {
+      const custom = localStorage.getItem('nexus_api_base');
+      if (custom) return custom;
+      if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+        return 'http://localhost:5000';
+      }
+    } catch (e) {}
+    return 'https://chat-web-backend-1-8wgm.onrender.com';
+  })();
   const TOKEN_KEY = 'nexus_token';
   const USER_KEY = 'nexus_user';
 
@@ -209,37 +218,6 @@
     },
   };
 
-  /* --------------------------------------------------------------------------
-     ROOMS API
-     -------------------------------------------------------------------------- */
-  const rooms = {
-    create(name = '') {
-      return request('/api/rooms', { method: 'POST', body: { name } });
-    },
-    join(code) {
-      return request('/api/rooms/join', { method: 'POST', body: { code } });
-    },
-    list() {
-      return request('/api/rooms');
-    },
-    get(id) {
-      return request('/api/rooms/' + id);
-    },
-    messages(id, limit = 50, before = null) {
-      const params = new URLSearchParams({ limit });
-      if (before) params.set('before', before);
-      return request('/api/rooms/' + id + '/messages?' + params.toString());
-    },
-    send(id, text) {
-      return request('/api/rooms/' + id + '/messages', {
-        method: 'POST',
-        body: { text },
-      });
-    },
-    remove(id) {
-      return request('/api/rooms/' + id, { method: 'DELETE' });
-    },
-  };
 
   /* --------------------------------------------------------------------------
      HEALTH
@@ -247,6 +225,156 @@
   const health = {
     check() {
       return request('/api/health');
+    },
+  };
+
+  /* --------------------------------------------------------------------------
+     STUDENT TESTS & BOARDS API
+     -------------------------------------------------------------------------- */
+  const tests = {
+    // Board & syllabus discovery
+    getBoards() {
+      return request('/api/tests/boards');
+    },
+    getBoard(boardCode) {
+      return request('/api/tests/boards/' + encodeURIComponent(boardCode));
+    },
+    getSubjects(boardCode, classLevel, stream = null) {
+      const params = new URLSearchParams();
+      if (classLevel) params.set('class', classLevel);
+      if (stream) params.set('stream', stream);
+      return request('/api/tests/boards/' + encodeURIComponent(boardCode) + '/subjects?' + params.toString());
+    },
+    getChapters(boardCode, classLevel, subjectCode, stream = null, phase = null) {
+      const params = new URLSearchParams({ subject: subjectCode });
+      if (classLevel) params.set('class', classLevel);
+      if (stream) params.set('stream', stream);
+      if (phase) params.set('phase', phase);
+      return request('/api/tests/boards/' + encodeURIComponent(boardCode) + '/chapters?' + params.toString());
+    },
+
+    // Student academic profile
+    getProfile() {
+      return request('/api/tests/profile');
+    },
+    updateProfile(payload) {
+      return request('/api/tests/profile', {
+        method: 'PUT',
+        body: payload,
+      });
+    },
+
+    // Phase 2: Question preparation & lazy loading
+    prepareChapter(payload) {
+      return request('/api/tests/chapters/prepare', {
+        method: 'POST',
+        body: payload,
+      });
+    },
+    getJobStatus(jobId) {
+      return request('/api/tests/jobs/' + encodeURIComponent(jobId));
+    },
+    getChapterQuestions(chapterNumber, queryParams = {}) {
+      const params = new URLSearchParams(queryParams);
+      return request('/api/tests/chapters/' + encodeURIComponent(chapterNumber) + '/questions?' + params.toString());
+    },
+
+    // Test engine methods (phases 2-6)
+    startTest(payload) {
+      return request('/api/tests/start', {
+        method: 'POST',
+        body: payload,
+      });
+    },
+    submitAnswer(attemptId, payload) {
+      return request('/api/tests/' + encodeURIComponent(attemptId) + '/answer', {
+        method: 'POST',
+        body: payload,
+      });
+    },
+    finishTest(attemptId) {
+      return request('/api/tests/' + encodeURIComponent(attemptId) + '/finish', {
+        method: 'POST',
+      });
+    },
+    getResult(attemptId) {
+      return request('/api/tests/' + encodeURIComponent(attemptId) + '/result');
+    },
+    getRecentResults(limit = 10) {
+      return request('/api/tests/results/recent?limit=' + limit);
+    },
+    reportQuestion(questionId, payload) {
+      return request('/api/tests/questions/' + encodeURIComponent(questionId) + '/flag', {
+        method: 'POST',
+        body: payload,
+      });
+    },
+
+    // Phase 4: Diagnostic PDF Report, Asynchronous Analysis Queue & Notifications
+    getPdfToken(attemptId) {
+      return request('/api/tests/' + encodeURIComponent(attemptId) + '/pdf-token');
+    },
+    async downloadPdf(attemptId, wrongOnly = false) {
+      const res = await this.getPdfToken(attemptId);
+      if (res && res.downloadUrl) {
+        const url = wrongOnly ? res.wrongOnlyUrl : res.downloadUrl;
+        const link = document.createElement('a');
+        link.href = API_BASE + url;
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    },
+    queueAnalysis(attemptId) {
+      return request('/api/tests/' + encodeURIComponent(attemptId) + '/queue-analysis', {
+        method: 'POST',
+      });
+    },
+    getNotifications(limit = 15) {
+      return request('/api/tests/notifications?limit=' + limit);
+    },
+    markNotificationRead(id) {
+      return request('/api/tests/notifications/' + encodeURIComponent(id) + '/read', {
+        method: 'PATCH',
+      });
+    },
+
+    // Phase 5: Official Board Papers & Ingestion
+    getAvailablePapers(subjectCode, phase = null) {
+      let q = '/api/tests/papers/available?subjectCode=' + encodeURIComponent(subjectCode);
+      if (phase) q += '&examPhase=' + encodeURIComponent(phase);
+      return request(q);
+    },
+    getPaper(paperId) {
+      return request('/api/tests/papers/' + encodeURIComponent(paperId));
+    },
+    startPaperTest(paperId, payload = {}) {
+      return request('/api/tests/papers/' + encodeURIComponent(paperId) + '/start', {
+        method: 'POST',
+        body: payload,
+      });
+    },
+    getPaperAnswers(paperId) {
+      return request('/api/tests/papers/' + encodeURIComponent(paperId) + '/answers');
+    },
+    getMvviAnalysis(subjectCode) {
+      return request('/api/tests/papers/mvvi-analysis?subjectCode=' + encodeURIComponent(subjectCode));
+    },
+    ingestPaper(paperData) {
+      return request('/api/tests/papers/ingest', {
+        method: 'POST',
+        body: paperData,
+      });
+    },
+    getPapersPendingReview() {
+      return request('/api/tests/papers/pending-review');
+    },
+    reviewPaperMatch(paperId, payload) {
+      return request('/api/tests/papers/' + encodeURIComponent(paperId) + '/review-match', {
+        method: 'POST',
+        body: payload,
+      });
     },
   };
 
@@ -260,9 +388,23 @@
     auth,
     tasks,
     notes,
-    rooms,
+    tests,
     health,
     request,
+  };
+
+  window.toggleSidebar = window.toggleSidebar || function() {
+    const sb = document.getElementById('sidebar');
+    const bd = document.getElementById('sidebarBackdrop');
+    if (!sb) return;
+    const isOpen = sb.classList.toggle('open');
+    if (bd) bd.classList.toggle('hidden', !isOpen);
+  };
+
+  window.handleLogout = window.handleLogout || function() {
+    if (!confirm('Sign out?')) return;
+    auth.logout();
+    window.location.href = 'index.html';
   };
 
   console.log('%c🔗 API Client Ready', 'color:#22d3ee;font-weight:bold', API_BASE);

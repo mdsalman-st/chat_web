@@ -55,25 +55,66 @@
   }
   window.toast = toast;
 
-  /* ---------- Storage ---------- */
+  /* ---------- Storage (MongoDB Connected) ---------- */
   function noteKey() {
-    const u = state.username || state.user.email || 'default';
+    const u = state.username || (state.user && state.user.email) || 'default';
     return 'nexus_notes_' + u;
   }
-  function loadNotes() {
-    try { noteState.list = JSON.parse(localStorage.getItem(noteKey()) || '[]'); }
-    catch(e){ noteState.list = []; }
-  }
-  function saveNotes() {
-    try { localStorage.setItem(noteKey(), JSON.stringify(noteState.list)); }
-    catch(e){ console.warn(e); }
+
+  async function loadNotes() {
+    try {
+      const res = await API.notes.list(noteState.colorFilter, noteState.search);
+      let serverNotes = res.notes || [];
+
+      // Check for legacy localStorage notes to auto-migrate to MongoDB
+      const localKey = noteKey();
+      try {
+        const local = JSON.parse(localStorage.getItem(localKey) || '[]');
+        if (local.length > 0 && serverNotes.length === 0) {
+          for (const item of local) {
+            await API.notes.create({
+              title: item.title,
+              content: item.content || '',
+              color: item.color || 'yellow',
+              roleTag: item.roleTag || '',
+              pinned: Boolean(item.pinned),
+            });
+          }
+          localStorage.removeItem(localKey);
+          const ref = await API.notes.list(noteState.colorFilter, noteState.search);
+          serverNotes = ref.notes || [];
+        }
+      } catch (mErr) {
+        console.warn('Migration check:', mErr);
+      }
+
+      noteState.list = serverNotes.map(n => ({
+        ...n,
+        id: n._id || n.id,
+        createdAt: n.createdAt ? new Date(n.createdAt).getTime() : Date.now(),
+        updatedAt: n.updatedAt ? new Date(n.updatedAt).getTime() : Date.now(),
+      }));
+
+      refresh();
+    } catch (err) {
+      console.warn('API notes load failed, trying local fallback:', err);
+      try {
+        const local = JSON.parse(localStorage.getItem(noteKey()) || '[]');
+        if (local.length && noteState.list.length === 0) {
+          noteState.list = local;
+          refresh();
+        }
+      } catch (e) {}
+    }
   }
 
   /* ---------- Helpers ---------- */
   const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
 
   function timeAgo(ts) {
-    const diff = Date.now() - ts;
+    const timeMs = typeof ts === 'string' ? new Date(ts).getTime() : Number(ts);
+    if (!timeMs || isNaN(timeMs)) return 'just now';
+    const diff = Date.now() - timeMs;
     const sec = Math.floor(diff / 1000);
     if (sec < 60) return 'just now';
     const min = Math.floor(sec / 60);
@@ -82,7 +123,7 @@
     if (hr < 24) return hr + 'h ago';
     const d = Math.floor(hr / 24);
     if (d < 7) return d + 'd ago';
-    return new Date(ts).toLocaleDateString('en-IN', { day:'numeric', month:'short' });
+    return new Date(timeMs).toLocaleDateString('en-IN', { day:'numeric', month:'short' });
   }
 
   /* ---------- Stats ---------- */
@@ -190,20 +231,35 @@
 
   function refresh() { renderStats(); renderNotes(); }
 
-  /* ---------- Actions ---------- */
-  window.togglePin = function(id) {
-    const n = noteState.list.find(x => x.id === id); if (!n) return;
-    n.pinned = !n.pinned;
-    n.updatedAt = Date.now();
-    saveNotes(); refresh();
-    toast(n.pinned ? 'Pinned 📌' : 'Unpinned', 'success');
+  /* ---------- Actions (MongoDB Connected) ---------- */
+  window.togglePin = async function(id) {
+    try {
+      const res = await API.notes.togglePin(id);
+      const updated = res.note;
+      const n = noteState.list.find(x => (x._id || x.id) === id);
+      if (n && updated) {
+        n.pinned = updated.pinned;
+        n.updatedAt = new Date(updated.updatedAt).getTime();
+      }
+      refresh();
+      toast(n && n.pinned ? 'Pinned 📌' : 'Unpinned', 'success');
+    } catch (err) {
+      console.error(err);
+      toast('Failed to toggle pin', 'error');
+    }
   };
 
-  window.deleteNote = function(id) {
+  window.deleteNote = async function(id) {
     if (!confirm('Delete this note?')) return;
-    noteState.list = noteState.list.filter(x => x.id !== id);
-    saveNotes(); refresh();
-    toast('Note deleted', 'success');
+    try {
+      await API.notes.remove(id);
+      noteState.list = noteState.list.filter(x => (x._id || x.id) !== id);
+      refresh();
+      toast('Note deleted', 'success');
+    } catch (err) {
+      console.error(err);
+      toast('Failed to delete note', 'error');
+    }
   };
 
   window.setColorFilter = function(color) {
@@ -211,7 +267,7 @@
     document.querySelectorAll('.filter-color-btn').forEach(b =>
       b.classList.toggle('active', b.dataset.color === color)
     );
-    renderNotes();
+    loadNotes();
   };
 
   window.setView = function(view) {
@@ -317,7 +373,7 @@
     noteState.editingId = null;
   };
 
-  window.saveNoteFromModal = function() {
+  window.saveNoteFromModal = async function() {
     const title = $('noteTitle').value.trim();
     const content = $('noteContent').value.trim();
     const roleTag = ($('noteRoleField') ? $('noteRoleField').value.trim() : '');
@@ -328,32 +384,32 @@
       return;
     }
 
-    if (noteState.editingId) {
-      const n = noteState.list.find(x => x.id === noteState.editingId);
-      if (n) {
-        n.title = title;
-        n.content = content;
-        n.color = noteState.currentColor;
-        n.roleTag = roleTag;
-        n.updatedAt = Date.now();
-      }
-      toast('Note updated ✓', 'success');
-    } else {
-      noteState.list.unshift({
-        id: uid(),
-        title, content,
-        color: noteState.currentColor,
-        roleTag,
-        pinned: false,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-      });
-      toast('Note saved ✓', 'success');
-    }
+    const payload = {
+      title,
+      content,
+      color: noteState.currentColor,
+      roleTag,
+    };
 
-    saveNotes();
-    closeNoteModal();
-    refresh();
+    const saveBtn = $('noteSaveBtn');
+    if (saveBtn) saveBtn.disabled = true;
+
+    try {
+      if (noteState.editingId) {
+        await API.notes.update(noteState.editingId, payload);
+        toast('Note updated ✓', 'success');
+      } else {
+        await API.notes.create({ ...payload, pinned: false });
+        toast('Note saved to MongoDB ✓', 'success');
+      }
+      closeNoteModal();
+      await loadNotes();
+    } catch (err) {
+      console.error(err);
+      toast('Failed to save note to database', 'error');
+    } finally {
+      if (saveBtn) saveBtn.disabled = false;
+    }
   };
 
   /* ---------- Sidebar / Dropdowns / Vault ---------- */
@@ -453,27 +509,42 @@
     }
   })();
 
-  /* ---------- Init ---------- */
-  document.addEventListener('DOMContentLoaded', () => {
+  /* ---------- Init (MongoDB Connected) ---------- */
+  document.addEventListener('DOMContentLoaded', async () => {
+    if (!API.Token.exists()) {
+      window.location.href = 'auth.html';
+      return;
+    }
+
     try {
-      state.role = localStorage.getItem(KEYS.ROLE) || 'student';
-      state.user = JSON.parse(localStorage.getItem(KEYS.USER) || '{}');
-      state.username = localStorage.getItem(KEYS.USERNAME) || '';
-      state.secret = (localStorage.getItem(KEYS.SECRET) || '').trim().toLowerCase();
-    } catch(e){}
+      const res = await API.auth.me();
+      state.user = res.user || {};
+      state.role = state.user.role || 'student';
+      state.username = state.user.username || '';
+    } catch(e) {
+      state.user = API.User.get() || {};
+      state.role = state.user.role || 'student';
+    }
 
     const name = (state.user.name || state.username || 'User').split(' ')[0];
-    $('avatarLetter').textContent = name.charAt(0).toUpperCase();
-    $('profileName').textContent = name;
-    $('panelName').textContent = state.user.name || 'User';
-    $('panelEmail').textContent = state.user.email || 'user@example.com';
-    $('sideRoleTag').textContent = state.role;
+    if ($('avatarLetter')) $('avatarLetter').textContent = name.charAt(0).toUpperCase();
+    if ($('profileName')) $('profileName').textContent = name;
+    if ($('panelName')) $('panelName').textContent = state.user.name || 'User';
+    if ($('panelEmail')) $('panelEmail').textContent = state.user.email || 'user@example.com';
+    if ($('sideRoleTag')) $('sideRoleTag').textContent = state.role;
 
-    loadNotes();
-    refresh();
+    let searchTimeout;
+    $('noteSearch')?.addEventListener('input', e => {
+      noteState.search = e.target.value;
+      renderNotes();
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(loadNotes, 350);
+    });
 
-    $('noteSearch').addEventListener('input', e => { noteState.search = e.target.value; renderNotes(); });
-    $('noteSort').addEventListener('change', e => { noteState.sort = e.target.value; renderNotes(); });
+    $('noteSort')?.addEventListener('change', e => {
+      noteState.sort = e.target.value;
+      renderNotes();
+    });
 
     document.addEventListener('click', e => { if (e.target.id === 'noteModal') closeNoteModal(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('noteModal') && !$('noteModal').classList.contains('hidden')) closeNoteModal(); });
@@ -483,7 +554,9 @@
     bindVault();
     bindAntiForensic();
 
-    console.log('%c✅ NOTES READY (role:', 'color:#22d3ee;font-weight:bold', state.role + ')');
+    await loadNotes();
+
+    console.log('%c✅ NOTES CONNECTED TO MONGODB (role:', 'color:#22d3ee;font-weight:bold', state.role + ')');
   });
 
 })();

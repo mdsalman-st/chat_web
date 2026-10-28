@@ -258,13 +258,59 @@
       return;
     }
 
-    // Render
+    // Render fake UI initially
     renderWelcome();
     renderStats();
     renderMain();
     renderSecondary();
     renderSide();
     bindDropdowns();
+
+    // 🔥 Fetch REAL stats and update
+    try {
+      const taskStats = await API.tasks.stats();
+      const noteStats = await API.notes.stats();
+
+      const t = taskStats.stats;
+      const n = noteStats.stats;
+
+      // Update the statRow manually with REAL data
+      const row = $('statRow');
+      if (row) {
+        row.innerHTML = `
+          <div class="nx-card p-4 bg-gradient-to-br from-cyan-500/15 to-cyan-500/[0.03] border border-cyan-500/20">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-[10px] font-bold uppercase tracking-[0.15em] text-cyan-300">Total Tasks</p>
+              <span class="text-base">📋</span>
+            </div>
+            <p class="text-2xl font-black text-white leading-none">${t.total}</p>
+          </div>
+          <div class="nx-card p-4 bg-gradient-to-br from-emerald-500/15 to-emerald-500/[0.03] border border-emerald-500/20">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-[10px] font-bold uppercase tracking-[0.15em] text-emerald-300">Completed</p>
+              <span class="text-base">✅</span>
+            </div>
+            <p class="text-2xl font-black text-white leading-none">${t.done}</p>
+          </div>
+          <div class="nx-card p-4 bg-gradient-to-br from-amber-500/15 to-amber-500/[0.03] border border-amber-500/20">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-[10px] font-bold uppercase tracking-[0.15em] text-amber-300">Pending Tasks</p>
+              <span class="text-base">⏳</span>
+            </div>
+            <p class="text-2xl font-black text-white leading-none">${t.pending}</p>
+          </div>
+          <div class="nx-card p-4 bg-gradient-to-br from-violet-500/15 to-violet-500/[0.03] border border-violet-500/20">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-[10px] font-bold uppercase tracking-[0.15em] text-violet-300">My Notes</p>
+              <span class="text-base">📝</span>
+            </div>
+            <p class="text-2xl font-black text-white leading-none">${n.total}</p>
+          </div>
+        `;
+      }
+    } catch (err) {
+      console.error('Failed to load real stats:', err);
+    }
 
     console.log('%c⚡ NEXUS DASHBOARD READY', 'color:#22d3ee;font-weight:bold');
     console.log('User:', state.user.name, '| Role:', state.role);

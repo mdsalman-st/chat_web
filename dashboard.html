@@ -10,14 +10,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: { extend: { colors: { ink: { 950:'#05070d',900:'#0a0e1a',850:'#0f1424',800:'#141a30',700:'#1f2740' } },
-        fontFamily: { sans: ['Inter','system-ui','sans-serif'] } } }
-    };
-  </script>
+  <script src="tailwind-config.js"></script>
   <link rel="stylesheet" href="vault.css">
+
+  <!-- 🔐 Bidirectional role guard — must be in <head> for early redirect -->
+  <script src="role-guard.js" data-page="staff"></script>
 
   <style>
     @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
@@ -105,15 +102,29 @@
           <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
           <span>Tasks</span>
         </a>
+        <a href="notes.html" class="nav-item">
+          <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+          <span>Notes</span>
+        </a>
         <a href="analytics.html" class="nav-item">
           <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
           <span>Analytics</span>
         </a>
 
         <p class="px-3 pt-4 pb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500">Workspace</p>
-        <a href="notes.html" class="nav-item">
-          <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-          <span>Notes</span>
+        <a href="calendar.html" class="nav-item">
+          <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <span>Calendar</span>
+        </a>
+        <a href="files.html" class="nav-item">
+          <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+          <span>Files</span>
+        </a>
+
+        <p class="px-3 pt-4 pb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500">Account</p>
+        <a href="settings.html" class="nav-item">
+          <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span>Settings</span>
         </a>
         <a href="pages.html" class="nav-item">
           <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -183,6 +194,10 @@
                   <p id="panelName" class="text-sm font-bold text-white">User</p>
                   <p id="panelEmail" class="text-[11px] text-slate-500 truncate">user@example.com</p>
                 </div>
+                <a href="settings.html" class="dropdown-item">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
+                  <span>Account Settings</span>
+                </a>
                 <a href="pages.html?tab=contact" class="dropdown-item">
                   <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                   <span>Help & Support</span>
@@ -200,7 +215,6 @@
 
       <!-- CONTENT -->
       <main class="flex-1 px-4 sm:px-6 py-8">
-
         <div class="anim anim-2 mb-8">
           <p class="text-xs uppercase tracking-[0.2em] text-cyan-400 font-bold mb-2">
             <span id="welcomeTime">Good morning</span>
@@ -211,27 +225,20 @@
           <p class="text-slate-400 text-sm max-w-xl" id="welcomeMsg">Here's what's happening today.</p>
         </div>
 
+        <!-- Real Stats Row (API Connected) -->
         <div id="statRow" class="anim anim-3 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-8"></div>
 
-        <div class="anim anim-4 grid grid-cols-1 lg:grid-cols-3 gap-5 mb-8">
+        <!-- Main Grid (Widgets) -->
+        <div class="anim anim-5 grid grid-cols-1 lg:grid-cols-3 gap-5 mb-8">
           <div class="lg:col-span-2 space-y-5">
             <div id="mainWidget" class="nx-card p-6"></div>
             <div id="secondaryWidget" class="nx-card p-6"></div>
           </div>
+
           <div class="space-y-5">
             <div id="sideWidget" class="nx-card p-6"></div>
-            <div class="nx-card p-5 border-cyan-500/20 bg-cyan-500/[0.03]">
-              <div class="flex items-start gap-3">
-                <span class="text-2xl leading-none">🔐</span>
-                <div>
-                  <h4 class="text-sm font-bold text-cyan-300 mb-1">Private Channel</h4>
-                  <p class="text-xs text-slate-400 leading-relaxed">Type your secret code in the search bar to open the encrypted workspace.</p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
-
       </main>
 
       <!-- FOOTER -->
@@ -243,118 +250,94 @@
     </div>
   </div>
 
-  <!-- Scripts -->
-<!-- ============================================================================
-     VAULT — Secret Chat (Paste this in every page, before </body>)
-     ============================================================================ -->
-
-<div id="chatVault" class="vault-overlay vault-hidden" role="region" aria-label="Private chat">
-
-  <!-- ══════════ HEADER ══════════ -->
-  <header class="vault-header">
-    <div class="vault-header-left">
-      <button type="button" class="vault-back-btn" id="vaultBackBtn" aria-label="Back">←</button>
-      <span class="vault-lock" aria-hidden="true">🔒</span>
-      <div class="vault-header-info">
-        <p class="vault-header-title">Secure Channel</p>
-        <p class="vault-header-status"><span class="vault-dot"></span> End-to-end encrypted</p>
+  <!-- ============================================================================
+       VAULT — Secret Chat
+       ============================================================================ -->
+  <div id="chatVault" class="vault-overlay vault-hidden" role="region" aria-label="Private chat">
+    <header class="vault-header">
+      <div class="vault-header-left">
+        <button type="button" class="vault-back-btn" id="vaultBackBtn" aria-label="Back">←</button>
+        <span class="vault-lock" aria-hidden="true">🔒</span>
+        <div class="vault-header-info">
+          <p class="vault-header-title">Secure Channel</p>
+          <p class="vault-header-status"><span class="vault-dot"></span> End-to-end encrypted</p>
+        </div>
       </div>
+      <button type="button" class="vault-exit-btn" id="vaultExitBtn" aria-label="Exit">✕ Exit</button>
+    </header>
+
+    <div class="vault-body">
+      <aside class="vault-sidebar" id="vaultSidebar">
+        <div class="vault-tabs">
+          <button type="button" class="vault-tab active" data-vtab="contacts">👥 Contacts</button>
+          <button type="button" class="vault-tab" data-vtab="rooms">🔗 Rooms</button>
+        </div>
+
+        <div class="vault-panel active" data-vpanel="contacts">
+          <div class="vault-search-row">
+            <input type="text" id="vaultContactSearch" placeholder="Search phone or username…" autocomplete="off" spellcheck="false" maxlength="30">
+          </div>
+          <div class="vault-list" id="vaultContactList">
+            <div class="vault-empty-list">
+              <span>🔍</span>
+              <p>Search for a contact to start chatting</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="vault-panel" data-vpanel="rooms">
+          <div class="vault-room-actions">
+            <button type="button" class="vault-action-btn primary" id="vaultCreateRoomBtn">
+              ✨ Create Room
+            </button>
+          </div>
+          <div class="vault-join-row">
+            <input type="text" id="vaultJoinCode" placeholder="Enter code e.g. GHOST-77" autocomplete="off" spellcheck="false" maxlength="12">
+            <button type="button" class="vault-join-btn" id="vaultJoinRoomBtn">Join</button>
+          </div>
+          <div class="vault-list" id="vaultRoomList">
+            <div class="vault-empty-list">
+              <span>🔗</span>
+              <p>No rooms yet. Create one or join with a code.</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <section class="vault-main" id="vaultMain">
+        <div class="vault-no-chat" id="vaultNoChat">
+          <div class="vault-no-chat-icon">💬</div>
+          <h3>No chat open</h3>
+          <p>Select a contact or room from the list</p>
+        </div>
+
+        <div class="vault-chat hidden" id="vaultChat">
+          <header class="vault-chat-header">
+            <button type="button" class="vault-chat-back" id="vaultChatBack" aria-label="Back to list">←</button>
+            <div class="vault-avatar" id="vaultChatAvatar">?</div>
+            <div class="vault-chat-info">
+              <p class="vault-chat-name" id="vaultChatName">Unknown</p>
+              <p class="vault-chat-status" id="vaultChatStatus">Offline</p>
+            </div>
+          </header>
+
+          <div class="vault-messages" id="vaultMessages"></div>
+
+          <footer class="vault-composer">
+            <input type="text" id="vaultMessageInput" placeholder="Type a message…" autocomplete="off" maxlength="2000">
+            <button type="button" class="vault-send-btn" id="vaultSendBtn" aria-label="Send message">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"/>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+            </button>
+          </footer>
+        </div>
+      </section>
     </div>
-    <button type="button" class="vault-exit-btn" id="vaultExitBtn" aria-label="Exit">✕ Exit</button>
-  </header>
-
-  <!-- ══════════ BODY ══════════ -->
-  <div class="vault-body">
-
-    <!-- ───── SIDEBAR (list side) ───── -->
-    <aside class="vault-sidebar" id="vaultSidebar">
-
-      <!-- Tabs: Contacts | Rooms -->
-      <div class="vault-tabs">
-        <button type="button" class="vault-tab active" data-vtab="contacts">👥 Contacts</button>
-        <button type="button" class="vault-tab" data-vtab="rooms">🔗 Rooms</button>
-      </div>
-
-      <!-- Contacts Panel -->
-      <div class="vault-panel active" data-vpanel="contacts">
-        <div class="vault-search-row">
-          <input type="text" id="vaultContactSearch" placeholder="Search phone or username…" autocomplete="off" spellcheck="false" maxlength="30">
-        </div>
-        <div class="vault-list" id="vaultContactList">
-          <div class="vault-empty-list">
-            <span>🔍</span>
-            <p>Search for a contact to start chatting</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Rooms Panel -->
-      <div class="vault-panel" data-vpanel="rooms">
-        <div class="vault-room-actions">
-          <button type="button" class="vault-action-btn primary" id="vaultCreateRoomBtn">
-            ✨ Create Room
-          </button>
-        </div>
-        <div class="vault-join-row">
-          <input type="text" id="vaultJoinCode" placeholder="Enter code e.g. GHOST-77" autocomplete="off" spellcheck="false" maxlength="12">
-          <button type="button" class="vault-join-btn" id="vaultJoinRoomBtn">Join</button>
-        </div>
-        <div class="vault-list" id="vaultRoomList">
-          <div class="vault-empty-list">
-            <span>🔗</span>
-            <p>No rooms yet. Create one or join with a code.</p>
-          </div>
-        </div>
-      </div>
-
-    </aside>
-
-    <!-- ───── MAIN (chat side) ───── -->
-    <section class="vault-main" id="vaultMain">
-
-      <!-- Empty state -->
-      <div class="vault-no-chat" id="vaultNoChat">
-        <div class="vault-no-chat-icon">💬</div>
-        <h3>No chat open</h3>
-        <p>Select a contact or room from the list</p>
-      </div>
-
-      <!-- Active chat -->
-      <div class="vault-chat hidden" id="vaultChat">
-
-        <header class="vault-chat-header">
-          <button type="button" class="vault-chat-back" id="vaultChatBack" aria-label="Back to list">←</button>
-          <div class="vault-avatar" id="vaultChatAvatar">?</div>
-          <div class="vault-chat-info">
-            <p class="vault-chat-name" id="vaultChatName">Unknown</p>
-            <p class="vault-chat-status" id="vaultChatStatus">Offline</p>
-          </div>
-        </header>
-
-        <div class="vault-messages" id="vaultMessages"></div>
-
-        <footer class="vault-composer">
-          <input type="text" id="vaultMessageInput" placeholder="Type a message…" autocomplete="off" maxlength="2000">
-          <button type="button" class="vault-send-btn" id="vaultSendBtn" aria-label="Send message">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="22" y1="2" x2="11" y2="13"/>
-              <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-            </svg>
-          </button>
-        </footer>
-
-      </div>
-
-    </section>
-
   </div>
 
-</div>
-
-  
-  
-  
-  
+  <!-- App scripts (existing) -->
   <script src="api.js"></script>
   <script src="socket-client.js"></script>
   <script src="vault.js"></script>

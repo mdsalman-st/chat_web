@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Answer Sheet — Nexus</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="tailwind-config.js"></script>
+  <link rel="stylesheet" href="vault.css">
+  <script src="role-guard.js" data-page="student"></script>
+</head>
+<body class="min-h-screen bg-[#05070d] text-slate-200 font-sans antialiased p-6 flex flex-col items-center justify-center">
+  <div class="max-w-lg w-full p-8 rounded-3xl bg-white/[0.03] border border-white/10 text-center shadow-2xl backdrop-blur-xl">
+    <div class="w-16 h-16 rounded-2xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-3xl mx-auto mb-4 border border-cyan-500/30">
+      📄
+    </div>
+    <h1 class="text-2xl font-black text-white mb-2">Upload Answer Sheet</h1>
+    <p class="text-sm text-slate-400 mb-6">
+      Upload handwritten PDFs or photos of your subjective board papers for AI vision evaluation against official board marking schemes.
+    </p>
+    <div class="p-4 rounded-xl bg-cyan-500/[0.05] border border-cyan-500/20 text-xs text-cyan-300 font-semibold mb-6">
+      🚀 Configured for Phase 6: OCR Handwriting recognition &amp; marking scheme matching.
+    </div>
+    <div class="flex gap-3 justify-center">
+      <a href="test-select.html" class="px-5 py-2.5 rounded-xl bg-cyan-500 text-ink-950 font-bold text-xs hover:bg-cyan-400 transition">
+        Take Mock Tests
+      </a>
+      <a href="student-dashboard.html" class="px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white font-bold text-xs transition">
+        Back to Dashboard
+      </a>
+    </div>
+  </div>
+</body>
+</html>

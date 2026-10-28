@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings — Nexus</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            ink: { 950:'#05070d', 900:'#0a0e1a', 850:'#0f1424', 800:'#141a30', 700:'#1f2740' }
+          },
+          fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="vault.css">
+
+  <style>
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+    @keyframes shimmer { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+    @keyframes float1 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(50px,30px) scale(1.08)} }
+    @keyframes float2 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(-60px,-40px) scale(1.1)} }
+    @keyframes rise { 0%{transform:translateY(0);opacity:0} 10%{opacity:1} 90%{opacity:1} 100%{transform:translateY(-110vh);opacity:0} }
+    @keyframes slideInRight { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+
+    .grad-text { background:linear-gradient(90deg,#22d3ee,#3b82f6,#8b5cf6,#22d3ee); background-size:300% 100%; -webkit-background-clip:text; background-clip:text; color:transparent; animation:shimmer 6s ease infinite; }
+    .anim { opacity:0; animation-fill-mode:forwards; animation-timing-function:cubic-bezier(0.16,1,0.3,1); }
+    .anim-1 { animation:fadeUp 0.6s 0.05s forwards; }
+    .anim-2 { animation:fadeUp 0.6s 0.15s forwards; }
+    .anim-3 { animation:fadeUp 0.6s 0.25s forwards; }
+
+    .particles { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+    .particle { position:absolute; border-radius:50%; background:rgba(34,211,238,0.5); box-shadow:0 0 8px rgba(34,211,238,0.9); animation:rise linear infinite; }
+    .orb-1 { animation:float1 20s ease-in-out infinite; }
+    .orb-2 { animation:float2 24s ease-in-out infinite; }
+
+    .nx-card { background:rgba(255,255,255,0.03); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,0.08); border-radius:1.25rem; transition:all 0.3s cubic-bezier(0.16,1,0.3,1); }
+
+    .nav-item { display:flex; align-items:center; gap:0.75rem; padding:0.7rem 0.9rem; border-radius:0.75rem; color:#94a3b8; font-size:0.875rem; font-weight:500; cursor:pointer; transition:all 0.2s ease; border:1px solid transparent; text-decoration:none; }
+    .nav-item:hover { background:rgba(255,255,255,0.04); color:#fff; }
+    .nav-item.active { background:linear-gradient(135deg,rgba(34,211,238,0.15),rgba(59,130,246,0.1)); color:#67e8f9; border-color:rgba(34,211,238,0.25); }
+    .nav-icon { width:18px; height:18px; flex-shrink:0; }
+
+    .dropdown-panel { position:absolute; top:calc(100% + 8px); right:0; min-width:220px; background:#0f1424; border:1px solid rgba(255,255,255,0.1); border-radius:1rem; padding:0.5rem; box-shadow:0 20px 50px rgba(0,0,0,0.5); z-index:50; animation:slideInRight 0.2s cubic-bezier(0.16,1,0.3,1) forwards; }
+    .dropdown-item { display:flex; align-items:center; gap:0.7rem; padding:0.6rem 0.75rem; border-radius:0.6rem; font-size:0.85rem; color:#cbd5e1; cursor:pointer; transition:all 0.15s ease; text-decoration:none; }
+    .dropdown-item:hover { background:rgba(255,255,255,0.05); color:#fff; }
+    .dropdown-item.danger:hover { background:rgba(220,38,38,0.15); color:#fca5a5; }
+
+    .sidebar { transition:transform 0.3s cubic-bezier(0.16,1,0.3,1); }
+    @media (max-width: 1023px) {
+      .sidebar { transform:translateX(-100%); }
+      .sidebar.open { transform:translateX(0); }
+    }
+
+    .secret-vector:focus { border-color:#22d3ee; box-shadow:0 0 0 4px rgba(34,211,238,0.15), 0 0 30px rgba(34,211,238,0.3); }
+
+    .setting-tab-btn { padding:0.65rem 1rem; border-radius:0.75rem; font-size:0.85rem; font-weight:600; color:#94a3b8; cursor:pointer; transition:all 0.2s; border:1px solid transparent; text-align:left; width:100%; display:flex; align-items:center; gap:0.6rem; }
+    .setting-tab-btn:hover { background:rgba(255,255,255,0.04); color:#fff; }
+    .setting-tab-btn.active { background:rgba(34,211,238,0.12); color:#67e8f9; border-color:rgba(34,211,238,0.3); }
+  </style>
+</head>
+
+<body class="min-h-screen relative overflow-x-hidden bg-ink-950 text-slate-200 font-sans antialiased">
+
+  <!-- Background decorations -->
+  <div class="fixed inset-0 pointer-events-none z-0 [background-image:linear-gradient(rgba(34,211,238,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(34,211,238,0.03)_1px,transparent_1px)] [background-size:60px_60px] [mask-image:radial-gradient(ellipse_at_top,black_20%,transparent_80%)]"></div>
+  <div class="orb-1 fixed rounded-full pointer-events-none z-0 blur-[120px] opacity-40 w-[400px] h-[400px] top-[-80px] left-[10%] bg-[radial-gradient(circle,#06b6d4,transparent_70%)]"></div>
+  <div class="orb-2 fixed rounded-full pointer-events-none z-0 blur-[120px] opacity-40 w-[400px] h-[400px] bottom-[-80px] right-[10%] bg-[radial-gradient(circle,#6366f1,transparent_70%)]"></div>
+  <div class="particles" id="particles"></div>
+
+  <div id="sidebarBackdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+  <div class="relative z-10 min-h-screen flex">
+
+    <!-- ══════════════ SIDEBAR ══════════════ -->
+    <aside id="sidebar" class="sidebar fixed lg:sticky top-0 left-0 z-50 w-64 h-screen bg-ink-900/95 backdrop-blur-xl border-r border-white/[0.06] flex flex-col">
+      <div class="p-5 border-b border-white/[0.06]">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white text-base font-bold shadow-[0_0_20px_rgba(34,211,238,0.4)]">⚡</div>
+          <div>
+            <p class="text-base font-black text-white leading-tight">Nexus</p>
+            <p class="text-[10px] font-semibold uppercase tracking-[0.15em] text-cyan-400" id="sideRoleTag">...</p>
+          </div>
+          <button class="lg:hidden ml-auto text-slate-400 hover:text-white" onclick="toggleSidebar()">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <nav class="flex-1 overflow-y-auto p-3 space-y-1">
+        <!-- Main Section -->
+        <p class="px-3 pt-3 pb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500">Main</p>
+        <a href="dashboard.html" class="nav-item">
+          <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
+          <span>Dashboard</span>
+        </a>
+        <a href="tasks.html" class="nav-item">
+          <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+          <span>Tasks</span>
+        </a>
+        <a href="notes.html" class="nav-item">
+          <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+          <span>Notes</span>
+        </a>
+        <a href="analytics.html" class="nav-item">
+          <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          <span>Analytics</span>
+        </a>
+
+        <!-- Workspace Section -->
+        <p class="px-3 pt-4 pb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500">Workspace</p>
+        <a href="calendar.html" class="nav-item">
+          <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <span>Calendar</span>
+        </a>
+        <a href="files.html" class="nav-item">
+          <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+          <span>Files</span>
+        </a>
+
+        <!-- Account Section -->
+        <p class="px-3 pt-4 pb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500">Account</p>
+        <a href="settings.html" class="nav-item active">
+          <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span>Settings</span>
+        </a>
+        <a href="pages.html" class="nav-item">
+          <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>Help & Pages</span>
+        </a>
+        <a href="#" class="nav-item" onclick="event.preventDefault(); handleLogout()">
+          <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          <span>Logout</span>
+        </a>
+      </nav>
+
+      <div class="p-3 border-t border-white/[0.06]">
+        <div class="p-3 rounded-xl bg-cyan-500/[0.05] border border-cyan-500/20">
+          <p class="text-[10px] font-bold uppercase tracking-wider text-cyan-300 mb-1">🔐 Private Channel</p>
+          <p class="text-[10px] text-slate-400 leading-relaxed">Type secret code in search bar</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ══════════════ MAIN ══════════════ -->
+    <div class="flex-1 min-w-0 flex flex-col">
+
+      <!-- TOPBAR -->
+      <header class="sticky top-0 z-30 backdrop-blur-xl bg-ink-950/70 border-b border-white/[0.06]">
+        <div class="px-4 sm:px-6 py-3 flex items-center gap-3">
+          <button class="lg:hidden w-9 h-9 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-slate-400 hover:text-white" onclick="toggleSidebar()">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+
+          <div class="flex-1 max-w-md">
+            <div class="relative">
+              <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
+              <input type="text" id="secretVector" autocomplete="off" spellcheck="false" placeholder="Search settings or secret code…"
+                     class="secret-vector w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white text-sm placeholder-slate-500 focus:outline-none transition-all">
+            </div>
+          </div>
+
+          <div class="ml-auto flex items-center gap-2">
+            <!-- Notifications -->
+            <div class="relative">
+              <button id="notifBtn" class="relative w-9 h-9 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] flex items-center justify-center text-slate-400 hover:text-white transition-all">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 00-4-5.7V5a2 2 0 10-4 0v.3A6 6 0 006 11v3.2c0 .5-.2 1-.6 1.4L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-cyan-400 border-2 border-ink-950"></span>
+              </button>
+              <div id="notifPanel" class="dropdown-panel hidden" style="min-width:320px">
+                <div class="flex items-center justify-between px-2 py-1.5 mb-1">
+                  <p class="text-xs font-bold text-white">Notifications</p>
+                </div>
+                <div class="dropdown-item">
+                  <div class="w-8 h-8 rounded-lg bg-cyan-500/15 text-cyan-300 flex items-center justify-center text-sm">⚙️</div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-xs font-semibold text-white">Account Settings</p>
+                    <p class="text-[10px] text-slate-500 mt-0.5">Profile & preferences synced</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Profile Menu -->
+            <div class="relative">
+              <button id="profileBtn" class="flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] transition-all">
+                <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center text-white font-bold text-xs">
+                  <span id="avatarLetter">U</span>
+                </div>
+                <span id="profileName" class="hidden sm:block text-xs font-semibold text-white max-w-[100px] truncate">User</span>
+              </button>
+              <div id="profilePanel" class="dropdown-panel hidden">
+                <div class="px-3 py-2 mb-1 border-b border-white/[0.06]">
+                  <p id="panelName" class="text-sm font-bold text-white">User</p>
+                  <p id="panelEmail" class="text-[11px] text-slate-500 truncate">user@example.com</p>
+                </div>
+                <a href="pages.html?tab=contact" class="dropdown-item">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <span>Help & Support</span>
+                </a>
+                <div class="my-1 border-t border-white/[0.06]"></div>
+                <div class="dropdown-item danger" onclick="handleLogout()">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                  <span>Logout</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- CONTENT -->
+      <main class="flex-1 px-4 sm:px-6 py-8">
+
+        <!-- Title -->
+        <div class="anim anim-1 mb-8">
+          <p class="text-xs uppercase tracking-[0.2em] text-cyan-400 font-bold mb-1">Account & Preferences</p>
+          <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">System Settings</h1>
+          <p class="text-slate-400 text-xs sm:text-sm mt-0.5">Customize your profile, security, and workspace features.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 anim anim-2">
+
+          <!-- Left Navigation Menu Tabs -->
+          <div class="space-y-2">
+            <div class="nx-card p-3 space-y-1">
+              <button onclick="switchSettingsTab('profile')" class="setting-tab-btn active" data-stab="profile">
+                <span>👤</span> Profile Information
+              </button>
+              <button onclick="switchSettingsTab('security')" class="setting-tab-btn" data-stab="security">
+                <span>🔐</span> Security & Private Channel
+              </button>
+              <button onclick="switchSettingsTab('preferences')" class="setting-tab-btn" data-stab="preferences">
+                <span>🎨</span> Workspace Preferences
+              </button>
+              <button onclick="switchSettingsTab('account')" class="setting-tab-btn" data-stab="account">
+                <span>⚡</span> Sessions & Data
+              </button>
+            </div>
+
+            <!-- Profile Summary Card -->
+            <div class="nx-card p-5 text-center">
+              <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-cyan-500 to-violet-600 text-white font-black text-2xl flex items-center justify-center mx-auto mb-3 shadow-[0_0_25px_rgba(34,211,238,0.3)]">
+                <span id="settingsBigAvatar">U</span>
+              </div>
+              <h3 id="settingsDisplayName" class="text-sm font-bold text-white">User</h3>
+              <p id="settingsDisplayEmail" class="text-xs text-slate-400 truncate mt-0.5">user@example.com</p>
+              <span id="settingsRoleBadge" class="inline-block mt-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-cyan-500/15 text-cyan-300 border border-cyan-500/20">
+                Workspace
+              </span>
+            </div>
+          </div>
+
+          <!-- Right Content Area -->
+          <div class="lg:col-span-3 space-y-6">
+
+            <!-- 1. PROFILE TAB -->
+            <div id="tab-profile" class="nx-card p-6">
+              <h2 class="text-base font-bold text-white mb-1">Personal Profile</h2>
+              <p class="text-xs text-slate-400 mb-6">Manage how your name and role appear across the workspace.</p>
+
+              <form id="profileForm" onsubmit="handleSaveProfile(event)" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1.5">Full Name</label>
+                    <input type="text" id="settingName" required
+                           class="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white text-sm focus:border-cyan-400 focus:outline-none transition-all">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1.5">Email Address</label>
+                    <input type="email" id="settingEmail" readonly
+                           class="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.02] border border-white/[0.05] text-slate-400 text-sm cursor-not-allowed">
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1.5">Role / Profession</label>
+                    <select id="settingRole" class="w-full px-3.5 py-2.5 rounded-xl bg-ink-850 border border-white/[0.08] text-white text-sm focus:border-cyan-400 focus:outline-none">
+                      <option value="student">🎓 Student</option>
+                      <option value="developer">💻 Developer / Engineer</option>
+                      <option value="employee">💼 Employee / Professional</option>
+                      <option value="freelancer">🧑‍💻 Freelancer</option>
+                      <option value="creator">🎨 Creator</option>
+                      <option value="trader">📈 Trader / Financial</option>
+                      <option value="teacher">📚 Educator / Teacher</option>
+                      <option value="doctor">🩺 Healthcare / Doctor</option>
+                      <option value="other">✨ Other</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1.5">Status Message</label>
+                    <input type="text" id="settingStatusMsg" placeholder="e.g. Focus Mode, Coding, Available"
+                           class="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white text-sm focus:border-cyan-400 focus:outline-none transition-all">
+                  </div>
+                </div>
+
+                <div class="pt-2 flex justify-end">
+                  <button type="submit" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-xs font-semibold hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] transition-all">
+                    Save Profile Changes
+                  </button>
+                </div>
+              </form>
+
+              <!-- Academic Profile (Student Test Module) -->
+              <div id="academicProfileSection" class="mt-8 pt-6 border-t border-white/[0.08]">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-xl">🎓</span>
+                    <div>
+                      <h3 class="text-sm font-bold text-white">Academic Curriculum &amp; Board</h3>
+                      <p class="text-xs text-slate-400">Class changes every year. Your mock tests and AI papers adapt to this profile.</p>
+                    </div>
+                  </div>
+                  <div>
+                    <span id="acadProfileBadge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+                      <span class="status-dot"></span>
+                      <span id="acadBadgeText">Class 10 • BSEB • Hindi</span>
+                    </span>
+                  </div>
+                </div>
+
+                <form id="academicForm" onsubmit="handleSaveAcademicProfile(event)" class="space-y-4">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-xs font-semibold text-slate-300 mb-1.5">Exam Board</label>
+                      <select id="acadSettingBoard" class="w-full px-3.5 py-2.5 rounded-xl bg-ink-850 border border-white/[0.08] text-white text-sm focus:border-cyan-400 focus:outline-none transition-all"></select>
+                    </div>
+                    <div>
+                      <label class="block text-xs font-semibold text-slate-300 mb-1.5">Class</label>
+                      <select id="acadSettingClass" class="w-full px-3.5 py-2.5 rounded-xl bg-ink-850 border border-white/[0.08] text-white text-sm focus:border-cyan-400 focus:outline-none transition-all">
+                        <option value="10">Class 10 (Secondary / Matric)</option>
+                        <option value="12">Class 12 (Senior Secondary / Inter)</option>
+                        <option value="9">Class 9</option>
+                        <option value="11">Class 11</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Other Board Input (conditional) -->
+                  <div id="acadSettingOtherWrap" class="hidden">
+                    <label class="block text-xs font-semibold text-cyan-300 mb-1.5">Custom Board / University Name</label>
+                    <input type="text" id="acadSettingOther" placeholder="Enter board name"
+                           class="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.04] border border-cyan-500/30 text-white text-sm focus:border-cyan-400 focus:outline-none">
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Stream (conditional for 11/12) -->
+                    <div id="acadSettingStreamWrap" class="hidden">
+                      <label class="block text-xs font-semibold text-slate-300 mb-1.5">Stream</label>
+                      <select id="acadSettingStream" class="w-full px-3.5 py-2.5 rounded-xl bg-ink-850 border border-white/[0.08] text-white text-sm focus:border-cyan-400 focus:outline-none transition-all">
+                        <option value="science_pcm">Science (PCM)</option>
+                        <option value="science_pcb">Science (PCB)</option>
+                        <option value="commerce">Commerce</option>
+                        <option value="arts">Arts / Humanities</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="block text-xs font-semibold text-slate-300 mb-1.5">Language / Medium</label>
+                      <select id="acadSettingMedium" class="w-full px-3.5 py-2.5 rounded-xl bg-ink-850 border border-white/[0.08] text-white text-sm focus:border-cyan-400 focus:outline-none transition-all">
+                        <option value="Hindi">🇮🇳 Hindi (हिन्दी)</option>
+                        <option value="English">🇬🇧 English</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1.5">Enrolled Subjects</label>
+                    <div id="acadSettingSubjects" class="grid grid-cols-2 sm:grid-cols-3 gap-2 p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] max-h-44 overflow-y-auto">
+                      <span class="text-xs text-slate-500 col-span-3">Loading subjects…</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1.5">Academic Goal</label>
+                    <input type="text" id="acadSettingGoal" placeholder="e.g. 95%+ in Board Exam"
+                           class="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white text-sm focus:border-cyan-400 focus:outline-none transition-all">
+                  </div>
+
+                  <div class="pt-2 flex justify-end">
+                    <button type="submit" id="saveAcadBtn" class="px-5 py-2.5 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/40 text-cyan-300 text-xs font-bold transition-all">
+                      Update Academic Profile
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- 2. SECURITY TAB -->
+            <div id="tab-security" class="nx-card p-6 hidden">
+              <h2 class="text-base font-bold text-white mb-1">Security & Secret Channel</h2>
+              <p class="text-xs text-slate-400 mb-6">Configure access tokens, private vault triggers, and credentials.</p>
+
+              <!-- Secret Vector configuration -->
+              <div class="p-4 rounded-xl bg-cyan-500/[0.04] border border-cyan-500/20 mb-6">
+                <div class="flex items-start gap-3">
+                  <span class="text-2xl">🔐</span>
+                  <div class="flex-1">
+                    <h4 class="text-sm font-bold text-cyan-300 mb-0.5">Private Channel Trigger Code</h4>
+                    <p class="text-xs text-slate-400 mb-3">Typing this exact keyword in the top search bar instantly unlocks your end-to-end encrypted private vault chat.</p>
+
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 max-w-md">
+                      <input type="text" id="settingSecretCode" placeholder="Enter secret code (e.g. nexus, 007)"
+                             class="flex-1 px-3.5 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white text-sm font-mono focus:border-cyan-400 focus:outline-none">
+                      <button onclick="handleSaveSecretCode()" class="px-4 py-2 rounded-xl bg-cyan-500 text-ink-950 font-bold text-xs hover:bg-cyan-400 transition-all">
+                        Update Code
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Password change simulation / updates -->
+              <form id="passwordForm" onsubmit="handleUpdatePassword(event)" class="space-y-4">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Update Password</h4>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1.5">New Password</label>
+                    <input type="password" id="newPassword" placeholder="••••••••"
+                           class="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white text-sm focus:border-cyan-400 focus:outline-none transition-all">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1.5">Confirm Password</label>
+                    <input type="password" id="confirmPassword" placeholder="••••••••"
+                           class="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white text-sm focus:border-cyan-400 focus:outline-none transition-all">
+                  </div>
+                </div>
+
+                <div class="pt-2 flex justify-end">
+                  <button type="submit" class="px-5 py-2.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-white text-xs font-semibold border border-white/10 transition-all">
+                    Update Password
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- 3. PREFERENCES TAB -->
+            <div id="tab-preferences" class="nx-card p-6 hidden">
+              <h2 class="text-base font-bold text-white mb-1">Workspace Preferences</h2>
+              <p class="text-xs text-slate-400 mb-6">Tailor your interface theme, sounds, and view density.</p>
+
+              <div class="space-y-5">
+                <div class="flex items-center justify-between pb-4 border-b border-white/[0.06]">
+                  <div>
+                    <p class="text-sm font-semibold text-white">Audio Feedback & Chimes</p>
+                    <p class="text-xs text-slate-400">Play subtle sound alerts on incoming messages and completed tasks.</p>
+                  </div>
+                  <input type="checkbox" id="prefSound" checked onchange="savePreferences()" class="w-5 h-5 accent-cyan-400 rounded cursor-pointer">
+                </div>
+
+                <div class="flex items-center justify-between pb-4 border-b border-white/[0.06]">
+                  <div>
+                    <p class="text-sm font-semibold text-white">Browser Push Notifications</p>
+                    <p class="text-xs text-slate-400">Receive alert popups when deadlines are nearing.</p>
+                  </div>
+                  <input type="checkbox" id="prefNotif" checked onchange="savePreferences()" class="w-5 h-5 accent-cyan-400 rounded cursor-pointer">
+                </div>
+
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm font-semibold text-white">Compact Density Mode</p>
+                    <p class="text-xs text-slate-400">Show more information on screen with tighter padding.</p>
+                  </div>
+                  <input type="checkbox" id="prefCompact" onchange="savePreferences()" class="w-5 h-5 accent-cyan-400 rounded cursor-pointer">
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. ACCOUNT & DATA TAB -->
+            <div id="tab-account" class="nx-card p-6 hidden">
+              <h2 class="text-base font-bold text-white mb-1">Session & Storage Data</h2>
+              <p class="text-xs text-slate-400 mb-6">Manage local cache, device tokens, and sign-out options.</p>
+
+              <div class="space-y-4">
+                <div class="p-4 rounded-xl bg-white/[0.02] border border-white/[0.05] flex items-center justify-between">
+                  <div>
+                    <p class="text-sm font-semibold text-white">Current Active Session</p>
+                    <p class="text-xs text-slate-400">Web Browser • Signed in via JWT</p>
+                  </div>
+                  <span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-emerald-500/20 text-emerald-300">Active Now</span>
+                </div>
+
+                <div class="p-4 rounded-xl bg-white/[0.02] border border-white/[0.05] flex items-center justify-between">
+                  <div>
+                    <p class="text-sm font-semibold text-white">Clear Cached Assets</p>
+                    <p class="text-xs text-slate-400">Purge local temporary state, preview files, and cached badges.</p>
+                  </div>
+                  <button onclick="handleClearCache()" class="px-3.5 py-1.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-xs font-semibold text-slate-300 transition-all">
+                    Clear Cache
+                  </button>
+                </div>
+
+                <div class="p-4 rounded-xl bg-red-500/[0.04] border border-red-500/20 flex items-center justify-between">
+                  <div>
+                    <p class="text-sm font-semibold text-rose-300">Sign Out Everywhere</p>
+                    <p class="text-xs text-slate-400">Terminate all sessions and return to the login screen.</p>
+                  </div>
+                  <button onclick="handleLogout()" class="px-4 py-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-300 text-xs font-semibold transition-all">
+                    Sign Out
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </main>
+
+      <!-- FOOTER -->
+      <footer class="border-t border-white/[0.06] bg-ink-900/50 backdrop-blur-xl mt-auto">
+        <div class="px-4 sm:px-6 py-6 text-center">
+          <p class="text-[11px] text-slate-500">© 2026 Nexus. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="api.js"></script>
+  <script src="settings.js"></script>
+</body>
+</html>

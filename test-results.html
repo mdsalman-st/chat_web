@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Results — Nexus</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="tailwind-config.js"></script>
+  <link rel="stylesheet" href="vault.css">
+  <script src="role-guard.js" data-page="student"></script>
+
+  <style>
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes shimmer { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+    @keyframes countUp { from{opacity:0;transform:scale(0.5)} to{opacity:1;transform:scale(1)} }
+    @keyframes slideIn { from{opacity:0;transform:translateX(-20px)} to{opacity:1;transform:translateX(0)} }
+
+    .grad-text { background:linear-gradient(90deg,#22d3ee,#3b82f6,#8b5cf6,#22d3ee); background-size:300% 100%; -webkit-background-clip:text; background-clip:text; color:transparent; animation:shimmer 6s ease infinite; }
+    .nx-card { background:rgba(255,255,255,0.03); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,0.08); border-radius:1.25rem; transition:all 0.3s cubic-bezier(0.16,1,0.3,1); }
+    .anim { opacity:0; animation:fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) forwards; }
+    .score-pop { animation:countUp 0.5s cubic-bezier(0.16,1,0.3,1) forwards; }
+    .answer-slide { animation:slideIn 0.3s cubic-bezier(0.16,1,0.3,1) forwards; }
+
+    .nav-item { display:flex; align-items:center; gap:0.75rem; padding:0.7rem 0.9rem; border-radius:0.75rem; color:#94a3b8; font-size:0.875rem; font-weight:500; cursor:pointer; transition:all 0.2s ease; border:1px solid transparent; text-decoration:none; }
+    .nav-item:hover { background:rgba(255,255,255,0.04); color:#fff; }
+    .nav-item.active { background:linear-gradient(135deg,rgba(34,211,238,0.15),rgba(59,130,246,0.1)); color:#67e8f9; border-color:rgba(34,211,238,0.25); }
+    .nav-icon { width:18px; height:18px; flex-shrink:0; }
+    .sidebar { transition:transform 0.3s cubic-bezier(0.16,1,0.3,1); }
+    @media (max-width: 1023px) { .sidebar { transform:translateX(-100%); } .sidebar.open { transform:translateX(0); } }
+  </style>
+</head>
+
+<body class="min-h-screen relative overflow-x-hidden bg-ink-950 text-slate-200 font-sans antialiased">
+
+  <!-- Background -->
+  <div class="fixed inset-0 pointer-events-none z-0 [background-image:linear-gradient(rgba(34,211,238,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(34,211,238,0.03)_1px,transparent_1px)] [background-size:60px_60px] [mask-image:radial-gradient(ellipse_at_top,black_20%,transparent_80%)]"></div>
+  <div class="fixed rounded-full pointer-events-none z-0 blur-[120px] opacity-30 w-[350px] h-[350px] top-[-60px] left-[5%] bg-[radial-gradient(circle,#06b6d4,transparent_70%)]"></div>
+  <div class="fixed rounded-full pointer-events-none z-0 blur-[120px] opacity-30 w-[350px] h-[350px] bottom-[-60px] right-[5%] bg-[radial-gradient(circle,#6366f1,transparent_70%)]"></div>
+
+  <div id="sidebarBackdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+  <div class="relative z-10 min-h-screen flex">
+
+    <!-- ══════════════ SIDEBAR ══════════════ -->
+    <aside id="sidebar" class="sidebar fixed lg:sticky top-0 left-0 z-50 w-64 h-screen bg-ink-900/95 backdrop-blur-xl border-r border-white/[0.06] flex flex-col">
+      <div class="p-5 border-b border-white/[0.06]">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white text-base font-bold shadow-[0_0_20px_rgba(34,211,238,0.4)]">⚡</div>
+          <div>
+            <p class="text-base font-black text-white leading-tight">Nexus</p>
+            <p class="text-[10px] font-semibold uppercase tracking-[0.15em] text-cyan-400">Student</p>
+          </div>
+          <button class="lg:hidden ml-auto text-slate-400 hover:text-white" onclick="toggleSidebar()">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <nav class="flex-1 overflow-y-auto p-3 space-y-1">
+        <p class="px-3 pt-3 pb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500">Main</p>
+        <a href="student-dashboard.html" class="nav-item">
+          <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
+          <span>Dashboard</span>
+        </a>
+        <a href="tasks.html" class="nav-item">
+          <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+          <span>Tasks</span>
+        </a>
+        <a href="notes.html" class="nav-item">
+          <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+          <span>Notes</span>
+        </a>
+
+        <p class="px-3 pt-4 pb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500">Student</p>
+        <a href="test-select.html" class="nav-item">
+          <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          <span>Mock Tests</span>
+        </a>
+        <a href="test-results.html" class="nav-item active">
+          <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          <span>Results</span>
+        </a>
+
+        <p class="px-3 pt-4 pb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500">Account</p>
+        <a href="settings.html" class="nav-item">
+          <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span>Settings</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- ══════════════ MAIN ══════════════ -->
+    <div class="flex-1 min-w-0 flex flex-col">
+
+      <!-- TOPBAR -->
+      <header class="sticky top-0 z-30 backdrop-blur-xl bg-ink-950/70 border-b border-white/[0.06]">
+        <div class="px-4 sm:px-6 py-3 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <button class="lg:hidden w-9 h-9 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-slate-400 hover:text-white" onclick="toggleSidebar()">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+            <h1 class="text-sm font-bold text-white" id="pageTitle">Test Results</h1>
+          </div>
+          <div class="flex items-center gap-2">
+            <a href="test-select.html" class="px-3 py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 text-xs font-bold border border-cyan-500/25 transition">
+              Take Another Test
+            </a>
+          </div>
+        </div>
+      </header>
+
+      <!-- CONTENT -->
+      <main class="flex-1 px-4 sm:px-6 py-8 max-w-5xl w-full mx-auto">
+
+        <!-- Loading -->
+        <div id="loadingResults" class="py-20 text-center">
+          <div class="w-8 h-8 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+          <p class="text-sm text-slate-400">Loading results…</p>
+        </div>
+
+        <!-- Single Result View (when ?attemptId is present) -->
+        <div id="singleResultView" class="hidden">
+
+          <!-- Report Actions & Status Banner -->
+          <div class="nx-card p-4 mb-8 flex flex-col sm:flex-row items-center justify-between gap-4 anim" style="animation-delay:0.05s">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 font-bold text-lg">
+                📄
+              </div>
+              <div>
+                <p class="text-sm font-bold text-white flex items-center gap-2">
+                  <span>Diagnostic PDF Report</span>
+                  <span id="analysisStatusBadge" class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Ready</span>
+                </p>
+                <p class="text-xs text-slate-400" id="analysisStatusText">Complete question breakdown with Hindi Devanagari font & AI mistake insights.</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+              <button onclick="downloadPdfReport(false)" class="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-ink-950 font-bold text-xs shadow-lg shadow-cyan-500/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                <span>Full PDF</span>
+              </button>
+              <button onclick="downloadPdfReport(true)" class="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-red-500/30 text-slate-300 hover:text-red-400 font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer" title="Download report with incorrect & skipped questions only">
+                <span>Mistakes Only</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Score Hero Card -->
+          <div class="nx-card p-8 mb-8 text-center anim" style="animation-delay:0.1s">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-6 border" id="performanceBadge">
+              <!-- Dynamic -->
+            </div>
+
+            <div class="flex flex-col items-center mb-6">
+              <div class="relative w-32 h-32 mb-4">
+                <svg class="w-full h-full -rotate-90" viewBox="0 0 36 36">
+                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="3"/>
+                  <path id="scoreRing" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="url(#scoreGradient)" stroke-width="3" stroke-dasharray="0, 100" stroke-linecap="round" style="transition: stroke-dasharray 1.5s cubic-bezier(0.16,1,0.3,1)"/>
+                  <defs>
+                    <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="#22d3ee"/>
+                      <stop offset="100%" stop-color="#3b82f6"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                  <span class="text-3xl font-black text-white score-pop" id="scorePercent">0%</span>
+                  <span class="text-[10px] text-slate-400 font-semibold" id="scoreLabel">0/0</span>
+                </div>
+              </div>
+
+              <h2 class="text-xl font-black text-white mb-1" id="resultSubject">Science</h2>
+              <p class="text-sm text-slate-400" id="resultChapter">Chapter 1 — Chemical Reactions</p>
+              <p id="resultSourceCredit" class="hidden text-xs text-cyan-400/90 mt-1.5 flex items-center justify-center gap-1.5">
+                <span>🏛️</span>
+                <span id="resultSourceCreditText"></span>
+              </p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+              <div class="p-3 rounded-xl bg-emerald-500/[0.06] border border-emerald-500/20">
+                <p class="text-xl font-black text-emerald-400" id="rCorrect">0</p>
+                <p class="text-[10px] text-slate-400 font-semibold">Correct</p>
+              </div>
+              <div class="p-3 rounded-xl bg-red-500/[0.06] border border-red-500/20">
+                <p class="text-xl font-black text-red-400" id="rIncorrect">0</p>
+                <p class="text-[10px] text-slate-400 font-semibold">Incorrect</p>
+              </div>
+              <div class="p-3 rounded-xl bg-amber-500/[0.06] border border-amber-500/20">
+                <p class="text-xl font-black text-amber-400" id="rSkipped">0</p>
+                <p class="text-[10px] text-slate-400 font-semibold">Skipped</p>
+              </div>
+              <div class="p-3 rounded-xl bg-blue-500/[0.06] border border-blue-500/20">
+                <p class="text-xl font-black text-blue-400" id="rDuration">0:00</p>
+                <p class="text-[10px] text-slate-400 font-semibold">Duration</p>
+              </div>
+            </div>
+
+            <!-- Difficulty Breakdown -->
+            <div class="grid grid-cols-3 gap-3">
+              <div class="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                <p class="text-xs font-bold text-emerald-400 mb-0.5">Easy</p>
+                <p class="text-sm font-black text-white" id="rEasy">0/0</p>
+              </div>
+              <div class="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                <p class="text-xs font-bold text-amber-400 mb-0.5">Medium</p>
+                <p class="text-sm font-black text-white" id="rMedium">0/0</p>
+              </div>
+              <div class="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                <p class="text-xs font-bold text-red-400 mb-0.5">Hard</p>
+                <p class="text-sm font-black text-white" id="rHard">0/0</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Analysis Card -->
+          <div class="nx-card p-6 mb-8 anim" style="animation-delay:0.2s">
+            <div class="flex items-center gap-2 mb-5">
+              <span class="text-lg">🤖</span>
+              <h3 class="text-base font-bold text-white">AI Performance Analysis</h3>
+            </div>
+
+            <p class="text-sm text-slate-300 mb-5 leading-relaxed" id="aiRemark"></p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div class="p-4 rounded-xl bg-emerald-500/[0.05] border border-emerald-500/20">
+                <p class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider mb-2">💪 Strengths</p>
+                <ul class="space-y-1" id="aiStrengths"></ul>
+              </div>
+              <div class="p-4 rounded-xl bg-red-500/[0.05] border border-red-500/20">
+                <p class="text-[10px] font-bold text-red-400 uppercase tracking-wider mb-2">⚠️ Weak Areas</p>
+                <ul class="space-y-1" id="aiWeakAreas"></ul>
+              </div>
+              <div class="p-4 rounded-xl bg-blue-500/[0.05] border border-blue-500/20">
+                <p class="text-[10px] font-bold text-blue-400 uppercase tracking-wider mb-2">📌 Recommendations</p>
+                <ul class="space-y-1" id="aiRecommendations"></ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Detailed Answer Review -->
+          <div class="nx-card p-6 mb-8 anim" style="animation-delay:0.3s">
+            <div class="flex items-center justify-between mb-5">
+              <h3 class="text-base font-bold text-white">📋 Answer Review</h3>
+              <div class="flex gap-2">
+                <button onclick="filterAnswers('all')" class="answer-filter-btn px-3 py-1 rounded-lg bg-white/[0.06] text-xs font-bold text-slate-300 border border-white/10 transition hover:border-cyan-500/40" data-filter="all">All</button>
+                <button onclick="filterAnswers('incorrect')" class="answer-filter-btn px-3 py-1 rounded-lg bg-white/[0.03] text-xs font-bold text-slate-400 border border-white/5 transition hover:border-red-500/40" data-filter="incorrect">Incorrect</button>
+                <button onclick="filterAnswers('skipped')" class="answer-filter-btn px-3 py-1 rounded-lg bg-white/[0.03] text-xs font-bold text-slate-400 border border-white/5 transition hover:border-amber-500/40" data-filter="skipped">Skipped</button>
+              </div>
+            </div>
+            <div id="answersReviewList" class="space-y-3">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex flex-wrap gap-3 justify-center mb-8 anim" style="animation-delay:0.4s">
+            <a href="test-select.html" class="px-6 py-3 rounded-2xl bg-cyan-500 text-ink-950 font-bold text-sm hover:bg-cyan-400 transition shadow-[0_4px_20px_rgba(34,211,238,0.3)]">
+              Take Another Test →
+            </a>
+            <a href="student-dashboard.html" class="px-6 py-3 rounded-2xl bg-white/[0.05] border border-white/10 text-slate-300 hover:text-white font-bold text-sm transition">
+              Back to Dashboard
+            </a>
+          </div>
+        </div>
+
+        <!-- Recent Results List (when no ?attemptId) -->
+        <div id="recentResultsView" class="hidden">
+          <div class="mb-8">
+            <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight mb-2">
+              Your <span class="grad-text">Test Results</span>
+            </h1>
+            <p class="text-slate-400 text-sm">View your recent test scores, performance analytics, and detailed answer reviews.</p>
+          </div>
+
+          <div id="recentResultsList" class="space-y-3">
+            <!-- Rendered by JS -->
+          </div>
+
+          <div id="noResultsMsg" class="hidden p-8 text-center nx-card">
+            <div class="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center text-2xl mx-auto mb-4">📊</div>
+            <p class="text-sm font-bold text-white mb-1">No test results yet</p>
+            <p class="text-xs text-slate-400 mb-4">Complete a mock test to see your results here.</p>
+            <a href="test-select.html" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-cyan-500 text-ink-950 font-bold text-xs hover:bg-cyan-400 transition">
+              Take Your First Test →
+            </a>
+          </div>
+        </div>
+
+      </main>
+
+      <footer class="border-t border-white/[0.06] bg-ink-900/50 backdrop-blur-xl mt-auto">
+        <div class="px-4 sm:px-6 py-6 text-center">
+          <p class="text-[11px] text-slate-500">© 2026 Nexus — Adaptive Student AI Workspace</p>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <script src="api.js"></script>
+  <script src="test-results.js"></script>
+</body>
+</html>
