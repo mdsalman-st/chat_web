@@ -379,6 +379,32 @@
   };
 
   /* --------------------------------------------------------------------------
+     PHASE 6: SUBJECTIVE HANDWRITING OCR & EVALUATION
+     -------------------------------------------------------------------------- */
+  const subjective = {
+    uploadSheet(formDataOrPayload) {
+      return request('/api/subjective/upload', {
+        method: 'POST',
+        body: formDataOrPayload,
+      });
+    },
+    getStatus(submissionId) {
+      return request('/api/subjective/' + encodeURIComponent(submissionId) + '/status');
+    },
+    getResult(submissionId) {
+      return request('/api/subjective/' + encodeURIComponent(submissionId) + '/result');
+    },
+    getRecent(limit = 10) {
+      return request('/api/subjective/recent?limit=' + limit);
+    },
+    retry(submissionId) {
+      return request('/api/subjective/' + encodeURIComponent(submissionId) + '/retry', {
+        method: 'POST',
+      });
+    },
+  };
+
+  /* --------------------------------------------------------------------------
      EXPORT
      -------------------------------------------------------------------------- */
   window.API = {
@@ -389,6 +415,7 @@
     tasks,
     notes,
     tests,
+    subjective,
     health,
     request,
   };
