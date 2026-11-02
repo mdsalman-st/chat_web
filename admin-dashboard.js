@@ -3,6 +3,49 @@
 
   const $ = (id) => document.getElementById(id);
 
+  // =========================================
+  // THEME LOGIC (Adaptive + Manual Toggle)
+  // =========================================
+  
+  // 1. Check LocalStorage or System Preference
+  function initTheme() {
+    const savedTheme = localStorage.getItem('nexus_admin_theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const themeBtn = $('themeBtn');
+
+    if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+      document.body.classList.add('dark-mode');
+      if (themeBtn) themeBtn.textContent = '☀️'; // Show Sun
+    } else {
+      document.body.classList.remove('dark-mode');
+      if (themeBtn) themeBtn.textContent = '🌙'; // Show Moon
+    }
+  }
+
+  // 2. Toggle Theme on Button Click
+  window.toggleTheme = function() {
+    const body = document.body;
+    const themeBtn = $('themeBtn');
+    
+    body.classList.toggle('dark-mode');
+    
+    if (body.classList.contains('dark-mode')) {
+      localStorage.setItem('nexus_admin_theme', 'dark');
+      if (themeBtn) themeBtn.textContent = '☀️';
+    } else {
+      localStorage.setItem('nexus_admin_theme', 'light');
+      if (themeBtn) themeBtn.textContent = '🌙';
+    }
+  };
+
+  // Init Theme Immediately (Page load hote hi)
+  initTheme();
+
+
+  // =========================================
+  // SECURITY & DATA LOADING
+  // =========================================
+
   window.addEventListener('DOMContentLoaded', async () => {
     if (!API.Token.exists()) { window.location.href = 'auth.html'; return; }
     const user = API.User.get();
@@ -25,7 +68,7 @@
 
     if (tabId === 'review') loadPendingReview();
     if (tabId === 'flags') loadFlags();
-    if (tabId === 'users') loadUsers(); // <-- Naya
+    if (tabId === 'users') loadUsers(); 
   };
 
   // 2. Ingest Paper
