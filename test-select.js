@@ -14,6 +14,7 @@
   let currentProfile = {};
   let currentSubjectCode = null;
   let activeMode = 'chapter'; // 'chapter' or 'full'
+  let pollingInterval = null; // Global scope for polling
 
   window.setTestMode = function (mode) {
     activeMode = mode;
@@ -49,6 +50,9 @@
 
     if (!listGrid || !currentSubjectCode) return;
 
+    // FIX 1: Race Condition Guard (Save current subject before API call)
+    const subjectAtRequest = currentSubjectCode;
+
     listGrid.innerHTML = `
       <div class="text-center py-8">
         <div class="w-6 h-6 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
@@ -64,6 +68,9 @@
         currentProfile.stream || null,
         phase
       );
+
+      // FIX 1: Agar response aate-aate user ne subject change kar diya, toh purana data discard karo
+      if (currentSubjectCode !== subjectAtRequest) return;
 
       const chapters = res.chapters || [];
       if (countLabel) {
@@ -120,6 +127,7 @@
 
     } catch (err) {
       console.error('loadChapters error:', err);
+      if (currentSubjectCode !== subjectAtRequest) return; // Safety check on error too
       listGrid.innerHTML = `
         <div class="p-6 text-center text-xs text-red-400">
           Failed to load chapters: ${err.message || 'Server error'}
@@ -157,6 +165,9 @@
 
     if (!listGrid || !currentSubjectCode) return;
 
+    // FIX 1: Race Condition Guard for Full Papers
+    const subjectAtRequest = currentSubjectCode;
+
     listGrid.innerHTML = `
       <div class="text-center py-8">
         <div class="w-6 h-6 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
@@ -166,6 +177,9 @@
 
     try {
       const res = await API.tests.getAvailablePapers(currentSubjectCode, phase);
+      
+      if (currentSubjectCode !== subjectAtRequest) return; // Discard stale response
+
       let papers = res.papers || [];
 
       if (year) {
@@ -251,6 +265,7 @@
       }).join('');
     } catch (err) {
       console.error('loadOfficialPapers error:', err);
+      if (currentSubjectCode !== subjectAtRequest) return;
       listGrid.innerHTML = `
         <div class="p-6 text-center text-xs text-red-400">
           Failed to load official papers: ${err.message || 'Server error'}
@@ -264,15 +279,18 @@
     window.location.href = `test-live.html?paperId=${encodeURIComponent(paperId)}&subject=${encodeURIComponent(currentSubjectCode)}${isHardMode ? '&hard=1' : ''}`;
   };
 
-  let pollingInterval = null;
-
   window.startChapterTest = async function (chapterNumber, rawTitle) {
-    const title = decodeURIComponent(rawTitle || '');
     const isHardMode = !!$('hardModeToggle')?.checked;
     const modal = $('lazySetupModal');
     const pBar = $('lazyProgressBar');
     const pPercent = $('lazyProgressPercent');
     const pMsg = $('lazyProgressMsg');
+
+    // FIX 3: Clear any existing polling before starting a new one (prevents double-click bug)
+    if (pollingInterval) {
+      clearInterval(pollingInterval);
+      pollingInterval = null;
+    }
 
     try {
       // 1. Ask backend if questions exist or need lazy loading setup
@@ -297,9 +315,21 @@
         if (pMsg) pMsg.textContent = res.progressMessage || 'Preparing questions…';
       }
 
-      if (pollingInterval) clearInterval(pollingInterval);
+      // FIX 2: Polling Limits (Agar 60 seconds tak complete na ho toh ruk jao)
+      let pollCount = 0;
+      const maxPolls = 30; // 30 * 2000ms = 60 seconds
 
       pollingInterval = setInterval(async () => {
+        pollCount++;
+
+        if (pollCount > maxPolls) {
+          clearInterval(pollingInterval);
+          pollingInterval = null;
+          alert('Server is taking too long to generate questions. Please try again after some time.');
+          modal?.classList.add('hidden');
+          return;
+        }
+
         try {
           const jobRes = await API.tests.getJobStatus(res.jobId);
           const job = jobRes.job;
@@ -311,17 +341,20 @@
 
           if (job.status === 'completed') {
             clearInterval(pollingInterval);
+            pollingInterval = null;
             if (pMsg) pMsg.textContent = 'Questions verified! Launching practice session…';
             setTimeout(() => {
               window.location.href = `test-live.html?subject=${encodeURIComponent(currentSubjectCode)}&chapter=${encodeURIComponent(chapterNumber)}${isHardMode ? '&hard=1' : ''}`;
             }, 750);
           } else if (job.status === 'failed') {
             clearInterval(pollingInterval);
+            pollingInterval = null;
             alert(job.error || 'Failed to generate questions. Please try again in a little while.');
             modal?.classList.add('hidden');
           }
         } catch (e) {
           console.warn('Polling error:', e);
+          // Agar network error aaye, toh loop na roko, agle attempt me try karega.
         }
       }, 2000);
 
