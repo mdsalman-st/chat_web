@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subject Admin — Nexus</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="tailwind-config.js"></script>
+  <link rel="stylesheet" href="vault.css">
+
+  <style>
+    /* =========================================
+       ORIGINAL BACKGROUND ANIMATIONS
+       ========================================= */
+    @keyframes float1 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(50px,30px) scale(1.08)} }
+    @keyframes float2 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(-60px,-40px) scale(1.1)} }
+    @keyframes rise { 0%{transform:translateY(0);opacity:0} 10%{opacity:1} 90%{opacity:1} 100%{transform:translateY(-110vh);opacity:0} }
+    @keyframes shimmer { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+
+    .grad-text { background:linear-gradient(90deg,#22d3ee,#3b82f6,#8b5cf6,#22d3ee); background-size:300% 100%; -webkit-background-clip:text; background-clip:text; color:transparent; animation:shimmer 6s ease infinite; }
+    .particles { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+    .particle { position:absolute; border-radius:50%; background:rgba(34,211,238,0.5); box-shadow:0 0 8px rgba(34,211,238,0.9); animation:rise linear infinite; }
+    
+    .orb-1 { animation:float1 20s ease-in-out infinite; }
+    .orb-2 { animation:float2 24s ease-in-out infinite; }
+
+    body {
+      background-color: #05070d;
+      color: #f8fafc;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    /* TRUE APPLE LIQUID GLASS */
+    .liquid-glass {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(50px) saturate(200%);
+      -webkit-backdrop-filter: blur(50px) saturate(200%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-top: 1px solid rgba(255, 255, 255, 0.4); 
+      border-left: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 30px 60px -10px rgba(0, 0, 0, 0.8), inset 0 1px 2px rgba(255, 255, 255, 0.3), inset 0 -1px 2px rgba(0, 0, 0, 0.5); 
+      border-radius: 24px;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    .liquid-glass::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 30%);
+      pointer-events: none;
+      border-radius: inherit;
+      z-index: 1;
+    }
+
+    .glass-inner {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-top: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 16px;
+      transition: all 0.3s ease;
+    }
+    .glass-inner:hover { background: rgba(255, 255, 255, 0.08); border-top-color: rgba(255, 255, 255, 0.4); }
+
+    .glass-nav {
+      background: rgba(10, 10, 12, 0.4);
+      backdrop-filter: blur(50px) saturate(200%);
+      -webkit-backdrop-filter: blur(50px) saturate(200%);
+      border-right: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .nav-item { display:flex; align-items:center; gap:0.75rem; padding:0.75rem 1rem; border-radius:1rem; color:#94a3b8; font-size:0.875rem; font-weight:500; cursor:pointer; transition:all 0.2s ease; border:1px solid transparent; text-decoration:none; }
+    .nav-item:hover { background:rgba(255,255,255,0.04); color:#fff; }
+    .nav-item.active { background:rgba(255,255,255,0.08); color:#fff; border-color:rgba(255,255,255,0.1); }
+
+    select option { background: #0f1424; color: #fff; }
+    
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+  </style>
+</head>
+<body class="relative antialiased">
+
+  <!-- BACKGROUND -->
+  <div class="fixed inset-0 pointer-events-none z-0 [background-image:linear-gradient(rgba(34,211,238,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(34,211,238,0.03)_1px,transparent_1px)] [background-size:60px_60px] [mask-image:radial-gradient(ellipse_at_top,black_20%,transparent_80%)]"></div>
+  <div class="orb-1 fixed rounded-full pointer-events-none z-0 blur-[120px] opacity-40 w-[400px] h-[400px] top-[-80px] left-[10%] bg-[radial-gradient(circle,#06b6d4,transparent_70%)]"></div>
+  <div class="orb-2 fixed rounded-full pointer-events-none z-0 blur-[120px] opacity-40 w-[400px] h-[400px] bottom-[-80px] right-[10%] bg-[radial-gradient(circle,#6366f1,transparent_70%)]"></div>
+
+  <div class="relative z-10 h-screen flex p-4 gap-4">
+
+    <!-- SIDEBAR -->
+    <aside class="glass-nav w-64 flex flex-col p-4 hidden lg:flex shrink-0 rounded-2xl border border-white/10">
+      <div class="flex items-center gap-3 mb-6 px-2 py-2 border-b border-white/10">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center text-white text-base font-bold shadow-lg">🎓</div>
+        <div>
+          <h1 class="text-base font-black text-white leading-tight" id="adminSubjectName">Economics Admin</h1>
+          <p class="text-[10px] font-bold text-amber-400 uppercase tracking-widest">Teacher Panel</p>
+        </div>
+      </div>
+
+      <nav class="flex-1 space-y-1 overflow-y-auto pr-1">
+        <a href="#" onclick="switchTab('overview')" class="nav-item active" id="nav-overview">
+          <span class="text-lg">📊</span> Dashboard
+        </a>
+        
+        <p class="px-3 pt-4 pb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500">Content</p>
+        <a href="#" onclick="switchTab('manage-qs')" class="nav-item" id="nav-manage-qs">
+          <span class="text-lg">📝</span> Manage Questions
+        </a>
+        <a href="#" onclick="switchTab('materials')" class="nav-item" id="nav-materials">
+          <span class="text-lg">📚</span> Books & Notes
+        </a>
+        <a href="#" onclick="switchTab('review')" class="nav-item" id="nav-review">
+          <span class="text-lg">🔍</span> AI Review Queue
+        </a>
+        
+        <p class="px-3 pt-4 pb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500">Quality</p>
+        <a href="#" onclick="switchTab('flags')" class="nav-item" id="nav-flags">
+          <span class="text-lg">🚩</span> Reported Qs
+        </a>
+
+        <p class="px-3 pt-4 pb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500">Account</p>
+        <a href="#" onclick="switchTab('profile')" class="nav-item" id="nav-profile">
+          <span class="text-lg">⚙️</span> My Profile
+        </a>
+      </nav>
+
+      <div class="pt-4 border-t border-white/10 mt-2">
+        <button onclick="handleLogout()" class="nav-item w-full text-red-400 hover:bg-red-500/10 hover:text-red-300">
+          <span class="text-lg">🚪</span> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden">
+      
+      <!-- TOPBAR -->
+      <header class="liquid-glass px-6 py-4 mb-4 flex justify-between items-center shrink-0 rounded-2xl">
+        <h2 class="text-lg font-bold text-white tracking-tight" id="page-title">Subject Overview</h2>
+        <div class="flex items-center gap-4">
+          <button onclick="toggleTheme()" class="w-10 h-10 rounded-xl glass-inner flex items-center justify-center text-lg" id="themeBtn">🌙</button>
+          <div class="flex items-center gap-3 px-4 py-2 glass-inner rounded-full">
+            <span class="text-xs font-semibold text-white" id="topEmail">teacher@nexus.com</span>
+            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center font-bold text-xs" id="topAvatar">T</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- SCROLLABLE TABS -->
+      <div class="flex-1 overflow-y-auto pr-2 pb-4 space-y-4">
+
+        <!-- 1. OVERVIEW TAB -->
+        <div id="tab-overview" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="liquid-glass p-6">
+              <div style="position:relative; z-index:2;">
+                <p class="text-xs font-bold text-slate-400 uppercase mb-2">My Questions</p>
+                <h3 class="text-4xl font-black text-white">1,240</h3>
+                <p class="text-[10px] text-emerald-400 mt-2 font-bold">Live in database</p>
+              </div>
+            </div>
+            <div class="liquid-glass p-6">
+              <div style="position:relative; z-index:2;">
+                <p class="text-xs font-bold text-slate-400 uppercase mb-2">Pending AI Drafts</p>
+                <h3 class="text-4xl font-black text-amber-400">45</h3>
+                <p class="text-[10px] text-slate-400 mt-2 font-bold">Needs your approval</p>
+              </div>
+            </div>
+            <div class="liquid-glass p-6">
+              <div style="position:relative; z-index:2;">
+                <p class="text-xs font-bold text-slate-400 uppercase mb-2">Books/Notes</p>
+                <h3 class="text-4xl font-black text-blue-400">12</h3>
+                <p class="text-[10px] text-slate-400 mt-2 font-bold">Materials uploaded</p>
+              </div>
+            </div>
+            <div class="liquid-glass p-6">
+              <div style="position:relative; z-index:2;">
+                <p class="text-xs font-bold text-slate-400 uppercase mb-2">Reported Qs</p>
+                <h3 class="text-4xl font-black text-red-400">3</h3>
+                <p class="text-[10px] text-slate-400 mt-2 font-bold">Needs fixing</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. MANAGE QUESTIONS TAB -->
+        <div id="tab-manage-qs" class="liquid-glass p-6 hidden">
+          <div style="position:relative; z-index:2;">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+              <div>
+                <h2 class="text-xl font-bold text-white">Manage Questions</h2>
+                <p class="text-sm text-slate-400">Add, edit, or delete questions for your subject.</p>
+              </div>
+              <button onclick="openAddQuestionModal()" class="px-5 py-2.5 bg-white text-black font-bold rounded-xl text-sm hover:scale-105 transition">+ Add New Question</button>
+            </div>
+            
+            <!-- Questions List (Mock) -->
+            <div class="space-y-3">
+              <div class="glass-inner p-5 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div class="flex-1">
+                  <p class="text-sm font-bold text-white mb-1">What is the primary objective of financial statements?</p>
+                  <p class="text-xs text-slate-400">Options: A) Profit B) Info C) Tax D) Investors | Correct: B</p>
+                </div>
+                <div class="flex gap-2">
+                  <button onclick="showToast('Edit Modal Opened')" class="px-4 py-2 glass-inner text-xs font-bold text-cyan-400">Edit</button>
+                  <button onclick="showToast('Question Deleted')" class="px-4 py-2 bg-red-500/10 text-xs font-bold text-red-400 border border-red-500/20 rounded-xl">Delete</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. BOOKS & NOTES TAB -->
+        <div id="tab-materials" class="liquid-glass p-6 hidden">
+          <div style="position:relative; z-index:2;">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+              <div>
+                <h2 class="text-xl font-bold text-white">Books & Study Materials</h2>
+                <p class="text-sm text-slate-400">Upload PDFs, notes, or important links for students.</p>
+              </div>
+              <button onclick="showToast('Upload Modal Opened')" class="px-5 py-2.5 bg-white text-black font-bold rounded-xl text-sm hover:scale-105 transition">+ Upload Material</button>
+            </div>
+            
+            <!-- Materials List (Mock) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="glass-inner p-5 rounded-2xl">
+                <div class="flex items-center gap-3 mb-2">
+                  <span class="text-2xl">📄</span>
+                  <p class="text-sm font-bold text-white">Chapter 1 - Microeconomics Notes</p>
+                </div>
+                <p class="text-xs text-slate-400 mb-3">Uploaded: 12 Jan 2024 • Size: 2.4 MB</p>
+                <div class="flex gap-2">
+                  <button class="px-3 py-1.5 glass-inner text-xs font-bold text-white">View</button>
+                  <button class="px-3 py-1.5 bg-red-500/10 text-xs font-bold text-red-400 rounded-lg">Delete</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. AI REVIEW TAB -->
+        <div id="tab-review" class="liquid-glass p-6 hidden">
+          <div style="position:relative; z-index:2;">
+            <h2 class="text-xl font-bold text-white mb-4">AI Draft Review</h2>
+            <p class="text-sm text-slate-400 mb-6">Approve AI-generated questions before they go live to students.</p>
+            <div id="reviewList" class="space-y-3">
+              <p class="text-sm text-slate-400">Loading pending drafts...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. FLAGS TAB -->
+        <div id="tab-flags" class="liquid-glass p-6 hidden">
+          <div style="position:relative; z-index:2;">
+            <h2 class="text-xl font-bold text-white mb-4">Reported Questions</h2>
+            <div id="flagsList" class="space-y-3">
+              <p class="text-sm text-slate-400">Loading reported questions...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. PROFILE TAB -->
+        <div id="tab-profile" class="liquid-glass p-6 hidden">
+          <div style="position:relative; z-index:2;">
+            <h2 class="text-xl font-bold text-white mb-6">Teacher Profile Settings</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div>
+                <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Full Name</label>
+                <input type="text" value="Subject Teacher" class="w-full px-4 py-3 glass-inner text-sm">
+              </div>
+              <div>
+                <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Email (Read-only)</label>
+                <input type="email" disabled class="w-full px-4 py-3 glass-inner text-sm opacity-50" id="profileEmail">
+              </div>
+              <div>
+                <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">New Password</label>
+                <input type="password" placeholder="••••••••" class="w-full px-4 py-3 glass-inner text-sm">
+              </div>
+            </div>
+            <button class="px-6 py-3 bg-white text-black font-bold rounded-xl text-sm hover:scale-105 transition">Update Profile</button>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <div id="toast" class="fixed bottom-10 right-10 bg-white text-black px-6 py-3 rounded-full font-bold text-sm shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+    Action Successful!
+  </div>
+
+  <script src="api.js"></script>
+  <script src="subject-admin.js"></script>
+</body>
+</html>
