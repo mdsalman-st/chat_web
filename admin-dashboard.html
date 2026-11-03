@@ -198,7 +198,11 @@
             <h2 class="text-2xl font-black text-slate-800 mb-1">Manage Users & Roles</h2>
             <p class="text-sm text-slate-500 font-medium">Assign Subject Admins or suspend users.</p>
           </div>
-          <input type="text" placeholder="Search by email..." class="neu-inner px-4 py-2 text-sm w-full sm:w-64">
+          <div class="flex items-center gap-3 w-full sm:w-auto">
+            <input type="text" placeholder="Search by email..." class="neu-inner px-4 py-2 text-sm w-full sm:w-64">
+            <!-- NAYA BUTTON ADD KIYA -->
+            <button onclick="openCreateAdminModal()" class="neu-btn px-4 py-2 text-sm text-blue-600">+ Create Admin</button>
+          </div>
         </div>
         <div id="usersList" class="space-y-4">
           <p class="text-sm text-slate-500">Loading users...</p>
@@ -243,7 +247,7 @@
                 <h2 class="text-2xl font-black text-slate-800 mb-1">Question Bank</h2>
                 <p class="text-sm text-slate-500 font-medium">Manage all AI-generated and official questions.</p>
             </div>
-            <button onclick="showToast('Bulk Approve Triggered')" class="neu-btn px-4 py-2 text-sm text-green-600">Bulk Approve All Drafts</button>
+            <button onclick="bulkApproveQuestions()" class="neu-btn px-4 py-2 text-sm text-green-600">Bulk Approve All Drafts</button>
         </div>
         <div id="questionBankList" class="space-y-4">
             <p class="text-sm text-slate-500">Loading questions...</p>
@@ -301,7 +305,7 @@
       <!-- 8. BROADCAST TAB -->
       <div id="tab-broadcast" class="neu-card p-6 sm:p-10 hidden">
         <h2 class="text-2xl font-black text-slate-800 mb-6">Send Notification</h2>
-        <form onsubmit="event.preventDefault(); showToast('📢 Notification Sent to All Students!');">
+        <form onsubmit="handleBroadcast(event)">
             <div class="mb-6">
                 <label class="text-xs font-bold text-slate-500 uppercase block mb-2 ml-1">Target Audience</label>
                 <select class="neu-inner w-full px-4 py-3.5 text-sm">
@@ -346,7 +350,7 @@
       <!-- 10. PROFILE TAB -->
       <div id="tab-profile" class="neu-card p-6 sm:p-10 hidden">
         <h2 class="text-2xl font-black text-slate-800 mb-6">Admin Settings</h2>
-        <form onsubmit="event.preventDefault(); showToast('✅ Profile Updated');" class="mb-8">
+        <form onsubmit="handleUpdateProfile(event)" class="mb-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div><label class="text-xs font-bold text-slate-500 block mb-2 ml-1">Full Name</label><input type="text" id="profileName" class="neu-inner w-full px-4 py-3.5 text-sm"></div>
               <div><label class="text-xs font-bold text-slate-500 block mb-2 ml-1">Email (Read-only)</label><input type="email" id="profileEmail" disabled class="neu-inner w-full px-4 py-3.5 text-sm opacity-50"></div>
@@ -358,7 +362,7 @@
         <div class="border-t border-slate-300/30 pt-8">
             <h3 class="text-lg font-bold text-slate-800 mb-2">System Maintenance Mode</h3>
             <p class="text-sm text-slate-500 mb-4">Put the student platform into maintenance mode.</p>
-            <button onclick="showToast('⚠️ Maintenance Mode Toggled')" class="neu-btn px-6 py-3 text-sm text-red-500">Toggle Maintenance Mode</button>
+            <button onclick="toggleMaintenanceMode()" class="neu-btn px-6 py-3 text-sm text-red-500">Toggle Maintenance Mode</button>
         </div>
       </div>
 
@@ -369,7 +373,41 @@
     Action Successful!
   </div>
 
-  <!-- Scripts -->
+  <!-- CREATE ADMIN MODAL (NAYA) -->
+  <div id="createAdminModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+    <div class="neu-card p-8 w-full max-w-md">
+      <h3 class="text-xl font-black text-slate-800 mb-4">Create Subject Admin</h3>
+      <form id="createAdminForm" onsubmit="handleCreateAdmin(event)">
+        <div class="space-y-4 mb-6">
+          <div>
+            <label class="text-xs font-bold text-slate-500 block mb-1">Full Name</label>
+            <input type="text" id="newAdminName" class="neu-inner w-full px-4 py-2.5 text-sm" required>
+          </div>
+          <div>
+            <label class="text-xs font-bold text-slate-500 block mb-1">Email</label>
+            <input type="email" id="newAdminEmail" class="neu-inner w-full px-4 py-2.5 text-sm" required>
+          </div>
+          <div>
+            <label class="text-xs font-bold text-slate-500 block mb-1">Phone</label>
+            <input type="text" id="newAdminPhone" class="neu-inner w-full px-4 py-2.5 text-sm" required>
+          </div>
+          <div>
+            <label class="text-xs font-bold text-slate-500 block mb-1">Password (Min 8 chars)</label>
+            <input type="password" id="newAdminPassword" class="neu-inner w-full px-4 py-2.5 text-sm" required>
+          </div>
+          <div>
+            <label class="text-xs font-bold text-slate-500 block mb-1">Subject Code (e.g. eco, acc)</label>
+            <input type="text" id="newAdminSubject" class="neu-inner w-full px-4 py-2.5 text-sm" required>
+          </div>
+        </div>
+        <div class="flex gap-3 justify-end">
+          <button type="button" onclick="closeCreateAdminModal()" class="neu-btn px-4 py-2 text-sm">Cancel</button>
+          <button type="submit" id="createAdminBtn" class="neu-btn px-4 py-2 text-sm text-blue-600">Create Admin</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script src="api.js"></script> 
   <script src="admin-dashboard.js"></script>
 </body>

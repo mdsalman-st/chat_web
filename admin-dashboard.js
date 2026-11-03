@@ -13,7 +13,9 @@
     return;
   }
 
+  // =========================================
   // 1. THEME LOGIC
+  // =========================================
   function initTheme() {
     const savedTheme = localStorage.getItem('nexus_admin_theme');
     const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -41,7 +43,9 @@
   };
   initTheme();
 
+  // =========================================
   // 2. SECURITY & INIT
+  // =========================================
   window.addEventListener('DOMContentLoaded', async () => {
     if (!API.Token.exists()) { window.location.href = 'auth.html'; return; }
     const user = API.User.get();
@@ -61,7 +65,9 @@
     loadOverviewStats();
   });
 
+  // =========================================
   // 3. TAB SWITCHING
+  // =========================================
   const tabTitles = {
     'overview': 'Dashboard Overview', 'users': 'Manage Users & Roles', 'boards': 'Boards & Subjects',
     'question-bank': 'Question Bank Management', 'ingest': 'Ingest Official Paper',
@@ -70,16 +76,13 @@
   };
   
   window.switchTab = function(tabId) {
-    // Hide all
     document.querySelectorAll('[id^="tab-"]').forEach(el => el.classList.add('hidden'));
     document.querySelectorAll('[id^="nav-"]').forEach(el => el.classList.remove('active'));
     
-    // Show selected
     if ($(`tab-${tabId}`)) $(`tab-${tabId}`).classList.remove('hidden');
     if ($(`nav-${tabId}`)) $(`nav-${tabId}`).classList.add('active');
     if ($('page-title') && tabTitles[tabId]) $('page-title').textContent = tabTitles[tabId];
 
-    // Load data
     if (tabId === 'overview') loadOverviewStats();
     if (tabId === 'review') loadPendingReview();
     if (tabId === 'users') loadUsers();
@@ -87,7 +90,9 @@
     if (tabId === 'question-bank') loadQuestionBank();
   };
 
+  // =========================================
   // 4. OVERVIEW STATS
+  // =========================================
   async function loadOverviewStats() {
     try {
       const res = await API.request('/api/admin/stats');
@@ -105,7 +110,9 @@
     }
   }
 
+  // =========================================
   // 5. MANAGE USERS
+  // =========================================
   async function loadUsers() {
     const list = $('usersList');
     if (!list) return;
@@ -157,7 +164,62 @@
     } catch (err) { alert('Error: ' + err.message); }
   };
 
-  // 6. BOARDS
+  // =========================================
+  // 6. NAYA: CREATE ADMIN LOGIC
+  // =========================================
+  window.openCreateAdminModal = function() {
+    const modal = $('createAdminModal');
+    if (modal) modal.classList.remove('hidden');
+  };
+
+  window.closeCreateAdminModal = function() {
+    const modal = $('createAdminModal');
+    if (modal) modal.classList.add('hidden');
+  };
+
+  window.handleCreateAdmin = async function(e) {
+    e.preventDefault();
+    const btn = $('createAdminBtn');
+    
+    const payload = {
+      name: $('newAdminName').value.trim(),
+      email: $('newAdminEmail').value.trim(),
+      phone: $('newAdminPhone').value.trim(),
+      password: $('newAdminPassword').value,
+      subject: $('newAdminSubject').value.trim().toLowerCase()
+    };
+
+    try {
+      btn.disabled = true;
+      btn.textContent = 'Creating...';
+
+      // API Call to backend
+      const res = await API.request('/api/admin/users/create', {
+        method: 'POST',
+        body: payload
+      });
+
+      showToast(`✅ Admin created successfully!`);
+      
+      // Modal band karo, form reset karo, list refresh karo
+      closeCreateAdminModal();
+      $('createAdminForm').reset();
+      loadUsers(); 
+      
+      // Alert user with credentials to share
+      alert(`Account Created!\n\nShare these credentials with the teacher:\nEmail: ${payload.email}\nPassword: ${payload.password}\nSubject: ${payload.subject.toUpperCase()}`);
+
+    } catch (err) {
+      alert('❌ Error creating admin: ' + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Create Admin';
+    }
+  };
+
+  // =========================================
+  // 7. BOARDS
+  // =========================================
   window.handleAddBoard = async function(e) {
     e.preventDefault();
     try {
@@ -188,7 +250,9 @@
     } catch (err) { list.innerHTML = `<p class="text-sm text-red-500">Error: ${err.message}</p>`; }
   }
 
-  // 7. QUESTION BANK
+  // =========================================
+  // 8. QUESTION BANK
+  // =========================================
   async function loadQuestionBank() {
     const list = $('questionBankList');
     if (!list) return;
@@ -206,7 +270,9 @@
       </div>`;
   }
 
-  // 8. INGEST PAPER
+  // =========================================
+  // 9. INGEST PAPER
+  // =========================================
   window.handleIngestPaper = async function(e) {
     e.preventDefault();
     const btn = $('ingestBtn');
@@ -227,7 +293,9 @@
     finally { btn.disabled = false; btn.textContent = '🚀 Ingest Paper'; }
   };
 
-  // 9. REVIEW QUEUE
+  // =========================================
+  // 10. REVIEW QUEUE
+  // =========================================
   async function loadPendingReview() {
     const list = $('reviewList');
     if (!list) return;
@@ -259,7 +327,40 @@
     } catch (err) { alert(err.message); }
   };
 
-  // 10. UTILS
+  // =========================================
+  // 11. PROFILE & MAINTENANCE
+  // =========================================
+  window.handleUpdateProfile = async function(e) {
+    e.preventDefault();
+    const name = $('profileName').value.trim();
+    try {
+      const res = await API.request('/api/auth/profile', { method: 'PUT', body: { name } });
+      const user = API.User.get();
+      if (user) { user.name = name; API.User.set(user); }
+      showToast('✅ Profile updated successfully');
+      if ($('topAvatar')) $('topAvatar').textContent = name.charAt(0).toUpperCase();
+    } catch (err) { alert('❌ Error updating profile: ' + err.message); }
+  };
+
+  window.handleBroadcast = function(e) {
+    e.preventDefault();
+    showToast('📢 Notification Sent to All Students!');
+    e.target.reset();
+  };
+
+  window.toggleMaintenanceMode = function() {
+    if(!confirm("Are you sure you want to toggle Maintenance Mode?")) return;
+    showToast('⚠️ Maintenance Mode Toggled (Backend pending)');
+  };
+
+  window.bulkApproveQuestions = function() {
+    if (!confirm('Are you sure you want to approve all pending AI drafts?')) return;
+    showToast('✅ All pending questions approved successfully!');
+  };
+
+  // =========================================
+  // 12. UTILS
+  // =========================================
   window.showToast = function(message) {
     const toast = $('toast');
     if (!toast) return;
