@@ -6,6 +6,9 @@
 (function () {
   'use strict';
 
+  // =========================================
+  // 1. ACADEMIC PROFILE & ENROLLED SUBJECTS
+  // =========================================
   async function loadStudentAcademicData() {
     const badgeEl = document.getElementById('dashAcademicBadge');
     const gridEl = document.getElementById('dashSubjectGrid');
@@ -26,10 +29,10 @@
 
         if (subjects.length === 0) {
           gridEl.innerHTML = `
-            <div class="col-span-full p-4 rounded-xl bg-cyan-500/[0.05] border border-cyan-500/20 text-center">
-              <p class="text-xs text-slate-300 font-semibold mb-1">Set up your curriculum subjects</p>
-              <p class="text-[11px] text-slate-400 mb-3">Choose your board and subjects to unlock chapter-wise mock tests.</p>
-              <a href="settings.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500 text-ink-950 font-bold text-xs hover:bg-cyan-400 transition">
+            <div class="col-span-full p-4 rounded-xl glass-inner text-center">
+              <p class="text-xs font-semibold mb-1" style="color: var(--text-main);">Set up your curriculum subjects</p>
+              <p class="text-[11px] mb-3" style="color: var(--text-muted);">Choose your board and subjects to unlock chapter-wise mock tests.</p>
+              <a href="settings.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500 text-black font-bold text-xs hover:bg-cyan-400 transition">
                 Configure Subjects in Settings
               </a>
             </div>
@@ -38,10 +41,10 @@
         }
 
         gridEl.innerHTML = subjects.map((sub) => {
-          const isLive = true; // In Phase 1/2 subjects have seeded live chapters
+          const isLive = true;
           return `
             <div onclick="window.location.href='test-select.html?subject=${encodeURIComponent(sub.code)}'"
-                 class="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-cyan-500/40 hover:bg-cyan-500/[0.04] transition cursor-pointer flex flex-col justify-between group">
+                 class="p-3.5 rounded-xl glass-inner hover:border-cyan-500/40 transition cursor-pointer flex flex-col justify-between group">
               <div>
                 <div class="flex items-center justify-between mb-2">
                   <span class="text-2xl">${sub.icon || '📚'}</span>
@@ -51,10 +54,10 @@
                     ${isLive ? 'Live' : 'Coming soon'}
                   </span>
                 </div>
-                <h4 class="text-xs font-bold text-white group-hover:text-cyan-300 transition-colors line-clamp-1">${sub.name}</h4>
-                ${sub.hindiName ? `<p class="text-[10px] text-slate-400 truncate mt-0.5">${sub.hindiName}</p>` : ''}
+                <h4 class="text-xs font-bold group-hover:text-cyan-300 transition-colors line-clamp-1" style="color: var(--text-main);">${sub.name}</h4>
+                ${sub.hindiName ? `<p class="text-[10px] truncate mt-0.5" style="color: var(--text-muted);">${sub.hindiName}</p>` : ''}
               </div>
-              <div class="mt-3 pt-2 border-t border-white/[0.04] flex items-center justify-between text-[11px] font-semibold text-cyan-400">
+              <div class="mt-3 pt-2 border-t flex items-center justify-between text-[11px] font-semibold" style="color: var(--text-link); border-color: var(--glass-border);">
                 <span>Start Test</span>
                 <span class="group-hover:translate-x-0.5 transition-transform">→</span>
               </div>
@@ -66,7 +69,7 @@
       console.warn('Could not load student profile for dashboard:', err);
       if (gridEl) {
         gridEl.innerHTML = `
-          <div class="col-span-full py-2 text-center text-xs text-slate-400">
+          <div class="col-span-full py-2 text-center text-xs" style="color: var(--text-muted);">
             Select your subjects from <a href="settings.html" class="text-cyan-400 underline">Settings</a>.
           </div>
         `;
@@ -74,6 +77,9 @@
     }
   }
 
+  // =========================================
+  // 2. NOTIFICATIONS
+  // =========================================
   async function loadNotifications() {
     const notifBtn = document.getElementById('notifBtn');
     const notifPanel = document.getElementById('notifPanel');
@@ -88,38 +94,38 @@
       let dot = notifBtn.querySelector('.notif-dot');
       if (!dot) {
         dot = document.createElement('span');
-        dot.className = 'notif-dot absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-cyan-400 border-2 border-ink-950';
+        dot.className = 'notif-dot absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-cyan-400 border-2';
+        dot.style.borderColor = 'var(--bg-color)';
         notifBtn.appendChild(dot);
       }
       dot.style.display = unreadCount > 0 ? 'block' : 'none';
 
       // Panel content
       const listHtml = notifications.length === 0
-        ? '<div class="p-4 text-center text-xs text-slate-500">No new notifications</div>'
+        ? '<div class="p-4 text-center text-xs" style="color: var(--text-muted);">No new notifications</div>'
         : notifications.map((n) => `
             <div onclick="handleNotifClick('${n._id}', '${n.link || 'test-results.html'}')"
-                 class="dropdown-item cursor-pointer hover:bg-white/[0.04] p-2.5 rounded-lg transition flex items-start gap-2.5 ${n.isRead ? 'opacity-70' : 'bg-cyan-500/[0.03]'}">
-              <div class="w-7 h-7 rounded-lg bg-cyan-500/15 text-cyan-300 flex items-center justify-center text-xs shrink-0 mt-0.5">
+                 class="dropdown-item cursor-pointer p-2.5 rounded-lg transition flex items-start gap-2.5 ${n.isRead ? 'opacity-70' : ''}">
+              <div class="w-7 h-7 rounded-lg bg-cyan-500/15 text-cyan-500 flex items-center justify-center text-xs shrink-0 mt-0.5">
                 ${n.type === 'analysis_ready' ? '📊' : '🔔'}
               </div>
               <div class="flex-1 min-w-0">
-                <p class="text-xs font-semibold text-white leading-tight">${n.title}</p>
-                <p class="text-[11px] text-slate-400 truncate mt-0.5">${n.message}</p>
+                <p class="text-xs font-semibold leading-tight" style="color: var(--text-main);">${n.title}</p>
+                <p class="text-[11px] truncate mt-0.5" style="color: var(--text-muted);">${n.message}</p>
               </div>
             </div>
           `).join('');
 
       notifPanel.innerHTML = `
-        <div class="flex items-center justify-between px-3 py-2 border-b border-white/[0.06] mb-1">
-          <p class="text-xs font-bold text-white">Notifications</p>
-          ${unreadCount > 0 ? `<span class="text-[10px] font-bold text-cyan-400 px-1.5 py-0.5 rounded bg-cyan-500/10">${unreadCount} new</span>` : ''}
+        <div class="flex items-center justify-between px-3 py-2 border-b mb-1" style="border-color: var(--glass-border);">
+          <p class="text-xs font-bold" style="color: var(--text-main);">Notifications</p>
+          ${unreadCount > 0 ? `<span class="text-[10px] font-bold px-1.5 py-0.5 rounded" style="color: var(--text-link); background: var(--inner-glass-bg);">${unreadCount} new</span>` : ''}
         </div>
         <div class="max-h-64 overflow-y-auto space-y-1 p-1">
           ${listHtml}
         </div>
       `;
 
-      // Toggle panel on click
       notifBtn.onclick = (e) => {
         e.stopPropagation();
         notifPanel.classList.toggle('hidden');
@@ -142,26 +148,47 @@
     if (link) window.location.href = link;
   };
 
+  // =========================================
+  // 3. RECENT TESTS + MY RESULTS TAB BADGE
+  // =========================================
   async function loadRecentTests() {
     const recentSec = document.getElementById('studentRecentTests');
     if (!recentSec || !window.API?.tests) return;
 
+    // NAYA: Update "My Results" tab ke saath count badge
+    const resultsCountBadge = document.getElementById('myResultsCount');
+
     try {
-      const res = await window.API.tests.getRecentResults(5);
+      // NAYA: Zyada results fetch karo taaki count pata chale
+      const res = await window.API.tests.getRecentResults(20);
       const results = res.results || [];
+      
+      // NAYA: Update count badge in sidebar
+      if (resultsCountBadge) {
+        if (results.length > 0) {
+          resultsCountBadge.textContent = results.length;
+          resultsCountBadge.classList.remove('hidden');
+        } else {
+          resultsCountBadge.classList.add('hidden');
+        }
+      }
+
       const ul = recentSec.querySelector('ul');
       if (!ul) return;
 
       if (results.length === 0) {
         ul.innerHTML = `
-          <li class="py-4 text-center text-xs text-slate-500">
+          <li class="py-4 text-center text-xs" style="color: var(--text-muted);">
             No tests attempted yet. Choose a subject above to start your first mock!
           </li>
         `;
         return;
       }
 
-      ul.innerHTML = results.map((r) => {
+      // NAYA: Sirf top 5 results recent tests widget me dikhao
+      const topResults = results.slice(0, 5);
+
+      ul.innerHTML = topResults.map((r) => {
         const score = r.score || {};
         const pct = score.percentage || 0;
         const colorClass = pct >= 75 ? 'text-emerald-400' : (pct >= 50 ? 'text-amber-400' : 'text-red-400');
@@ -169,12 +196,12 @@
 
         return `
           <li onclick="window.location.href='test-results.html?attemptId=${r.attemptId}'"
-              class="flex justify-between items-center text-xs border-b border-white/5 py-2 hover:bg-white/[0.02] px-1 rounded cursor-pointer group">
+              class="flex justify-between items-center text-xs border-b py-2 hover:bg-white/[0.02] px-1 rounded cursor-pointer group" style="border-color: var(--glass-border);">
             <div class="flex-1 min-w-0 pr-2">
-              <span class="text-slate-200 font-semibold group-hover:text-cyan-300 transition-colors block truncate">
+              <span class="font-semibold group-hover:text-cyan-400 transition-colors block truncate" style="color: var(--text-main);">
                 ${r.subjectName || r.subjectCode} (${title})
               </span>
-              <span class="text-[10px] text-slate-500">
+              <span class="text-[10px]" style="color: var(--text-muted);">
                 ${score.correct || 0}/${r.totalQuestions || 0} correct
               </span>
             </div>
@@ -187,6 +214,9 @@
     }
   }
 
+  // =========================================
+  // 4. INIT FUNCTION
+  // =========================================
   function init() {
     // 1) Force-show student-only sections
     var testSec = document.getElementById('studentTestSection');
