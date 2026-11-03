@@ -405,6 +405,68 @@
   };
 
   /* --------------------------------------------------------------------------
+     ADMIN API (Super Admin & Subject Admin - NAYA MODULE)
+     -------------------------------------------------------------------------- */
+  const admin = {
+    // Stats & Dashboard
+    getStats() {
+      return request('/api/admin/stats');
+    },
+    
+    // User Management
+    getUsers() {
+      return request('/api/admin/users');
+    },
+    promoteUser(userId, assignedSubject) {
+      return request('/api/admin/users/' + userId + '/promote', {
+        method: 'PUT',
+        body: { assignedSubject }
+      });
+    },
+    revokeAdmin(userId) {
+      return request('/api/admin/users/' + userId + '/revoke', {
+        method: 'PUT'
+      });
+    },
+
+    // Board Management
+    addBoard(payload) {
+      return request('/api/admin/boards', {
+        method: 'POST',
+        body: payload
+      });
+    },
+
+    // Flags Management
+    getFlags() {
+      return request('/api/admin/flags');
+    },
+    resolveFlag(flagId, action) {
+      return request('/api/admin/flags/' + flagId + '/resolve', {
+        method: 'POST',
+        body: { action }
+      });
+    },
+
+    // Paper Ingest & Review (Pointing to admin routes)
+    ingestPaper(payload) {
+      return request('/api/admin/papers/ingest', {
+        method: 'POST',
+        body: payload
+      });
+    },
+    getPendingReview() {
+      return request('/api/admin/papers/pending-review');
+    },
+    reviewMatch(paperId, action, questionNumber = 1) {
+      return request('/api/admin/papers/' + paperId + '/review', {
+        method: 'POST',
+        body: { questionNumber, action }
+      });
+    }
+  };
+
+  /* --------------------------------------------------------------------------
      EXPORT
      -------------------------------------------------------------------------- */
   window.API = {
@@ -416,6 +478,7 @@
     notes,
     tests,
     subjective,
+    admin, // <-- NAYA MODULE EXPORT KIYA
     health,
     request,
   };
