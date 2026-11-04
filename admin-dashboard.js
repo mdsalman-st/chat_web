@@ -82,20 +82,21 @@
     if ($(`nav-${tabId}`)) $(`nav-${tabId}`).classList.add('active');
     if ($('page-title') && tabTitles[tabId]) $('page-title').textContent = tabTitles[tabId];
 
-    if (tabId === 'overview') loadOverviewStats();
-    if (tabId === 'review') loadPendingReview();
-    if (tabId === 'users') loadUsers();
-    if (tabId === 'boards') loadBoards();
-    if (tabId === 'question-bank') loadQuestionBank();
-    if (tabId === 'my-papers') loadAllPapers();
-    if (tabId === 'audit') loadAuditLogs();
-    if (tabId === 'ai-health') loadAiHealth();
+    // Call the respective loader functions
+    if (tabId === 'overview') window.loadOverviewStats();
+    if (tabId === 'review') window.loadPendingReview();
+    if (tabId === 'users') window.loadUsers();
+    if (tabId === 'boards') window.loadBoards();
+    if (tabId === 'question-bank') window.loadQuestionBank();
+    if (tabId === 'my-papers') window.loadAllPapers();
+    if (tabId === 'audit') window.loadAuditLogs();
+    if (tabId === 'ai-health') window.loadAiHealth();
   };
 
   // =========================================
   // 4. OVERVIEW STATS
   // =========================================
-  async function loadOverviewStats() {
+  window.loadOverviewStats = async function() {
     try {
       const res = await API.request('/api/admin/stats');
       if (res.success && res.stats) {
@@ -107,12 +108,12 @@
     } catch (err) {
       console.warn('Stats load error:', err);
     }
-  }
+  };
 
   // =========================================
   // 5. MANAGE USERS
   // =========================================
-  async function loadUsers() {
+  window.loadUsers = async function() {
     const list = $('usersList');
     if (!list) return;
     list.innerHTML = '<p class="text-sm text-slate-500">Loading users...</p>';
@@ -142,7 +143,7 @@
           </div>`;
       }).join('');
     } catch (err) { list.innerHTML = `<p class="text-sm text-red-500 font-semibold">Error: ${err.message}</p>`; }
-  }
+  };
 
   window.promoteUser = async function(userId) {
     const subject = prompt("Enter Subject Code for this Admin (e.g. eco, acc, sci):");
@@ -150,7 +151,7 @@
     try {
       await API.request(`/api/admin/users/${userId}/promote`, { method: 'PUT', body: { assignedSubject: subject.trim().toLowerCase() } });
       showToast(`✅ Promoted to ${subject.toUpperCase()} Admin`);
-      loadUsers(); 
+      window.loadUsers(); 
     } catch (err) { alert('Error: ' + err.message); }
   };
 
@@ -159,7 +160,7 @@
     try {
       await API.request(`/api/admin/users/${userId}/revoke`, { method: 'PUT' });
       showToast('✅ Access Revoked');
-      loadUsers();
+      window.loadUsers();
     } catch (err) { alert('Error: ' + err.message); }
   };
 
@@ -198,9 +199,9 @@
       });
 
       showToast(`✅ Admin created successfully!`);
-      closeCreateAdminModal();
+      window.closeCreateAdminModal();
       $('createAdminForm').reset();
-      loadUsers(); 
+      window.loadUsers(); 
       
       alert(`Account Created!\n\nShare these credentials with the teacher:\nEmail: ${payload.email}\nPassword: ${payload.password}\nSubject: ${payload.subject.toUpperCase()}`);
 
@@ -226,11 +227,11 @@
       const res = await API.request('/api/admin/boards', { method: 'POST', body: payload });
       showToast(`✅ Board Added: ${res.board.shortName}`);
       e.target.reset();
-      loadBoards();
+      window.loadBoards();
     } catch (err) { alert('❌ Error: ' + err.message); }
   };
 
-  async function loadBoards() {
+  window.loadBoards = async function() {
     const list = $('boardList');
     if (!list) return;
     list.innerHTML = '<p class="text-sm text-slate-500">Loading boards...</p>';
@@ -243,17 +244,18 @@
         </div>
       `).join('');
     } catch (err) { list.innerHTML = `<p class="text-sm text-red-500">Error: ${err.message}</p>`; }
-  }
+  };
 
   // =========================================
-  // 8. QUESTION BANK (Live fetch, fake removed)
+  // 8. QUESTION BANK (Live fetch)
   // =========================================
-  async function loadQuestionBank() {
+  window.loadQuestionBank = async function() {
     const list = $('questionBankList');
     if (!list) return;
     list.innerHTML = '<p class="text-sm text-slate-500">Loading questions...</p>';
     
     try {
+      // Fallback to /api/tests/questions if admin one is not ready
       const res = await API.request('/api/admin/questions').catch(() => API.request('/api/tests/questions'));
       const questions = res.questions || [];
       
@@ -278,10 +280,10 @@
     } catch (err) {
       list.innerHTML = `<p class="text-sm text-red-500">Could not load questions. API might not be ready.</p>`;
     }
-  }
+  };
 
   // =========================================
-  // 9. INGEST PAPER (PDF UPLOAD + 3D ANIMATION)
+  // 9. INGEST PAPER (PDF UPLOAD)
   // =========================================
   window.handleSuperAdminPdfUpload = async function(e) {
     e.preventDefault();
@@ -298,7 +300,6 @@
 
     btn.innerText = '⏳ Uploading PDF...';
     btn.disabled = true;
-
     if (overlay) overlay.classList.add('active');
 
     const formData = new FormData();
@@ -314,12 +315,11 @@
       const user = API.User.get();
       const isSuperAdmin = (user.role === 'super_admin' || user.role === 'superadmin');
       
-      // 👇 YAHAN API.JS WALA FUNCTION USE KIYA HAI 👇
-      const data = await API.admin.uploadPaper(formData, isSuperAdmin);
+      await API.admin.uploadPaper(formData, isSuperAdmin);
 
       showToast('✅ Paper uploaded successfully! AI is extracting text.');
       $('ingestForm').reset(); 
-      loadAllPapers(); // Refresh list after upload
+      window.loadAllPapers(); 
 
     } catch (error) {
       console.error(error);
@@ -332,25 +332,31 @@
   };
 
   // =========================================
-  // 9.5 MANAGE ALL PAPERS
+  // 9.5 MANAGE ALL PAPERS (Fixed 403 Error)
   // =========================================
-  async function loadAllPapers() {
+  window.loadAllPapers = async function() {
     const list = $('allPapersList');
     if (!list) return;
     list.innerHTML = '<p class="text-sm text-slate-500">Loading...</p>';
 
     try {
-      const res = await API.request('/api/superadmin/papers');
+      const user = API.User.get();
+      const isSuperAdmin = (user.role === 'super_admin' || user.role === 'superadmin');
+      
+      // Agar Super Admin hai toh saare papers dikhao, agar normal admin hai toh uske apne
+      const endpoint = isSuperAdmin ? '/api/superadmin/papers' : '/api/admin/papers';
+
+      const res = await API.request(endpoint);
       const papers = res.papers || [];
       
       if (!papers.length) {
-        list.innerHTML = '<p class="text-sm text-slate-500">No papers uploaded by any admin yet.</p>';
+        list.innerHTML = '<p class="text-sm text-slate-500">No papers uploaded yet.</p>';
         return;
       }
 
       list.innerHTML = papers.map(p => {
         const date = new Date(p.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
-        const uploaderName = p.ingestedBy?.name || 'Unknown Admin';
+        const uploaderName = p.ingestedBy?.name || 'Admin';
         const statusColor = p.status === 'ingested' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' : 'text-amber-400 bg-amber-500/10 border-amber-500/20';
         
         return `
@@ -361,7 +367,7 @@
                 <span class="text-xs text-slate-500 font-mono">${p.paperCode || 'N/A'}</span>
               </div>
               <p class="text-sm font-bold text-slate-800">${p.subjectName} - ${p.boardCode.toUpperCase()} Class ${p.classLevel} (${p.year})</p>
-              <p class="text-xs text-slate-500 mt-1">Uploaded by <span class="font-bold">${uploaderName}</span> on ${date} • Size: ${(p.fileSize / 1024 / 1024).toFixed(2)} MB</p>
+              <p class="text-xs text-slate-500 mt-1">By ${uploaderName} • ${(p.fileSize / 1024 / 1024).toFixed(2)} MB</p>
             </div>
             <div class="flex gap-2 w-full sm:w-auto">
               <a href="${p.fileUrl}" target="_blank" class="neu-btn px-4 py-2 text-xs font-bold text-blue-500 text-center flex-1 sm:flex-none">View PDF</a>
@@ -374,15 +380,19 @@
     } catch (err) {
       list.innerHTML = `<p class="text-sm text-red-500">Error loading papers: ${err.message}</p>`;
     }
-  }
+  };
 
   window.deleteSuperAdminPaper = async function(id) {
     if (!confirm('Are you sure you want to delete this paper? It will be removed for everyone.')) return;
     
     try {
-      await API.request(`/api/superadmin/papers/${id}`, { method: 'DELETE' });
+      const user = API.User.get();
+      const isSuperAdmin = (user.role === 'super_admin' || user.role === 'superadmin');
+      const endpoint = isSuperAdmin ? `/api/superadmin/papers/${id}` : `/api/admin/papers/${id}`;
+      
+      await API.request(endpoint, { method: 'DELETE' });
       showToast('✅ Paper deleted successfully');
-      loadAllPapers();
+      window.loadAllPapers();
     } catch (err) {
       alert('❌ Error deleting paper: ' + err.message);
     }
@@ -391,7 +401,7 @@
   // =========================================
   // 10. REVIEW QUEUE
   // =========================================
-  async function loadPendingReview() {
+  window.loadPendingReview = async function() {
     const list = $('reviewList');
     if (!list) return;
     list.innerHTML = '<p class="text-sm text-slate-500">Loading...</p>';
@@ -412,7 +422,7 @@
         </div>
       `).join('');
     } catch (err) { list.innerHTML = `<p class="text-sm text-red-500">Error: ${err.message}</p>`; }
-  }
+  };
 
   window.reviewAction = async function(paperId, action) {
     try {
@@ -423,9 +433,9 @@
   };
 
   // =========================================
-  // 11. AI HEALTH & AUDIT LOGS (Dynamic, fake removed)
+  // 11. AI HEALTH & AUDIT LOGS
   // =========================================
-  async function loadAiHealth() {
+  window.loadAiHealth = async function() {
     try {
       const res = await API.request('/api/admin/ai-health').catch(() => null);
       if (res) {
@@ -441,9 +451,9 @@
     } catch (e) {
       console.warn('AI Health error', e);
     }
-  }
+  };
 
-  async function loadAuditLogs() {
+  window.loadAuditLogs = async function() {
     const list = $('auditLogsList');
     if (!list) return;
     list.innerHTML = '<p class="text-sm text-slate-500">Loading logs...</p>';
@@ -466,7 +476,7 @@
     } catch (err) {
       list.innerHTML = '<p class="text-sm text-slate-500">Audit Logs API not configured yet.</p>';
     }
-  }
+  };
 
   // =========================================
   // 12. PROFILE & MAINTENANCE
