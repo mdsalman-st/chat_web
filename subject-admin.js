@@ -60,23 +60,185 @@
     'overview': 'Subject Overview',
     'manage-qs': 'Manage Questions',
     'materials': 'Books & Notes',
+    'ingest': 'Ingest Official Paper',
+    'my-papers': 'My Uploaded Papers',
     'review': 'AI Question Review',
     'flags': 'Reported Questions',
     'profile': 'Teacher Profile Settings'
   };
 
   window.switchTab = function(tabId) {
-    ['overview', 'manage-qs', 'materials', 'review', 'flags', 'profile'].forEach(t => {
+    ['overview', 'manage-qs', 'materials', 'ingest', 'my-papers', 'review', 'flags', 'profile'].forEach(t => {
       if ($(`tab-${t}`)) $(`tab-${t}`).classList.add('hidden');
       if ($(`nav-${t}`)) $(`nav-${t}`).classList.remove('active');
     });
     
     if ($(`tab-${tabId}`)) $(`tab-${tabId}`).classList.remove('hidden');
     if ($(`nav-${tabId}`)) $(`nav-${tabId}`).classList.add('active');
-    if ($('page-title')) $('page-title').textContent = tabTitles[tabId];
+    if ($('page-title') && tabTitles[tabId]) $('page-title').textContent = tabTitles[tabId];
 
     if (tabId === 'review') loadPendingReview();
     if (tabId === 'flags') loadFlags();
+    if (tabId === 'my-papers') loadMyPapers();
+    if (tabId === 'manage-qs') loadQuestions(); // 👈 NAYA
+  };
+
+  // =========================================
+  // PDF UPLOAD LOGIC FOR SUBJECT ADMIN
+  // =========================================
+  window.handleAdminPdfUpload = async function(e) {
+    e.preventDefault();
+    
+    const btn = $('ingestBtn');
+    const originalText = btn.innerText;
+    const fileInput = $('ingestPdf');
+
+    if (!fileInput || !fileInput.files.length) {
+      alert('Please select a PDF file first.');
+      return;
+    }
+
+    btn.innerText = '⏳ Uploading...';
+    btn.disabled = true;
+
+    const formData = new FormData();
+    formData.append('pdf', fileInput.files[0]);
+    formData.append('boardCode', $('ingestBoard').value);
+    formData.append('classLevel', $('ingestClass').value);
+    formData.append('subjectCode', $('ingestSubjectCode').value.trim());
+    formData.append('subjectName', $('ingestSubjectName').value.trim());
+    formData.append('year', $('ingestYear').value);
+    formData.append('examPhase', $('ingestPhase').value);
+
+    try {
+      const token = (typeof API !== 'undefined' && API.Token.get) ? API.Token.get() : localStorage.getItem('nexus_token'); 
+
+      const response = await fetch('/api/admin/papers/upload', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        showToast('✅ Paper uploaded successfully! AI is extracting text.');
+        $('ingestForm').reset(); 
+        loadMyPapers(); 
+      } else {
+        alert(`❌ Upload Error: ${data.message}`);
+      }
+    } catch (error) {
+      console.error(error);
+      alert('❌ Network Error. Server check karein.');
+    } finally {
+      btn.innerText = originalText;
+      btn.disabled = false;
+    }
+  };
+
+  // =========================================
+  // LOAD MY PAPERS LIST
+  // =========================================
+  async function loadMyPapers() {
+    const list = $('myPapersList');
+    if (!list) return;
+    list.innerHTML = '<p class="text-sm text-slate-400">Loading...</p>';
+
+    try {
+      const res = await API.request('/api/admin/papers');
+      const papers = res.papers || [];
+      
+      if (!papers.length) {
+        list.innerHTML = '<p class="text-sm text-slate-400">No papers uploaded yet.</p>';
+        return;
+      }
+
+      list.innerHTML = papers.map(p => {
+        const date = new Date(p.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+        const statusColor = p.status === 'ingested' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' : 'text-amber-400 bg-amber-500/10 border-amber-500/20';
+        
+        return `
+          <div class="glass-inner p-5 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div class="flex-1">
+              <div class="flex items-center gap-3 mb-1">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${statusColor}">${p.status}</span>
+                <span class="text-xs text-slate-400 font-mono">${p.paperCode || 'N/A'}</span>
+              </div>
+              <p class="text-sm font-bold text-white">${p.subjectName} - ${p.boardCode.toUpperCase()} Class ${p.classLevel} (${p.year})</p>
+              <p class="text-xs text-slate-400 mt-1">Uploaded on ${date} • Size: ${(p.fileSize / 1024 / 1024).toFixed(2)} MB</p>
+            </div>
+            <div class="flex gap-2 w-full sm:w-auto">
+              <a href="${p.fileUrl}" target="_blank" class="px-4 py-2 glass-inner text-xs font-bold text-cyan-400 text-center flex-1 sm:flex-none">View PDF</a>
+              <button onclick="deletePaper('${p._id}')" class="px-4 py-2 bg-red-500/10 text-xs font-bold text-red-400 border border-red-500/20 rounded-xl hover:bg-red-500/20 transition flex-1 sm:flex-none">Delete</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+    } catch (err) {
+      list.innerHTML = `<p class="text-sm text-red-500">Error loading papers: ${err.message}</p>`;
+    }
+  }
+
+  window.deletePaper = async function(id) {
+    if (!confirm('Are you sure you want to delete this paper? This action cannot be undone.')) return;
+    
+    try {
+      await API.request(`/api/admin/papers/${id}`, { method: 'DELETE' });
+      showToast('✅ Paper deleted successfully');
+      loadMyPapers(); 
+    } catch (err) {
+      alert('❌ Error deleting paper: ' + err.message);
+    }
+  };
+
+  // =========================================
+  // NAYA: MANAGE QUESTIONS (LIVE DATA)
+  // =========================================
+  async function loadQuestions() {
+    const list = $('manageQuestionsList');
+    if (!list) return;
+    list.innerHTML = '<p class="text-sm text-slate-400">Loading questions...</p>';
+    
+    try {
+      const res = await API.request('/api/admin/questions');
+      const questions = res.questions || [];
+      
+      if (questions.length === 0) {
+        list.innerHTML = '<p class="text-sm text-slate-400">No questions found for your subject. Generate some using AI first!</p>';
+        return;
+      }
+
+      list.innerHTML = questions.map(q => `
+        <div class="glass-inner p-5 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="px-2 py-1 bg-green-500/10 text-green-400 border border-green-500/20 text-[10px] font-bold rounded-md uppercase">${q.status || 'VERIFIED'}</span>
+              <span class="text-[10px] font-bold text-slate-400">${q.difficulty || 'Medium'}</span>
+            </div>
+            <p class="text-sm font-bold text-white mb-1">${q.questionText}</p>
+            <p class="text-xs text-slate-400">Class ${q.classLevel} • Chapter ${q.chapterNumber} • ${q.subjectCode.toUpperCase()}</p>
+          </div>
+          <div class="flex gap-2 w-full sm:w-auto">
+            <button onclick="deleteSubjectQuestion('${q._id}')" class="px-4 py-2 bg-red-500/10 text-xs font-bold text-red-400 border border-red-500/20 rounded-xl hover:bg-red-500/20 w-full sm:w-auto">Delete</button>
+          </div>
+        </div>
+      `).join('');
+    } catch (err) {
+      list.innerHTML = `<p class="text-sm text-red-500">Error loading questions: ${err.message}</p>`;
+    }
+  }
+
+  window.deleteSubjectQuestion = async function(id) {
+    if (!confirm('Are you sure you want to delete this question?')) return;
+    try {
+      await API.request(`/api/admin/questions/${id}`, { method: 'DELETE' });
+      showToast('✅ Question deleted successfully');
+      loadQuestions();
+    } catch (err) {
+      alert('❌ Error deleting question: ' + err.message);
+    }
   };
 
   // MOCK FUNCTIONS FOR NEW FEATURES
@@ -150,6 +312,7 @@
 
   function showToast(message) {
     const toast = $('toast');
+    if(!toast) return;
     toast.textContent = message;
     toast.style.transform = 'translateY(0)'; toast.style.opacity = '1';
     setTimeout(() => { toast.style.transform = 'translateY(20px)'; toast.style.opacity = '0'; }, 3000);

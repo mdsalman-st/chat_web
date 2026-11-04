@@ -7,7 +7,77 @@
   'use strict';
 
   // =========================================
-  // 1. ACADEMIC PROFILE & ENROLLED SUBJECTS
+  // 1. DASHBOARD STATS (LIVE DATA)
+  // =========================================
+  async function loadDashboardStats() {
+    const statRow = document.getElementById('statRow');
+    if (!statRow || !window.API?.tests) return;
+
+    // Loading state
+    statRow.innerHTML = `
+      <div class="p-4 rounded-xl glass-inner flex flex-col justify-center animate-pulse">
+        <div class="h-4 bg-white/10 rounded w-1/2 mb-2"></div>
+        <div class="h-8 bg-white/10 rounded w-3/4"></div>
+      </div>
+      <div class="p-4 rounded-xl glass-inner flex flex-col justify-center animate-pulse">
+        <div class="h-4 bg-white/10 rounded w-1/2 mb-2"></div>
+        <div class="h-8 bg-white/10 rounded w-3/4"></div>
+      </div>
+      <div class="p-4 rounded-xl glass-inner flex flex-col justify-center animate-pulse">
+        <div class="h-4 bg-white/10 rounded w-1/2 mb-2"></div>
+        <div class="h-8 bg-white/10 rounded w-3/4"></div>
+      </div>
+      <div class="p-4 rounded-xl glass-inner flex flex-col justify-center animate-pulse">
+        <div class="h-4 bg-white/10 rounded w-1/2 mb-2"></div>
+        <div class="h-8 bg-white/10 rounded w-3/4"></div>
+      </div>
+    `;
+
+    try {
+      // Fetch up to 50 recent results to calculate stats
+      const res = await window.API.tests.getRecentResults(50);
+      const results = res.results || [];
+
+      let totalTests = results.length;
+      let totalScorePct = 0;
+      let bestScore = 0;
+      let totalQuestionsSolved = 0;
+
+      results.forEach(r => {
+        const pct = r.score?.percentage || 0;
+        totalScorePct += pct;
+        if (pct > bestScore) bestScore = pct;
+        totalQuestionsSolved += (r.totalQuestions || 0);
+      });
+
+      const avgScore = totalTests > 0 ? Math.round(totalScorePct / totalTests) : 0;
+
+      statRow.innerHTML = `
+        <div class="p-4 rounded-xl glass-inner flex flex-col justify-center">
+          <p class="text-xs font-bold uppercase tracking-wider mb-1" style="color: var(--text-muted);">Tests Taken</p>
+          <h3 class="text-2xl font-black" style="color: var(--text-main);">${totalTests}</h3>
+        </div>
+        <div class="p-4 rounded-xl glass-inner flex flex-col justify-center">
+          <p class="text-xs font-bold uppercase tracking-wider mb-1" style="color: var(--text-muted);">Avg. Score</p>
+          <h3 class="text-2xl font-black text-cyan-400">${avgScore}%</h3>
+        </div>
+        <div class="p-4 rounded-xl glass-inner flex flex-col justify-center">
+          <p class="text-xs font-bold uppercase tracking-wider mb-1" style="color: var(--text-muted);">Best Score</p>
+          <h3 class="text-2xl font-black text-emerald-400">${bestScore}%</h3>
+        </div>
+        <div class="p-4 rounded-xl glass-inner flex flex-col justify-center">
+          <p class="text-xs font-bold uppercase tracking-wider mb-1" style="color: var(--text-muted);">Qs Solved</p>
+          <h3 class="text-2xl font-black text-violet-400">${totalQuestionsSolved}</h3>
+        </div>
+      `;
+    } catch (e) {
+      console.warn('Could not load dashboard stats:', e);
+      statRow.innerHTML = '<div class="col-span-full text-center text-xs text-red-400">Failed to load stats.</div>';
+    }
+  }
+
+  // =========================================
+  // 2. ACADEMIC PROFILE & ENROLLED SUBJECTS
   // =========================================
   async function loadStudentAcademicData() {
     const badgeEl = document.getElementById('dashAcademicBadge');
@@ -78,7 +148,7 @@
   }
 
   // =========================================
-  // 2. NOTIFICATIONS
+  // 3. NOTIFICATIONS
   // =========================================
   async function loadNotifications() {
     const notifBtn = document.getElementById('notifBtn');
@@ -149,21 +219,18 @@
   };
 
   // =========================================
-  // 3. RECENT TESTS + MY RESULTS TAB BADGE
+  // 4. RECENT TESTS + MY RESULTS TAB BADGE
   // =========================================
   async function loadRecentTests() {
     const recentSec = document.getElementById('studentRecentTests');
     if (!recentSec || !window.API?.tests) return;
 
-    // NAYA: Update "My Results" tab ke saath count badge
     const resultsCountBadge = document.getElementById('myResultsCount');
 
     try {
-      // NAYA: Zyada results fetch karo taaki count pata chale
       const res = await window.API.tests.getRecentResults(20);
       const results = res.results || [];
       
-      // NAYA: Update count badge in sidebar
       if (resultsCountBadge) {
         if (results.length > 0) {
           resultsCountBadge.textContent = results.length;
@@ -185,7 +252,6 @@
         return;
       }
 
-      // NAYA: Sirf top 5 results recent tests widget me dikhao
       const topResults = results.slice(0, 5);
 
       ul.innerHTML = topResults.map((r) => {
@@ -215,7 +281,7 @@
   }
 
   // =========================================
-  // 4. INIT FUNCTION
+  // 5. INIT FUNCTION
   // =========================================
   function init() {
     // 1) Force-show student-only sections
@@ -234,8 +300,35 @@
     if (welcomeMsg && !welcomeMsg.textContent.trim()) {
       welcomeMsg.textContent = "Let's ace your next exam. Here's your progress.";
     }
+    
+    // 4) Set Greeting based on time & User Name
+    const hour = new Date().getHours();
+    let greeting = 'Good morning';
+    if (hour >= 12 && hour < 17) greeting = 'Good afternoon';
+    else if (hour >= 17) greeting = 'Good evening';
+    
+    const welcomeTimeEl = document.getElementById('welcomeTime');
+    if (welcomeTimeEl) welcomeTimeEl.textContent = greeting;
 
-    // 4) Load dynamic academic data, notifications, and recent tests
+    // Try to fetch user name from API if available
+    if (window.API && window.API.User) {
+        const user = window.API.User.get();
+        if (user && user.name) {
+            const welcomeNameEl = document.getElementById('welcomeName');
+            if (welcomeNameEl) welcomeNameEl.textContent = user.name.split(' ')[0];
+            const profileNameEl = document.getElementById('profileName');
+            if (profileNameEl) profileNameEl.textContent = user.name;
+            const panelNameEl = document.getElementById('panelName');
+            if (panelNameEl) panelNameEl.textContent = user.name;
+            const panelEmailEl = document.getElementById('panelEmail');
+            if (panelEmailEl) panelEmailEl.textContent = user.email;
+            const avatarLetterEl = document.getElementById('avatarLetter');
+            if (avatarLetterEl) avatarLetterEl.textContent = user.name.charAt(0).toUpperCase();
+        }
+    }
+
+    // 5) Load dynamic data
+    loadDashboardStats(); // 👈 NAYA: Stats populate karega
     loadStudentAcademicData();
     loadNotifications();
     loadRecentTests();

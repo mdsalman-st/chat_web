@@ -5,6 +5,7 @@
 
   let currentAttemptId = null;
   let allHistoryResults = [];
+  let currentResultData = null; // Store for Retake
 
   async function init() {
     if (!API.Token.exists()) { window.location.href = 'auth.html'; return; }
@@ -23,15 +24,17 @@
         const singleRes = await API.tests.getResult(currentAttemptId);
         latestResult = singleRes.result;
       } else if (allHistoryResults.length > 0) {
-        // If no attemptId, load the most recent one
+        // If no attemptId in URL, load the most recent one
         const singleRes = await API.tests.getResult(allHistoryResults[0].attemptId);
         latestResult = singleRes.result;
+        currentAttemptId = latestResult.attemptId; // Set for PDF download
       }
 
       $('loadingResults').classList.add('hidden');
       $('resultsContainer').classList.remove('hidden');
 
       if (latestResult) {
+        currentResultData = latestResult;
         renderLatestResult(latestResult);
       } else {
         $('latestResultSection').innerHTML = '<p class="text-center text-slate-500 py-10">No recent result found. Take a test to see your analysis!</p>';
@@ -78,17 +81,16 @@
     $('rCorrect').textContent = score.correct || 0;
     $('rIncorrect').textContent = score.incorrect || 0;
 
-    // 5. Time Analysis (Mocked for UI, can be calculated from durationMs)
+    // 5. Time Analysis
     const durMin = Math.round((result.durationMs || 0) / 60000);
     $('rTimeTaken').textContent = `${durMin}m`;
     $('rAvgTime').textContent = `${Math.round(durMin / (result.totalQuestions || 1))}m`;
-    $('rTimeSaved').textContent = `${Math.max(0, 180 - durMin)}m`; // Assuming 3 hour limit
+    $('rTimeSaved').textContent = `${Math.max(0, 180 - durMin)}m`;
 
     // 6. PDF Card (Show only for Full Paper)
     if (result.testType === 'full_paper') {
       $('pdfCard').classList.remove('hidden');
       $('pdfFileName').textContent = `${result.subjectName || 'Board'}_AnswerSheet.pdf`;
-      // Set Subjective Score (Mocked for now until backend links it)
       $('rSubjScore').textContent = `--/--`; 
     } else {
       $('pdfCard').classList.add('hidden');
@@ -110,7 +112,7 @@
     const answersList = $('answersReviewList');
     if (result.answers && result.answers.length > 0) {
       answersList.innerHTML = result.answers.map((ans, idx) => {
-        if (ans.isSkipped) return ''; // Optional: hide skipped for cleaner look
+        if (ans.isSkipped) return ''; 
         const isCorrect = ans.isCorrect;
         const bg = isCorrect ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-red-500/10 border-red-500/20';
         const status = isCorrect ? '<span class="text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20">Correct</span>' : '<span class="text-red-400 text-[10px] font-bold px-2 py-0.5 rounded bg-red-500/20">Incorrect</span>';
@@ -160,7 +162,7 @@
             </div>
           </div>
           <div class="col-span-2 text-center hidden sm:block">
-            <span class="px-2 py-1 rounded-md bg-white/5 text-slate-300 text-[10px] font-bold">${isFull ? 'PDF Pending' : 'Completed'}</span>
+            <span class="px-2 py-1 rounded-md bg-white/5 text-slate-300 text-[10px] font-bold">Completed</span>
           </div>
           <div class="col-span-2 text-center text-[11px] text-slate-400 hidden sm:block">${date}</div>
           <div class="col-span-2 text-center">
@@ -168,7 +170,6 @@
           </div>
           <div class="col-span-2 flex justify-end gap-2">
             <a href="test-results.html?attemptId=${r.attemptId}" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/20 text-slate-300 flex items-center justify-center border border-white/10 transition" title="View">👁️</a>
-            ${isFull ? `<button onclick="downloadPdf()" class="w-8 h-8 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 flex items-center justify-center border border-cyan-500/20 transition" title="Download PDF">⬇️</button>` : ''}
           </div>
         </div>
       `;
@@ -187,10 +188,56 @@
     }
   };
 
-  window.viewPdf = function() { showToast('👁️ Opening PDF viewer...'); };
-  window.downloadPdf = function() { showToast('⬇️ Downloading PDF...'); };
-  window.downloadBoardMarksheet = function() { showToast('📜 Generating Official Marksheet PDF...'); };
-  window.retakeTest = function() { showToast('🔄 Redirecting to retake test...'); };
+  // REAL PDF DOWNLOAD LOGIC (ROUTE FIXED)
+  window.downloadPdf = async function() {
+    if (!currentAttemptId) {
+      showToast('⚠️ No active attempt to download.');
+      return;
+    }
+    showToast('⏳ Generating PDF Report...');
+    
+    try {
+      const token = (typeof API !== 'undefined' && API.Token.get) ? API.Token.get() : localStorage.getItem('nexus_token'); 
+      
+      // 👇 ROUTE FIXED AS PER BACKEND CONTROLLER 👇
+      const res = await fetch(`/api/tests/${currentAttemptId}/pdf`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || 'Server rejected PDF request');
+      }
+      
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Nexus_Report_${currentAttemptId}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      
+      showToast('✅ PDF Downloaded Successfully!');
+    } catch (err) {
+      console.error('PDF Error:', err);
+      alert(`❌ Could not download PDF: ${err.message}`);
+    }
+  };
+
+  window.retakeTest = function() {
+    if (!currentResultData) return;
+    
+    // Reconstruct URL based on test type
+    if (currentResultData.testType === 'full_paper' && currentResultData.paperId) {
+      window.location.href = `test-live.html?paperId=${currentResultData.paperId}&subject=${currentResultData.subjectCode}`;
+    } else if (currentResultData.chapterNumber) {
+      window.location.href = `test-live.html?subject=${currentResultData.subjectCode}&chapter=${currentResultData.chapterNumber}`;
+    } else {
+      window.location.href = 'test-select.html';
+    }
+  };
 
   window.filterHistory = function(type, btn) {
     document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
@@ -210,6 +257,7 @@
 
   function showToast(msg) {
     const t = $('toast');
+    if(!t) return;
     t.textContent = msg;
     t.style.opacity = '1'; t.style.transform = 'translateX(-50%) translateY(0)';
     setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(-50%) translateY(20px)'; }, 3000);

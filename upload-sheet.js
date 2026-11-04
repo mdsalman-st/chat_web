@@ -24,7 +24,6 @@
       return;
     }
 
-    // Check if URL has existing submissionId (?submissionId=...)
     const params = new URLSearchParams(window.location.search);
     const urlSubmissionId = params.get('submissionId');
 
@@ -53,7 +52,6 @@
         return;
       }
 
-      // Default active subject
       currentSubjectCode = subjects[0].code;
 
       if (tabsWrap) {
@@ -73,16 +71,10 @@
         }).join('');
       }
 
-      // 3. Load official papers for this subject
       await loadAvailablePapersForSubject();
-
-      // 4. Setup Drag & Drop and File Inputs
       setupDropZone();
-
-      // 5. Load Recent Submissions
       loadRecentSubmissions();
 
-      // If url provided submissionId, load result immediately
       if (urlSubmissionId) {
         loadSubmissionResult(urlSubmissionId);
       }
@@ -237,17 +229,14 @@
           <img src="${p.previewUrl}" alt="Page ${idx + 1}" class="w-full h-full object-cover">
         </div>
 
-        <!-- Page Number Badge -->
         <span class="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-ink-950/80 backdrop-blur-md text-[10px] font-bold text-cyan-300 border border-white/10">
           Page ${idx + 1}
         </span>
 
-        <!-- Delete Button -->
         <button onclick="removePage(${idx})" title="Remove page" class="absolute top-2 right-2 w-6 h-6 rounded-md bg-red-500/80 hover:bg-red-500 text-white flex items-center justify-center text-xs transition opacity-0 group-hover:opacity-100 cursor-pointer">
           ✕
         </button>
 
-        <!-- Order Controls -->
         <div class="absolute bottom-2 inset-x-2 flex items-center justify-between opacity-0 group-hover:opacity-100 transition">
           <button onclick="movePage(${idx}, -1)" ${idx === 0 ? 'disabled' : ''} class="px-2 py-0.5 rounded bg-ink-950/80 text-[10px] text-white disabled:opacity-30 cursor-pointer">
             ←
@@ -303,11 +292,17 @@
 
     if (submitBtn) {
       submitBtn.disabled = true;
-      submitBtn.innerHTML = '<span>Uploading…</span>';
+      submitBtn.innerHTML = '<span>⏳ Uploading to Cloudinary...</span>';
+    }
+
+    // 👇 NAYA: 3D Cube Overlay Show karo 👇
+    const overlay = $('cubeLoadingOverlay');
+    if (overlay) {
+      overlay.classList.add('active');
     }
 
     try {
-      // Build JSON payload with base64 images for seamless cross-browser transfer
+      // Payload for backend (Backend will upload base64 to Cloudinary)
       const payload = {
         boardCode: currentProfile.board || 'bseb',
         classLevel: currentProfile.classLevel || '10',
@@ -321,7 +316,7 @@
         setCode,
         pages: uploadedPages.map((p, idx) => ({
           pageNumber: idx + 1,
-          imageBase64: p.base64,
+          imageBase64: p.base64, // Backend will handle this!
           mimeType: p.mimeType,
         })),
       };
@@ -333,15 +328,24 @@
       }
 
       activeSubmissionId = res.submissionId;
-
-      // Switch to progress view
+      
+      // Overlay band karo aur polling start karo
+      if (overlay) overlay.classList.remove('active');
+      
       startEvaluationPolling(activeSubmissionId);
+
     } catch (err) {
       console.error('Submit answer sheet error:', err);
       alert(err.message || 'Failed to upload answer sheet');
+      
       if (submitBtn) {
         submitBtn.disabled = false;
         submitBtn.innerHTML = '<span>🚀 Check Copy with AI Vision</span><span>→</span>';
+      }
+    } finally {
+      // 👇 NAYA: Chahe success ho ya error, overlay band ho jaye 👇
+      if (overlay) {
+        overlay.classList.remove('active');
       }
     }
   };
@@ -357,7 +361,6 @@
 
     if (pollingInterval) clearInterval(pollingInterval);
 
-    // Scroll progress card into view
     progressCard?.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
     pollingInterval = setInterval(async () => {
@@ -437,11 +440,8 @@
 
       resultsCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-      // Title & Score
       const titleEl = $('resSubjectTitle');
-      if (titleEl) {
-        titleEl.textContent = `${sub.subjectName || sub.subjectCode} Copy Evaluated`;
-      }
+      if (titleEl) titleEl.textContent = `${sub.subjectName || sub.subjectCode} Copy Evaluated`;
 
       const attrEl = $('resPaperAttribution');
       if (attrEl) {
@@ -456,11 +456,9 @@
       const percentEl = $('resPercentText');
       if (percentEl) percentEl.textContent = `${sub.percentage}% Marks Awarded`;
 
-      // Overall Feedback
       const fbEl = $('resOverallFeedback');
       if (fbEl) fbEl.textContent = sub.overallFeedback || 'Evaluation completed successfully.';
 
-      // Questions breakdown
       const listEl = $('evalQuestionsList');
       if (listEl) {
         const evals = sub.evaluations || [];
@@ -471,7 +469,6 @@
         }
       }
 
-      // Reload recent submissions
       loadRecentSubmissions();
     } catch (err) {
       console.error('loadSubmissionResult error:', err);
@@ -485,7 +482,6 @@
 
     return `
       <div class="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08] hover:border-cyan-500/30 transition">
-        <!-- Header -->
         <div class="flex items-start justify-between gap-3 mb-3">
           <div class="flex items-center gap-2.5">
             <span class="w-7 h-7 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 font-bold text-xs flex items-center justify-center shrink-0">
@@ -501,7 +497,6 @@
           </span>
         </div>
 
-        <!-- Student Transcribed Answer & Model Answer -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3 text-xs">
           <div class="p-3 rounded-xl bg-ink-950/60 border border-white/5">
             <p class="text-[11px] font-bold text-cyan-300 mb-1 flex items-center gap-1">
@@ -518,7 +513,6 @@
           </div>
         </div>
 
-        <!-- Step Marks Table -->
         ${steps.length > 0 ? `
           <div class="mb-3 overflow-x-auto">
             <table class="w-full text-left text-xs border border-white/5 rounded-xl overflow-hidden">
@@ -544,7 +538,6 @@
           </div>
         ` : ''}
 
-        <!-- Keywords Analysis -->
         <div class="flex flex-wrap items-center gap-1.5 mb-2 text-[10px]">
           <span class="text-slate-400 font-semibold mr-1">Key Terminology:</span>
           ${covered.map((k) => `
@@ -559,7 +552,6 @@
           `).join('')}
         </div>
 
-        <!-- Examiner Remarks -->
         <div class="p-2.5 rounded-xl bg-white/[0.02] border border-white/5 text-[11px] text-slate-300">
           <span class="font-bold text-cyan-400">Teacher Note:</span> ${esc(q.feedback || q.examinerRemarks || 'Good attempt.')}
         </div>
