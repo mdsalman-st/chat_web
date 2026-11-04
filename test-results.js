@@ -5,7 +5,7 @@
 
   let currentAttemptId = null;
   let allHistoryResults = [];
-  let currentResultData = null; // Store for Retake
+  let currentResultData = null; 
 
   async function init() {
     if (!API.Token.exists()) { window.location.href = 'auth.html'; return; }
@@ -14,20 +14,17 @@
     currentAttemptId = params.get('attemptId');
 
     try {
-      // 1. Fetch Recent History
       const historyRes = await API.tests.getRecentResults(20);
       allHistoryResults = historyRes.results || [];
       
-      // 2. Determine Latest Result
       let latestResult = null;
       if (currentAttemptId) {
         const singleRes = await API.tests.getResult(currentAttemptId);
         latestResult = singleRes.result;
       } else if (allHistoryResults.length > 0) {
-        // If no attemptId in URL, load the most recent one
         const singleRes = await API.tests.getResult(allHistoryResults[0].attemptId);
         latestResult = singleRes.result;
-        currentAttemptId = latestResult.attemptId; // Set for PDF download
+        currentAttemptId = latestResult.attemptId; 
       }
 
       $('loadingResults').classList.add('hidden');
@@ -52,7 +49,9 @@
   // RENDER LATEST RESULT
   // =========================================
   function renderLatestResult(result) {
-    const score = result.score || {};
+    const score = result.combinedScore || result.score || {}; // Use combined score if available
+    const mcqScore = result.score || {};
+    const subjScore = result.subjectiveScore || {};
     const ai = result.aiAnalysis || {};
     const pct = score.percentage || 0;
 
@@ -60,7 +59,7 @@
     $('resultSubject').textContent = result.subjectName || result.subjectCode;
     $('resultChapter').textContent = result.chapterTitle || (result.chapterNumber ? `Chapter ${result.chapterNumber}` : 'Full Board Paper');
 
-    // 2. Score Ring
+    // 2. Score Ring (Combined)
     const ring = $('scoreRing');
     const circumference = 2 * Math.PI * 15.9155;
     const offset = circumference * (1 - pct / 100);
@@ -77,9 +76,10 @@
     else badge.className = 'inline-flex px-4 py-1.5 rounded-full text-xs font-bold border bg-red-500/20 text-red-400 border-red-500/30';
 
     // 4. Score Breakdown
-    $('rMcqScore').textContent = `${score.obtainedMarks || 0}/${score.totalMarks || 0}`;
-    $('rCorrect').textContent = score.correct || 0;
-    $('rIncorrect').textContent = score.incorrect || 0;
+    $('rMcqScore').textContent = `${mcqScore.obtainedMarks || 0}/${mcqScore.totalMarks || 0}`;
+    $('rSubjScore').textContent = subjScore.totalMarks > 0 ? `${subjScore.obtainedMarks}/${subjScore.totalMarks}` : `N/A`;
+    $('rCorrect').textContent = mcqScore.correct || 0;
+    $('rIncorrect').textContent = mcqScore.incorrect || 0;
 
     // 5. Time Analysis
     const durMin = Math.round((result.durationMs || 0) / 60000);
@@ -87,14 +87,12 @@
     $('rAvgTime').textContent = `${Math.round(durMin / (result.totalQuestions || 1))}m`;
     $('rTimeSaved').textContent = `${Math.max(0, 180 - durMin)}m`;
 
-    // 6. PDF Card (Show only for Full Paper)
-    if (result.testType === 'full_paper') {
+    // 6. PDF Card (Show if subjective was submitted)
+    if (result.subjectiveDetails) {
       $('pdfCard').classList.remove('hidden');
       $('pdfFileName').textContent = `${result.subjectName || 'Board'}_AnswerSheet.pdf`;
-      $('rSubjScore').textContent = `--/--`; 
     } else {
       $('pdfCard').classList.add('hidden');
-      $('rSubjScore').textContent = `N/A`;
     }
 
     // 7. AI Analysis
@@ -108,7 +106,74 @@
     renderList('aiWeakAreas', ai.weakAreas, 'No major weak areas.');
     renderList('aiRecommendations', ai.recommendations, 'Continue your pace.');
 
-    // 8. Answer Review (MCQ Only)
+    // 8. Subjective Evaluation Section
+    if (result.subjectiveDetails && result.subjectiveDetails.evaluations && result.subjectiveDetails.evaluations.length > 0) {
+      $('subjectiveEvalSection').classList.remove('hidden');
+      const subjList = $('subjectiveQuestionsList');
+      
+      subjList.innerHTML = result.subjectiveDetails.evaluations.map((q, idx) => {
+        const steps = q.stepMarksBreakdown || [];
+        const covered = q.keywordsCovered || [];
+        const missed = q.keywordsMissed || [];
+        const isGood = q.awardedMarks >= q.maxMarks * 0.7;
+
+        return `
+          <div class="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08]">
+            <div class="flex items-start justify-between gap-3 mb-3">
+              <div class="flex items-center gap-2.5">
+                <span class="w-7 h-7 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 font-bold text-xs flex items-center justify-center shrink-0">Q${q.questionNumber || idx+1}</span>
+                <div>
+                  <h5 class="text-xs sm:text-sm font-bold text-white">${esc(q.questionText)}</h5>
+                  ${q.hindiQuestionText && q.hindiQuestionText !== q.questionText ? `<p class="text-xs text-slate-400 mt-0.5">${esc(q.hindiQuestionText)}</p>` : ''}
+                </div>
+              </div>
+              <span class="px-2.5 py-1 rounded-full text-xs font-black ${isGood ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/15 text-amber-300 border border-amber-500/30'} shrink-0">
+                ${q.awardedMarks}/${q.maxMarks} Marks
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3 text-xs">
+              <div class="p-3 rounded-xl bg-ink-950/60 border border-white/5">
+                <p class="text-[11px] font-bold text-cyan-300 mb-1 flex items-center gap-1"><span>✍️</span> Your Answer</p>
+                <p class="text-slate-300 leading-relaxed font-mono text-[11px]">${esc(q.studentAnswer || 'Not found')}</p>
+              </div>
+              <div class="p-3 rounded-xl bg-emerald-500/[0.03] border border-emerald-500/10">
+                <p class="text-[11px] font-bold text-emerald-300 mb-1 flex items-center gap-1"><span>🏛️</span> Official Model Answer</p>
+                <p class="text-slate-300 leading-relaxed text-[11px]">${esc(q.modelAnswer || 'Standard solution')}</p>
+              </div>
+            </div>
+
+            ${steps.length > 0 ? `
+              <div class="mb-3 overflow-x-auto">
+                <table class="w-full text-left text-xs border border-white/5 rounded-xl overflow-hidden">
+                  <thead class="bg-white/[0.03] text-slate-400 text-[10px] uppercase font-bold">
+                    <tr><th class="p-2">Marking Step</th><th class="p-2 w-20">Max</th><th class="p-2 w-20">Awarded</th><th class="p-2">Comment</th></tr>
+                  </thead>
+                  <tbody class="divide-y divide-white/5 text-slate-300">
+                    ${steps.map((st) => `
+                      <tr>
+                        <td class="p-2 font-medium">${esc(st.step)}</td>
+                        <td class="p-2 text-slate-400">${st.marks}</td>
+                        <td class="p-2 font-bold text-emerald-400">${st.awarded}</td>
+                        <td class="p-2 text-slate-400 text-[11px]">${esc(st.comment || 'Satisfactory')}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            ` : ''}
+
+            <div class="p-2.5 rounded-xl bg-white/[0.02] border border-white/5 text-[11px] text-slate-300">
+              <span class="font-bold text-cyan-400">Teacher Note:</span> ${esc(q.feedback || q.examinerRemarks || 'Good attempt.')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    } else {
+      $('subjectiveEvalSection').classList.add('hidden');
+    }
+
+    // 9. MCQ Answer Review
     const answersList = $('answersReviewList');
     if (result.answers && result.answers.length > 0) {
       answersList.innerHTML = result.answers.map((ans, idx) => {
@@ -145,7 +210,7 @@
 
     list.innerHTML = results.map(r => {
       const isFull = r.testType === 'full_paper';
-      const pct = r.score?.percentage || 0;
+      const pct = r.combinedScore ? r.combinedScore.percentage : (r.score?.percentage || 0);
       const color = pct >= 75 ? 'text-emerald-400' : pct >= 50 ? 'text-amber-400' : 'text-red-400';
       const date = new Date(r.finishedAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
       
@@ -199,7 +264,6 @@
     try {
       const token = (typeof API !== 'undefined' && API.Token.get) ? API.Token.get() : localStorage.getItem('nexus_token'); 
       
-      // 👇 YAHAN API.BASE LAGA DIYA HAI 👇
       const res = await fetch(`${API.base}/api/tests/${currentAttemptId}/pdf`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -229,7 +293,6 @@
   window.retakeTest = function() {
     if (!currentResultData) return;
     
-    // Reconstruct URL based on test type
     if (currentResultData.testType === 'full_paper' && currentResultData.paperId) {
       window.location.href = `test-live.html?paperId=${currentResultData.paperId}&subject=${currentResultData.subjectCode}`;
     } else if (currentResultData.chapterNumber) {

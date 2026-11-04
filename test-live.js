@@ -1,9 +1,18 @@
+/**
+ * DIGITAL BOARD EXAM ENGINE — Nexus
+ * Merged logic for MCQ Test + Subjective Answer Sheet Upload
+ */
+
 (function () {
   'use strict';
 
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s || '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+  // =========================================
+  // STATE VARIABLES
+  // =========================================
+  // MCQ Variables
   let attemptId = null;
   let questions = [];
   let currentIndex = 0;
@@ -12,6 +21,11 @@
   let timerInterval = null;
   let questionStartTime = 0;
   let testMeta = {};
+
+  // Subjective Upload Variables
+  let uploadedPages = []; 
+  let activeSubmissionId = null;
+  let pollingInterval = null;
 
   /* ── Timer ── */
   function startTimer() {
@@ -28,7 +42,53 @@
     if (timerInterval) clearInterval(timerInterval);
   }
 
-  /* ── Question Navigation Dots ── */
+  /* ── Tab Switching (MCQ vs Subjective) ── */
+  window.switchExamTab = function (tabId) {
+    const btnMcq = $('tabBtn-mcq');
+    const btnSub = $('tabBtn-subjective');
+    const secMcq = $('section-mcq');
+    const secSub = $('section-subjective');
+
+    if (tabId === 'mcq') {
+      secMcq.classList.remove('hidden');
+      secMcq.classList.add('flex');
+      secSub.classList.add('hidden');
+      
+      btnMcq.className = 'px-4 py-2 rounded-t-lg text-sm font-bold bg-cyan-500/10 text-cyan-400 border-b-2 border-cyan-400 transition-all';
+      btnSub.className = 'px-4 py-2 rounded-t-lg text-sm font-semibold text-slate-400 hover:text-white transition-all flex items-center gap-2';
+    } else {
+      secMcq.classList.add('hidden');
+      secMcq.classList.remove('flex');
+      secSub.classList.remove('hidden');
+      
+      btnMcq.className = 'px-4 py-2 rounded-t-lg text-sm font-semibold text-slate-400 hover:text-white transition-all';
+      btnSub.className = 'px-4 py-2 rounded-t-lg text-sm font-bold bg-cyan-500/10 text-cyan-400 border-b-2 border-cyan-400 transition-all flex items-center gap-2';
+    }
+  };
+
+  /* ── Render Subjective Questions ── */
+  function renderSubjectiveQuestions(sqList) {
+    const container = $('subjectiveQuestionsList');
+    if (!container) return;
+
+    if (!sqList || sqList.length === 0) {
+      container.innerHTML = '<p class="text-sm text-slate-500">No subjective questions available for this paper.</p>';
+      return;
+    }
+
+    container.innerHTML = sqList.map((sq, idx) => `
+      <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5 mb-3 hover:border-white/10 transition">
+        <div class="flex justify-between items-start mb-2">
+          <span class="font-bold text-cyan-400 text-sm">Q.${sq.questionNumber || (idx + 1)}</span>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-white/5 text-slate-300 border border-white/10">${sq.marks || 5} Marks</span>
+        </div>
+        <p class="text-sm font-medium text-white leading-relaxed">${esc(sq.questionText)}</p>
+        ${sq.hindiQuestionText ? `<p class="text-xs text-slate-400 mt-1">${esc(sq.hindiQuestionText)}</p>` : ''}
+      </div>
+    `).join('');
+  }
+
+  /* ── Question Navigation Dots (MCQ) ── */
   function renderNavigationDots() {
     const nav = $('questionNav');
     if (!nav) return;
@@ -70,7 +130,7 @@
     if (bar) bar.style.width = `${Math.round((answered / questions.length) * 100)}%`;
   }
 
-  /* ── Render Question ── */
+  /* ── Render MCQ Question ── */
   function renderQuestion() {
     if (currentIndex < 0 || currentIndex >= questions.length) return;
 
@@ -94,24 +154,6 @@
       else qDiff.className += 'bg-white/5 text-slate-300 border-white/10';
     }
 
-    // Tag Badge (MVVI / VVI)
-    const qTag = $('qTagBadge');
-    if (qTag) {
-      const isMvvi = q.isMVVI || q.mvviTag?.tag === 'MVVI';
-      const isVvi = q.isVVI || q.mvviTag?.tag === 'VVI';
-      if (isMvvi) {
-        qTag.textContent = '🔥 VVI';
-        qTag.className = 'text-[10px] font-bold tracking-wider px-2 py-1 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20';
-        qTag.classList.remove('hidden');
-      } else if (isVvi) {
-        qTag.textContent = '⭐ Important';
-        qTag.className = 'text-[10px] font-bold tracking-wider px-2 py-1 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20';
-        qTag.classList.remove('hidden');
-      } else {
-        qTag.classList.add('hidden');
-      }
-    }
-
     const qMarks = $('qMarks');
     if (qMarks) qMarks.textContent = `+${q.marks || 1} Mark${(q.marks || 1) > 1 ? 's' : ''}`;
 
@@ -130,7 +172,7 @@
       }
     }
 
-    // Options (Dual Language)
+    // Options
     const optContainer = $('optionsContainer');
     if (optContainer) {
       optContainer.innerHTML = (q.options || []).map((opt) => {
@@ -153,44 +195,6 @@
       }).join('');
     }
 
-    // Feedback
-    const fbArea = $('feedbackArea');
-    if (fbArea) {
-      if (isAnswered && ans.explanation) {
-        fbArea.classList.remove('hidden');
-        const fbCard = $('feedbackCard');
-        const fbIcon = $('feedbackIcon');
-        const fbTitle = $('feedbackTitle');
-        const fbExp = $('feedbackExplanation');
-
-        if (ans.isCorrect) {
-          fbCard.className = 'p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 animate-[fadeIn_0.3s_ease]';
-          if (fbIcon) { fbIcon.textContent = '✅'; fbIcon.className = 'text-emerald-400 text-lg'; }
-          if (fbTitle) { fbTitle.textContent = 'Correct!'; fbTitle.className = 'text-sm font-bold text-emerald-400'; }
-        } else {
-          fbCard.className = 'p-4 rounded-xl border border-red-500/20 bg-red-500/5 animate-[fadeIn_0.3s_ease]';
-          if (fbIcon) { fbIcon.textContent = '❌'; fbIcon.className = 'text-red-400 text-lg'; }
-          if (fbTitle) { fbTitle.textContent = `Incorrect — Correct answer: ${ans.correctOption}`; fbTitle.className = 'text-sm font-bold text-red-400'; }
-        }
-        if (fbExp) fbExp.textContent = ans.explanation;
-      } else {
-        fbArea.classList.add('hidden');
-      }
-    }
-
-    // Source Attribution
-    const qSource = $('qSourceAttribution');
-    const qSourceText = $('qSourceText');
-    if (qSource && qSourceText) {
-      const credit = testMeta.sourceCreditText || q.sourceLabel;
-      if (credit) {
-        qSourceText.textContent = `Official Paper: ${credit}`;
-        qSource.classList.remove('hidden');
-      } else {
-        qSource.classList.add('hidden');
-      }
-    }
-
     // Navigation buttons
     const prevBtn = $('prevBtn');
     if (prevBtn) prevBtn.disabled = currentIndex === 0;
@@ -198,17 +202,12 @@
     const nextBtn = $('nextBtn');
     if (nextBtn) {
       if (currentIndex === questions.length - 1) {
-        nextBtn.innerHTML = 'Finish 🏁';
-        nextBtn.onclick = () => handleFinishTest();
+        nextBtn.innerHTML = 'Finish MCQ 🏁';
+        nextBtn.onclick = () => switchExamTab('subjective'); // Auto redirect to subjective
       } else {
         nextBtn.innerHTML = 'Save & Next';
         nextBtn.onclick = () => navigateQuestion(1);
       }
-    }
-
-    const skipBtn = $('skipBtn');
-    if (skipBtn) {
-      skipBtn.style.display = isAnswered ? 'none' : 'block';
     }
 
     renderNavigationDots();
@@ -218,7 +217,7 @@
   /* ── Option Selection ── */
   window.selectOption = async function (key) {
     const q = questions[currentIndex];
-    if (!q || answersMap[q.id]) return; // Prevent double answer
+    if (!q || answersMap[q.id]) return; 
 
     const timeTakenMs = Date.now() - questionStartTime;
 
@@ -263,41 +262,237 @@
     if (currentIndex < questions.length - 1) {
       navigateQuestion(1);
     } else {
-      handleFinishTest();
+      switchExamTab('subjective');
     }
   };
 
-  /* ── Finish Test ── */
+
+  /* =========================================
+     SUBJECTIVE UPLOAD LOGIC
+     ========================================= */
+  function setupDropZone() {
+    const dropZone = $('dropZone');
+    const fileInput = $('fileInput');
+    const cameraInput = $('cameraInput');
+
+    if (dropZone) {
+      ['dragenter', 'dragover'].forEach((ev) => {
+        dropZone.addEventListener(ev, (e) => {
+          e.preventDefault();
+          dropZone.classList.add('dragover');
+        });
+      });
+      ['dragleave', 'drop'].forEach((ev) => {
+        dropZone.addEventListener(ev, (e) => {
+          e.preventDefault();
+          dropZone.classList.remove('dragover');
+        });
+      });
+      dropZone.addEventListener('drop', (e) => handleFilesSelected(e.dataTransfer.files));
+    }
+    if (fileInput) fileInput.addEventListener('change', (e) => { handleFilesSelected(e.target.files); fileInput.value = ''; });
+    if (cameraInput) cameraInput.addEventListener('change', (e) => { handleFilesSelected(e.target.files); cameraInput.value = ''; });
+  }
+
+  function handleFilesSelected(files) {
+    if (!files || files.length === 0) return;
+
+    Array.from(files).forEach((file) => {
+      if (!file.type.startsWith('image/') && file.type !== 'application/pdf') {
+        alert('Please select image files (JPG, PNG, WEBP) or PDFs');
+        return;
+      }
+      if (uploadedPages.length >= 20) {
+        alert('Maximum 20 pages allowed');
+        return;
+      }
+
+      if (file.type === 'application/pdf') {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const dataUrl = e.target.result;
+          uploadedPages.push({
+            id: 'page_' + Date.now(),
+            base64: dataUrl.split(',')[1],
+            mimeType: file.type,
+            previewUrl: dataUrl,
+          });
+          renderPagesGrid();
+        };
+        reader.readAsDataURL(file);
+      } else {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+            const MAX_WIDTH = 1600;
+            if (width > MAX_WIDTH) {
+              height = Math.round((height * MAX_WIDTH) / width);
+              width = MAX_WIDTH;
+            }
+            canvas.width = width;
+            canvas.height = height;
+            canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+            const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+            uploadedPages.push({
+              id: 'page_' + Date.now(),
+              base64: compressedDataUrl.split(',')[1],
+              mimeType: 'image/jpeg',
+              previewUrl: compressedDataUrl,
+            });
+            renderPagesGrid();
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  function renderPagesGrid() {
+    const container = $('pagesGridContainer');
+    const grid = $('pagesGrid');
+    const badge = $('pageCountBadge');
+    const submitBtn = $('submitEvalBtn');
+
+    if (!container || !grid) return;
+
+    if (uploadedPages.length === 0) {
+      container.classList.add('hidden');
+      if (badge) badge.textContent = '0 pages added';
+      if (submitBtn) submitBtn.disabled = true;
+      return;
+    }
+
+    container.classList.remove('hidden');
+    if (badge) badge.textContent = `${uploadedPages.length} pages added`;
+    if (submitBtn) submitBtn.disabled = false;
+
+    grid.innerHTML = uploadedPages.map((p, idx) => {
+      const isPdf = p.mimeType === 'application/pdf';
+      const previewContent = isPdf 
+        ? `<div class="flex flex-col items-center justify-center text-rose-400"><svg class="w-8 h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg><span class="text-[9px] font-bold">PDF</span></div>`
+        : `<img src="${p.previewUrl}" alt="Page ${idx + 1}" class="w-full h-full object-cover">`;
+
+      return `
+        <div class="page-thumb relative rounded-xl overflow-hidden border border-white/10 bg-black/40 group aspect-[3/4]">
+          <div class="w-full h-full flex items-center justify-center bg-ink-950">${previewContent}</div>
+          <span class="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/80 text-[10px] font-bold text-cyan-300 border border-white/10">Page ${idx + 1}</span>
+          <button onclick="removePage(${idx})" class="absolute top-2 right-2 w-6 h-6 rounded bg-red-500/80 text-white flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition">✕</button>
+        </div>
+      `;
+    }).join('');
+  }
+
+  window.removePage = function (idx) {
+    uploadedPages.splice(idx, 1);
+    renderPagesGrid();
+  };
+
+  window.submitSubjectiveSheet = async function () {
+    if (uploadedPages.length === 0) return alert('Please add at least one page');
+
+    const submitBtn = $('submitEvalBtn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span>⏳ Uploading...</span>';
+    $('cubeLoadingOverlay')?.classList.add('active');
+
+    try {
+      const payload = {
+        attemptId: attemptId, // Link to the MCQ exam
+        boardCode: testMeta.boardCode || 'bseb',
+        classLevel: testMeta.classLevel || '10',
+        subjectCode: testMeta.subjectCode,
+        subjectName: testMeta.subjectName,
+        medium: testMeta.medium || 'Hindi',
+        paperId: testMeta.paperId || null,
+        paperCode: testMeta.paperCode || '',
+        year: testMeta.year || null,
+        examPhase: testMeta.examPhase || '',
+        setCode: testMeta.setCode || '',
+        pages: uploadedPages.map((p, idx) => ({
+          pageNumber: idx + 1,
+          imageBase64: p.base64,
+          mimeType: p.mimeType,
+        })),
+      };
+
+      const res = await API.subjective.uploadSheet(payload);
+      if (!res.success || !res.submissionId) throw new Error(res.error || 'Upload failed');
+
+      activeSubmissionId = res.submissionId;
+      
+      submitBtn.innerHTML = '<span>⏳ AI Evaluating...</span>';
+      startEvaluationPolling(activeSubmissionId);
+
+    } catch (err) {
+      alert(err.message);
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<span>🚀 Upload & Evaluate</span>';
+    } finally {
+      $('cubeLoadingOverlay')?.classList.remove('active');
+    }
+  };
+
+  function startEvaluationPolling(submissionId) {
+    if (pollingInterval) clearInterval(pollingInterval);
+    pollingInterval = setInterval(async () => {
+      try {
+        const res = await API.subjective.getStatus(submissionId);
+        if (!res.success) return;
+        
+        if (res.status === 'completed') {
+          clearInterval(pollingInterval);
+          pollingInterval = null;
+          $('submitEvalBtn').innerHTML = '<span>✅ Evaluation Complete</span>';
+          $('subjectiveUploadStatus').classList.remove('hidden');
+          $('finishModalSubjectiveStatus').textContent = 'Subjective Sheet: Evaluated ✅';
+        } else if (res.status === 'failed') {
+          clearInterval(pollingInterval);
+          pollingInterval = null;
+          alert('Evaluation failed. Please try again.');
+          $('submitEvalBtn').disabled = false;
+          $('submitEvalBtn').innerHTML = '<span>🚀 Upload & Evaluate</span>';
+        }
+      } catch (e) { console.error(e); }
+    }, 3000);
+  }
+
+
+  /* =========================================
+     FINISH EXAM LOGIC
+     ========================================= */
   window.handleFinishTest = function () {
     const answered = Object.keys(answersMap).length;
     const total = questions.length;
     const unanswered = total - answered;
 
     const statsEl = $('finishModalStats');
-    if (statsEl) statsEl.textContent = `You answered ${answered} of ${total} questions.`;
+    if (statsEl) statsEl.textContent = `You answered ${answered} of ${total} MCQs.`;
 
-    const warnEl = $('finishModalWarning');
-    if (warnEl) {
-      if (unanswered > 0) {
-        warnEl.textContent = `⚠️ ${unanswered} question${unanswered > 1 ? 's' : ''} unanswered — they will be marked wrong.`;
+    const subStatus = $('finishModalSubjectiveStatus');
+    if (subStatus) {
+      if (activeSubmissionId) {
+        subStatus.textContent = 'Subjective Sheet: Uploaded ✅';
+        subStatus.className = 'text-emerald-400 font-semibold';
       } else {
-        warnEl.textContent = '✅ All questions answered!';
+        subStatus.textContent = 'Subjective Sheet: Not Uploaded ⚠️';
+        subStatus.className = 'text-amber-400 font-semibold';
       }
     }
 
-    const modal = $('finishModal');
-    if (modal) modal.classList.remove('hidden');
+    $('finishModal')?.classList.remove('hidden');
   };
 
   window.closeFinishModal = function () {
-    const modal = $('finishModal');
-    if (modal) modal.classList.add('hidden');
+    $('finishModal')?.classList.add('hidden');
   };
 
   window.confirmFinishTest = async function () {
-    const modal = $('finishModal');
     const finishBtn = $('finishBtn');
-    
     if (finishBtn) {
       finishBtn.disabled = true;
       finishBtn.textContent = 'Submitting...';
@@ -305,7 +500,10 @@
 
     try {
       stopTimer();
-      const res = await API.tests.finishTest(attemptId);
+      // Pass the subjectiveSubmissionId to backend to calculate combined score
+      const res = await API.tests.finishTest(attemptId, { 
+        subjectiveSubmissionId: activeSubmissionId 
+      });
 
       if (res.success) {
         window.location.href = `test-results.html?attemptId=${encodeURIComponent(attemptId)}`;
@@ -315,13 +513,16 @@
       alert(err.message || 'Failed to submit test');
       if (finishBtn) {
         finishBtn.disabled = false;
-        finishBtn.textContent = 'Finish Test';
+        finishBtn.textContent = 'Finish Exam';
       }
       startTimer();
     }
   };
 
-  /* ── Initialization ── */
+
+  /* =========================================
+     INITIALIZATION
+     ========================================= */
   async function init() {
     if (!API.Token.exists()) {
       window.location.href = 'auth.html';
@@ -345,50 +546,64 @@
       if (paperId) {
         res = await API.tests.startPaperTest(paperId, { isHardMode: isHard });
       } else {
-        // Question limit set to 20
         res = await API.tests.startTest({
           subjectCode,
           chapterNumber: chapterNumber ? Number(chapterNumber) : undefined,
           isHardMode: isHard,
-          questionLimit: 20, 
+          questionLimit: 100, 
         });
       }
 
-      if (!res.success || !res.questions || res.questions.length === 0) {
+      // Check if any questions exist (MCQ or Subjective)
+      const hasMcq = res.questions && res.questions.length > 0;
+      const hasSub = res.subjectiveQuestions && res.subjectiveQuestions.length > 0;
+
+      if (!res.success || (!hasMcq && !hasSub)) {
         alert('No questions available for this selection.');
         window.location.href = 'test-select.html';
         return;
       }
 
       attemptId = res.attemptId;
-      questions = res.questions.map(q => ({ ...q, subjectCode: subjectCode || res.subjectCode }));
+      questions = (res.questions || []).map(q => ({ ...q, subjectCode: subjectCode || res.subjectCode }));
+      
       testMeta = {
         testType: res.testType || (paperId ? 'full_paper' : 'chapter_practice'),
         subjectName: res.subjectName,
         chapterTitle: res.chapterTitle,
-        totalQuestions: res.totalQuestions,
         medium: res.medium,
         subjectCode: subjectCode || res.subjectCode,
-        sourceCreditText: res.sourceCreditText || '',
         paperCode: res.paperCode || '',
         year: res.year,
         examPhase: res.examPhase,
         setCode: res.setCode,
+        boardCode: res.boardCode,
+        classLevel: res.classLevel,
+        paperId: paperId,
+        sourceCreditText: res.sourceCreditText || '',
       };
 
-      const titleEl = $('testTitle');
-      if (titleEl) titleEl.textContent = res.paperCode || res.chapterTitle || 'Exam Test';
+      // Update UI Titles
+      $('testTitle').textContent = res.paperCode || res.chapterTitle || 'Digital Board Exam';
+      $('testSubtitle').textContent = `${res.subjectName} • ${res.medium}`;
 
-      const subtitleEl = $('testSubtitle');
-      if (subtitleEl) {
-        if (res.testType === 'full_paper') {
-          subtitleEl.textContent = `${res.subjectName} • ${res.year} ${(res.examPhase || '').toUpperCase()}`;
-        } else {
-          subtitleEl.textContent = `${res.subjectName} • ${res.medium}`;
-        }
+      // Render Subjective Questions (if any)
+      if (hasSub) {
+        renderSubjectiveQuestions(res.subjectiveQuestions);
+      } else {
+        // Hide subjective tab if no subjective questions
+        $('tabBtn-subjective').style.display = 'none';
       }
 
-      // Hide Loading, Show UI
+      // If no MCQs, switch directly to Subjective tab
+      if (!hasMcq && hasSub) {
+        switchExamTab('subjective');
+      }
+
+      // Setup Upload Logic
+      setupDropZone();
+
+      // Show UI
       $('loadingState')?.classList.add('hidden');
       const testUI = $('testUI');
       if (testUI) {
@@ -397,7 +612,9 @@
       }
 
       startTimer();
-      renderQuestion();
+      
+      if (hasMcq) renderQuestion();
+      updateStats();
 
     } catch (err) {
       console.error('Test init error:', err);
@@ -409,9 +626,9 @@
   document.addEventListener('DOMContentLoaded', init);
 
   window.addEventListener('beforeunload', (e) => {
-    if (attemptId && Object.keys(answersMap).length > 0) {
+    if (attemptId && (Object.keys(answersMap).length > 0 || uploadedPages.length > 0)) {
       e.preventDefault();
-      e.returnValue = 'Your test progress may be lost. Are you sure you want to leave?';
+      e.returnValue = 'Your exam progress may be lost. Are you sure you want to leave?';
     }
   });
 })();

@@ -160,6 +160,7 @@
     const countLabel = $('paperCountLabel');
     const phaseSelect = $('paperPhaseFilter');
     const yearSelect = $('paperYearFilter');
+    
     const phase = phaseSelect ? phaseSelect.value : null;
     const year = yearSelect ? yearSelect.value : null;
 
@@ -176,14 +177,32 @@
     `;
 
     try {
+      // 1. Fetch from API (Phase filter backend se hota hai)
       const res = await API.tests.getAvailablePapers(currentSubjectCode, phase);
       
       if (currentSubjectCode !== subjectAtRequest) return; // Discard stale response
 
       let papers = res.papers || [];
 
-      if (year) {
-        papers = papers.filter(p => String(p.year) === String(year));
+      // 👇 NAYA LOGIC: Years ko dynamically populate karo 👇
+      if (yearSelect) {
+        const availableYears = [...new Set(papers.map(p => p.year))].sort((a, b) => b - a);
+        const currentSelectedYear = yearSelect.value;
+
+        yearSelect.innerHTML = `<option value="">All Years</option>` + 
+          availableYears.map(y => `<option value="${y}">${y}</option>`).join('');
+
+        // Restore selection if still valid
+        if (currentSelectedYear && availableYears.includes(Number(currentSelectedYear))) {
+          yearSelect.value = currentSelectedYear;
+        }
+      }
+      // 👆 NAYA LOGIC KHATAM 👆
+
+      // 2. Apply Year filter client-side
+      const activeYear = yearSelect ? yearSelect.value : null;
+      if (activeYear) {
+        papers = papers.filter(p => String(p.year) === String(activeYear));
       }
 
       if (countLabel) {

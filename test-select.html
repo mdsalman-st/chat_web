@@ -13,7 +13,6 @@
   <script src="tailwind-config.js"></script>
   <link rel="stylesheet" href="vault.css">
 
-  <!-- Role guard -->
   <script src="role-guard.js" data-page="student"></script>
 
   <style>
@@ -325,12 +324,9 @@
                   <option value="annual">Annual Board Exam</option>
                 </select>
 
+                <!-- 👇 YAHAN HARDCODED YEARS HATA DIYE HAIN 👇 -->
                 <select id="paperYearFilter" onchange="loadOfficialPapers()" class="px-3 py-2 rounded-xl glass-inner text-xs focus:outline-none transition">
                   <option value="">All Years</option>
-                  <option value="2024">2024</option>
-                  <option value="2023">2023</option>
-                  <option value="2022">2022</option>
-                  <option value="2021">2021</option>
                 </select>
               </div>
             </div>

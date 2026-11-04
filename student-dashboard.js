@@ -28,7 +28,9 @@
       let totalQuestionsSolved = 0;
 
       results.forEach(r => {
-        const pct = r.score?.percentage || 0;
+        // 👇 NAYA: Combined Score ko priority do, agar nahi hai toh MCQ score use karo
+        const pct = r.combinedScore?.percentage ?? r.score?.percentage ?? 0;
+        
         totalScorePct += pct;
         if (pct > bestScore) bestScore = pct;
         totalQuestionsSolved += (r.totalQuestions || 0);
@@ -132,7 +134,6 @@
       return;
     }
 
-    // Dynamic logic: Takes user's subjects and assigns tasks
     const timeSlots = ['45 min', '60 min', '30 min', '90 min'];
     const actions = ['Revise Chapter 1', 'Practice Mock Test', 'Read Textbook', 'Solve PYQs'];
     
@@ -246,10 +247,10 @@
       const topResults = results.slice(0, 4);
 
       ul.innerHTML = topResults.map((r) => {
-        const score = r.score || {};
+        // 👇 NAYA: Recent tests me bhi Combined Score dikhao
+        const score = r.combinedScore || r.score || {};
         const pct = score.percentage || 0;
         
-        // Badge color matching screenshot
         let badgeClass = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
         if (pct < 50) badgeClass = 'bg-red-500/20 text-red-400 border-red-500/30';
         else if (pct < 75) badgeClass = 'bg-amber-500/20 text-amber-400 border-amber-500/30';
