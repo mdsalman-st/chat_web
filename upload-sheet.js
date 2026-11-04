@@ -180,19 +180,42 @@
         return;
       }
 
+      // 👇 NAYA: IMAGE COMPRESSION LOGIC (Canvas API) 👇
       const reader = new FileReader();
       reader.onload = (e) => {
-        const dataUrl = e.target.result;
-        const base64 = dataUrl.split(',')[1];
-        uploadedPages.push({
-          id: 'page_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
-          file,
-          base64,
-          mimeType: file.type || 'image/jpeg',
-          previewUrl: dataUrl,
-        });
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
 
-        renderPagesGrid();
+          // Max width 1600px (Isse photo ka size kam ho jayega)
+          const MAX_WIDTH = 1600;
+          if (width > MAX_WIDTH) {
+            height = Math.round((height * MAX_WIDTH) / width);
+            width = MAX_WIDTH;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Compress to JPEG at 70% quality
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+          const base64 = compressedDataUrl.split(',')[1];
+
+          uploadedPages.push({
+            id: 'page_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+            file,
+            base64,
+            mimeType: 'image/jpeg',
+            previewUrl: compressedDataUrl,
+          });
+
+          renderPagesGrid();
+        };
+        img.src = e.target.result;
       };
       reader.readAsDataURL(file);
     });
@@ -295,7 +318,7 @@
       submitBtn.innerHTML = '<span>⏳ Uploading to Cloudinary...</span>';
     }
 
-    // 👇 NAYA: 3D Cube Overlay Show karo 👇
+    // 3D Cube Overlay Show karo
     const overlay = $('cubeLoadingOverlay');
     if (overlay) {
       overlay.classList.add('active');
@@ -343,7 +366,7 @@
         submitBtn.innerHTML = '<span>🚀 Check Copy with AI Vision</span><span>→</span>';
       }
     } finally {
-      // 👇 NAYA: Chahe success ho ya error, overlay band ho jaye 👇
+      // Chahe success ho ya error, overlay band ho jaye
       if (overlay) {
         overlay.classList.remove('active');
       }

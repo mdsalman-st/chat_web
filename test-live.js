@@ -1,13 +1,3 @@
-/**
- * TEST-LIVE.JS — Nexus Live Test Engine
- * Handles the full test taking flow:
- * - Loads questions from backend via API.tests.startTest()
- * - Single-question display with option selection
- * - Real-time answer submission
- * - Timer, navigation, skip functionality
- * - Test completion with redirect to results
- */
-
 (function () {
   'use strict';
 
@@ -17,7 +7,7 @@
   let attemptId = null;
   let questions = [];
   let currentIndex = 0;
-  let answersMap = {}; // questionId -> { selectedOption, isCorrect, explanation }
+  let answersMap = {}; 
   let timerSeconds = 0;
   let timerInterval = null;
   let questionStartTime = 0;
@@ -57,22 +47,25 @@
 
   /* ── Update Stats ── */
   function updateStats() {
-    let correct = 0, incorrect = 0, skipped = 0;
+    let correct = 0, incorrect = 0;
     questions.forEach((q) => {
       const ans = answersMap[q.id];
-      if (!ans) skipped++;
-      else if (ans.isCorrect) correct++;
-      else incorrect++;
+      if (ans) {
+        if (ans.isCorrect) correct++;
+        else incorrect++;
+      }
     });
+    
+    const skipped = questions.length - correct - incorrect;
 
     const el = (id, v) => { const e = $(id); if (e) e.textContent = v; };
     el('statCorrect', correct);
     el('statIncorrect', incorrect);
-    el('statSkipped', questions.length - correct - incorrect);
+    el('statSkipped', skipped);
 
     // Progress
     const answered = correct + incorrect;
-    el('progressLabel', `${answered}/${questions.length}`);
+    el('progressLabel', `${answered} / ${questions.length}`);
     const bar = $('progressBar');
     if (bar) bar.style.width = `${Math.round((answered / questions.length) * 100)}%`;
   }
@@ -89,16 +82,16 @@
 
     // Header
     const qNum = $('qNumber');
-    if (qNum) qNum.textContent = String(currentIndex + 1).padStart(2, '0');
+    if (qNum) qNum.textContent = `Q.${currentIndex + 1}`;
 
     const qDiff = $('qDifficulty');
     if (qDiff) {
-      qDiff.textContent = q.difficulty || 'Medium';
-      qDiff.className = 'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ';
+      qDiff.textContent = (q.difficulty || 'Medium').toUpperCase();
+      qDiff.className = 'text-[10px] font-bold tracking-wider px-2 py-1 rounded border ';
       const d = (q.difficulty || 'Medium').toLowerCase();
-      if (d === 'easy') qDiff.className += 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25';
-      else if (d === 'hard') qDiff.className += 'bg-red-500/10 text-red-400 border-red-500/25';
-      else qDiff.className += 'bg-amber-500/10 text-amber-400 border-amber-500/25';
+      if (d === 'easy') qDiff.className += 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+      else if (d === 'hard') qDiff.className += 'bg-red-500/10 text-red-400 border-red-500/20';
+      else qDiff.className += 'bg-white/5 text-slate-300 border-white/10';
     }
 
     // Tag Badge (MVVI / VVI)
@@ -107,40 +100,22 @@
       const isMvvi = q.isMVVI || q.mvviTag?.tag === 'MVVI';
       const isVvi = q.isVVI || q.mvviTag?.tag === 'VVI';
       if (isMvvi) {
-        qTag.textContent = '🔥 MVVI';
-        qTag.className = 'text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30';
-        qTag.title = q.mvviTag?.reason || 'Frequently asked in board exams (3+ times)';
+        qTag.textContent = '🔥 VVI';
+        qTag.className = 'text-[10px] font-bold tracking-wider px-2 py-1 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20';
         qTag.classList.remove('hidden');
       } else if (isVvi) {
-        qTag.textContent = '⭐ VVI';
-        qTag.className = 'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30';
-        qTag.title = q.mvviTag?.reason || 'Important board exam question (repeated in PYQ)';
+        qTag.textContent = '⭐ Important';
+        qTag.className = 'text-[10px] font-bold tracking-wider px-2 py-1 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20';
         qTag.classList.remove('hidden');
       } else {
         qTag.classList.add('hidden');
       }
     }
 
-    // Source Attribution
-    const qSource = $('qSourceAttribution');
-    const qSourceText = $('qSourceText');
-    if (qSource && qSourceText) {
-      const credit = testMeta.sourceCreditText || q.sourceLabel;
-      if (credit) {
-        qSourceText.textContent = `Official Board Paper: ${credit}`;
-        qSource.classList.remove('hidden');
-      } else {
-        qSource.classList.add('hidden');
-      }
-    }
-
-    const qSub = $('qSubtopic');
-    if (qSub) qSub.textContent = q.subtopic || '';
-
     const qMarks = $('qMarks');
-    if (qMarks) qMarks.textContent = `${q.marks || 1} mark${(q.marks || 1) > 1 ? 's' : ''}`;
+    if (qMarks) qMarks.textContent = `+${q.marks || 1} Mark${(q.marks || 1) > 1 ? 's' : ''}`;
 
-    // Question text
+    // Question Text (EN + HI)
     const qText = $('qText');
     if (qText) qText.textContent = q.questionText || '';
 
@@ -155,36 +130,24 @@
       }
     }
 
-    // Options
+    // Options (Dual Language)
     const optContainer = $('optionsContainer');
     if (optContainer) {
       optContainer.innerHTML = (q.options || []).map((opt) => {
-        let btnClass = 'option-btn w-full p-4 rounded-2xl border border-white/[0.08] bg-white/[0.02] text-left flex items-start gap-3.5 cursor-pointer group';
-
+        let btnClass = 'option-btn w-full p-4 text-left flex gap-4';
         if (isAnswered) {
           btnClass += ' answered';
-          if (opt.key === ans.correctOption) {
-            btnClass += ' correct';
-          } else if (opt.key === ans.selectedOption && !ans.isCorrect) {
-            btnClass += ' incorrect';
-          }
+          if (opt.key === ans.correctOption) btnClass += ' correct';
+          else if (opt.key === ans.selectedOption && !ans.isCorrect) btnClass += ' incorrect';
         }
-
-        const keyBg = isAnswered && opt.key === ans.correctOption
-          ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
-          : isAnswered && opt.key === ans.selectedOption && !ans.isCorrect
-            ? 'bg-red-500/20 border-red-500/40 text-red-400'
-            : 'bg-white/[0.04] border-white/10 text-slate-300 group-hover:border-cyan-500/40 group-hover:text-cyan-300';
 
         return `
           <button onclick="selectOption('${opt.key}')" class="${btnClass}" ${isAnswered ? 'disabled' : ''}>
-            <span class="w-8 h-8 rounded-lg ${keyBg} font-bold text-xs flex items-center justify-center shrink-0 border transition-colors">${esc(opt.key)}</span>
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-semibold ${isAnswered && opt.key === ans.correctOption ? 'text-emerald-300' : isAnswered && opt.key === ans.selectedOption && !ans.isCorrect ? 'text-red-300' : 'text-white'}">${esc(opt.text)}</p>
-              ${opt.hindiText ? `<p class="text-xs text-slate-400 mt-0.5">${esc(opt.hindiText)}</p>` : ''}
+            <div class="opt-key w-6 h-6 rounded bg-white/5 border border-white/10 text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5 transition-colors">${esc(opt.key)}</div>
+            <div>
+              <p class="text-sm font-medium text-white leading-snug">${esc(opt.text)}</p>
+              ${opt.hindiText ? `<p class="text-[12px] text-slate-400 mt-1 leading-snug">${esc(opt.hindiText)}</p>` : ''}
             </div>
-            ${isAnswered && opt.key === ans.correctOption ? '<span class="text-emerald-400 shrink-0">✓</span>' : ''}
-            ${isAnswered && opt.key === ans.selectedOption && !ans.isCorrect ? '<span class="text-red-400 shrink-0">✗</span>' : ''}
           </button>
         `;
       }).join('');
@@ -201,17 +164,30 @@
         const fbExp = $('feedbackExplanation');
 
         if (ans.isCorrect) {
-          fbCard.className = 'p-5 rounded-2xl border border-emerald-500/25 bg-emerald-500/[0.05]';
-          if (fbIcon) fbIcon.textContent = '✅';
-          if (fbTitle) { fbTitle.textContent = 'Correct!'; fbTitle.className = 'font-bold text-sm text-emerald-400'; }
+          fbCard.className = 'p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 animate-[fadeIn_0.3s_ease]';
+          if (fbIcon) { fbIcon.textContent = '✅'; fbIcon.className = 'text-emerald-400 text-lg'; }
+          if (fbTitle) { fbTitle.textContent = 'Correct!'; fbTitle.className = 'text-sm font-bold text-emerald-400'; }
         } else {
-          fbCard.className = 'p-5 rounded-2xl border border-red-500/25 bg-red-500/[0.05]';
-          if (fbIcon) fbIcon.textContent = '❌';
-          if (fbTitle) { fbTitle.textContent = `Incorrect — Correct answer: ${ans.correctOption}`; fbTitle.className = 'font-bold text-sm text-red-400'; }
+          fbCard.className = 'p-4 rounded-xl border border-red-500/20 bg-red-500/5 animate-[fadeIn_0.3s_ease]';
+          if (fbIcon) { fbIcon.textContent = '❌'; fbIcon.className = 'text-red-400 text-lg'; }
+          if (fbTitle) { fbTitle.textContent = `Incorrect — Correct answer: ${ans.correctOption}`; fbTitle.className = 'text-sm font-bold text-red-400'; }
         }
         if (fbExp) fbExp.textContent = ans.explanation;
       } else {
         fbArea.classList.add('hidden');
+      }
+    }
+
+    // Source Attribution
+    const qSource = $('qSourceAttribution');
+    const qSourceText = $('qSourceText');
+    if (qSource && qSourceText) {
+      const credit = testMeta.sourceCreditText || q.sourceLabel;
+      if (credit) {
+        qSourceText.textContent = `Official Paper: ${credit}`;
+        qSource.classList.remove('hidden');
+      } else {
+        qSource.classList.add('hidden');
       }
     }
 
@@ -222,25 +198,17 @@
     const nextBtn = $('nextBtn');
     if (nextBtn) {
       if (currentIndex === questions.length - 1) {
-        nextBtn.innerHTML = '<span>Finish</span> <span>🏁</span>';
+        nextBtn.innerHTML = 'Finish 🏁';
         nextBtn.onclick = () => handleFinishTest();
       } else {
-        nextBtn.innerHTML = '<span>Next</span> <span>→</span>';
+        nextBtn.innerHTML = 'Save & Next';
         nextBtn.onclick = () => navigateQuestion(1);
       }
     }
 
     const skipBtn = $('skipBtn');
     if (skipBtn) {
-      skipBtn.classList.toggle('hidden', isAnswered);
-    }
-
-    // Animate card
-    const card = $('questionCard');
-    if (card) {
-      card.classList.remove('question-enter');
-      void card.offsetWidth; // force reflow
-      card.classList.add('question-enter');
+      skipBtn.style.display = isAnswered ? 'none' : 'block';
     }
 
     renderNavigationDots();
@@ -250,7 +218,7 @@
   /* ── Option Selection ── */
   window.selectOption = async function (key) {
     const q = questions[currentIndex];
-    if (!q || answersMap[q.id]) return; // already answered
+    if (!q || answersMap[q.id]) return; // Prevent double answer
 
     const timeTakenMs = Date.now() - questionStartTime;
 
@@ -261,7 +229,6 @@
         timeTakenMs,
       });
 
-      // Store answer with server response
       answersMap[q.id] = {
         selectedOption: key,
         isCorrect: res.isCorrect,
@@ -312,7 +279,7 @@
     const warnEl = $('finishModalWarning');
     if (warnEl) {
       if (unanswered > 0) {
-        warnEl.textContent = `⚠️ ${unanswered} question${unanswered > 1 ? 's' : ''} unanswered — they will be marked as skipped.`;
+        warnEl.textContent = `⚠️ ${unanswered} question${unanswered > 1 ? 's' : ''} unanswered — they will be marked wrong.`;
       } else {
         warnEl.textContent = '✅ All questions answered!';
       }
@@ -330,9 +297,10 @@
   window.confirmFinishTest = async function () {
     const modal = $('finishModal');
     const finishBtn = $('finishBtn');
+    
     if (finishBtn) {
       finishBtn.disabled = true;
-      finishBtn.textContent = 'Submitting…';
+      finishBtn.textContent = 'Submitting...';
     }
 
     try {
@@ -340,7 +308,6 @@
       const res = await API.tests.finishTest(attemptId);
 
       if (res.success) {
-        // Redirect to results page
         window.location.href = `test-results.html?attemptId=${encodeURIComponent(attemptId)}`;
       }
     } catch (err) {
@@ -376,15 +343,14 @@
     try {
       let res;
       if (paperId) {
-        // Start full board paper test
         res = await API.tests.startPaperTest(paperId, { isHardMode: isHard });
       } else {
-        // Start chapter practice test
+        // Question limit set to 20
         res = await API.tests.startTest({
           subjectCode,
           chapterNumber: chapterNumber ? Number(chapterNumber) : undefined,
           isHardMode: isHard,
-          questionLimit: 15,
+          questionLimit: 20, 
         });
       }
 
@@ -410,27 +376,27 @@
         setCode: res.setCode,
       };
 
-      // Update UI
       const titleEl = $('testTitle');
       if (titleEl) titleEl.textContent = res.paperCode || res.chapterTitle || 'Exam Test';
 
       const subtitleEl = $('testSubtitle');
       if (subtitleEl) {
         if (res.testType === 'full_paper') {
-          subtitleEl.textContent = `${res.subjectName} • ${res.year} ${(res.examPhase || '').toUpperCase()}${res.setCode ? ` Set ${res.setCode}` : ''} • ${res.medium}${isHard ? ' • 🔥 Hard' : ''}`;
+          subtitleEl.textContent = `${res.subjectName} • ${res.year} ${(res.examPhase || '').toUpperCase()}`;
         } else {
-          subtitleEl.textContent = `${res.subjectName} • ${res.medium}${isHard ? ' • 🔥 Hard Mode' : ''}`;
+          subtitleEl.textContent = `${res.subjectName} • ${res.medium}`;
         }
       }
 
-      // Show test UI, hide loading
+      // Hide Loading, Show UI
       $('loadingState')?.classList.add('hidden');
-      $('testUI')?.classList.remove('hidden');
+      const testUI = $('testUI');
+      if (testUI) {
+        testUI.classList.remove('hidden');
+        testUI.classList.add('flex');
+      }
 
-      // Start timer
       startTimer();
-
-      // Render first question
       renderQuestion();
 
     } catch (err) {
@@ -442,7 +408,6 @@
 
   document.addEventListener('DOMContentLoaded', init);
 
-  // Warn before leaving
   window.addEventListener('beforeunload', (e) => {
     if (attemptId && Object.keys(answersMap).length > 0) {
       e.preventDefault();
