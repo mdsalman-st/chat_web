@@ -329,21 +329,33 @@
           </div>
         </div>
 
-        <!-- Main Grid (Widgets) - Cleaned up, removed fake widgets -->
-        <div class="anim anim-5 grid grid-cols-1 lg:grid-cols-1 gap-5 mb-8">
-          <div class="space-y-5">
-            <!-- Recent Tests Widget -->
-            <div id="studentRecentTests" class="liquid-glass p-6 glass-content">
-              <h3 class="text-base font-bold mb-4 flex items-center gap-2" style="color: var(--text-main);">
-                <span class="w-1 h-4 rounded bg-cyan-500"></span>
-                Recent AI Tests
+        <!-- Main Grid (Widgets) - Fake Data Removed, Dynamic Structure Kept -->
+        <div class="anim anim-5 grid grid-cols-1 lg:grid-cols-2 gap-5 mb-8">
+          
+          <!-- Today's Study Plan -->
+          <div id="studyPlanWidget" class="liquid-glass p-6 glass-content">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-base font-bold flex items-center gap-2" style="color: var(--text-main);">
+                <span class="w-1 h-4 rounded bg-cyan-500"></span> Today's Study Plan
               </h3>
-              <ul class="space-y-2">
-                <li class="py-3 text-center text-xs" style="color: var(--text-muted);">No recent tests found.</li>
-              </ul>
-              <button onclick="window.location.href='test-results.html'" class="w-full mt-3 py-2 text-xs font-bold rounded-lg glass-inner transition hover:opacity-80" style="color: var(--text-link);">View All Results</button>
+              <span class="text-[10px] uppercase font-bold text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">Auto-generated</span>
             </div>
+            <ul id="studyPlanList" class="space-y-2">
+              <li class="py-3 text-center text-xs" style="color: var(--text-muted);">Loading study plan...</li>
+            </ul>
           </div>
+
+          <!-- Recent Tests -->
+          <div id="studentRecentTests" class="liquid-glass p-6 glass-content">
+            <h3 class="text-base font-bold mb-4 flex items-center gap-2" style="color: var(--text-main);">
+              <span class="w-1 h-4 rounded bg-cyan-500"></span> Recent Tests
+            </h3>
+            <ul class="space-y-2">
+              <li class="py-3 text-center text-xs" style="color: var(--text-muted);">No recent tests found.</li>
+            </ul>
+            <button onclick="window.location.href='test-results.html'" class="w-full mt-4 py-2 text-xs font-bold rounded-lg glass-inner transition hover:opacity-80" style="color: var(--text-link);">View All Results</button>
+          </div>
+
         </div>
       </main>
 
@@ -356,7 +368,6 @@
     </div>
   </div>
 
-  <!-- App scripts - dashboard.js REMOVED -->
   <script src="api.js"></script>
   <script src="student-dashboard.js"></script>
 
@@ -370,7 +381,7 @@
         const y = e.clientY - rect.top;  
         const centerX = rect.width / 2;
         const centerY = rect.height / 2;
-        const rotateX = ((y - centerY) / centerY) * -3; // Reduced tilt for bigger layout
+        const rotateX = ((y - centerY) / centerY) * -3;
         const rotateY = ((x - centerX) / centerX) * 3;
         card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.005, 1.005, 1.005)`;
       });

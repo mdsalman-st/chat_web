@@ -1,7 +1,5 @@
 /**
  * Nexus — Student Dashboard logic
- * Force-shows student-only sections (AI tests, recent results) and sets labels.
- * Loads dynamic academic profile (e.g. "Class 10 • BSEB • Hindi") and enrolled subjects.
  */
 (function () {
   'use strict';
@@ -13,28 +11,14 @@
     const statRow = document.getElementById('statRow');
     if (!statRow || !window.API?.tests) return;
 
-    // Loading state
     statRow.innerHTML = `
-      <div class="p-4 rounded-xl glass-inner flex flex-col justify-center animate-pulse">
-        <div class="h-4 bg-white/10 rounded w-1/2 mb-2"></div>
-        <div class="h-8 bg-white/10 rounded w-3/4"></div>
-      </div>
-      <div class="p-4 rounded-xl glass-inner flex flex-col justify-center animate-pulse">
-        <div class="h-4 bg-white/10 rounded w-1/2 mb-2"></div>
-        <div class="h-8 bg-white/10 rounded w-3/4"></div>
-      </div>
-      <div class="p-4 rounded-xl glass-inner flex flex-col justify-center animate-pulse">
-        <div class="h-4 bg-white/10 rounded w-1/2 mb-2"></div>
-        <div class="h-8 bg-white/10 rounded w-3/4"></div>
-      </div>
-      <div class="p-4 rounded-xl glass-inner flex flex-col justify-center animate-pulse">
-        <div class="h-4 bg-white/10 rounded w-1/2 mb-2"></div>
-        <div class="h-8 bg-white/10 rounded w-3/4"></div>
-      </div>
+      <div class="p-4 rounded-xl glass-inner flex flex-col justify-center animate-pulse"><div class="h-4 bg-white/10 rounded w-1/2 mb-2"></div><div class="h-8 bg-white/10 rounded w-3/4"></div></div>
+      <div class="p-4 rounded-xl glass-inner flex flex-col justify-center animate-pulse"><div class="h-4 bg-white/10 rounded w-1/2 mb-2"></div><div class="h-8 bg-white/10 rounded w-3/4"></div></div>
+      <div class="p-4 rounded-xl glass-inner flex flex-col justify-center animate-pulse"><div class="h-4 bg-white/10 rounded w-1/2 mb-2"></div><div class="h-8 bg-white/10 rounded w-3/4"></div></div>
+      <div class="p-4 rounded-xl glass-inner flex flex-col justify-center animate-pulse"><div class="h-4 bg-white/10 rounded w-1/2 mb-2"></div><div class="h-8 bg-white/10 rounded w-3/4"></div></div>
     `;
 
     try {
-      // Fetch up to 50 recent results to calculate stats
       const res = await window.API.tests.getRecentResults(50);
       const results = res.results || [];
 
@@ -88,12 +72,13 @@
       const res = await window.API.tests.getProfile();
       const profile = res.profile || {};
 
-      // 1) Update academic badge
       if (badgeEl && profile.formattedBadge) {
         badgeEl.textContent = profile.formattedBadge;
       }
 
-      // 2) Render enrolled subjects
+      // Render study plan based on enrolled subjects
+      loadStudyPlan(profile);
+
       if (gridEl) {
         const subjects = profile.selectedSubjects || [];
 
@@ -102,9 +87,7 @@
             <div class="col-span-full p-4 rounded-xl glass-inner text-center">
               <p class="text-xs font-semibold mb-1" style="color: var(--text-main);">Set up your curriculum subjects</p>
               <p class="text-[11px] mb-3" style="color: var(--text-muted);">Choose your board and subjects to unlock chapter-wise mock tests.</p>
-              <a href="settings.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500 text-black font-bold text-xs hover:bg-cyan-400 transition">
-                Configure Subjects in Settings
-              </a>
+              <a href="settings.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500 text-black font-bold text-xs hover:bg-cyan-400 transition">Configure Subjects in Settings</a>
             </div>
           `;
           return;
@@ -118,11 +101,7 @@
               <div>
                 <div class="flex items-center justify-between mb-2">
                   <span class="text-2xl">${sub.icon || '📚'}</span>
-                  <span class="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
-                    isLive ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/25' : 'bg-slate-500/15 text-slate-400 border border-slate-500/25'
-                  }">
-                    ${isLive ? 'Live' : 'Coming soon'}
-                  </span>
+                  <span class="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${isLive ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/25' : 'bg-slate-500/15 text-slate-400 border border-slate-500/25'}">${isLive ? 'Live' : 'Coming soon'}</span>
                 </div>
                 <h4 class="text-xs font-bold group-hover:text-cyan-300 transition-colors line-clamp-1" style="color: var(--text-main);">${sub.name}</h4>
                 ${sub.hindiName ? `<p class="text-[10px] truncate mt-0.5" style="color: var(--text-muted);">${sub.hindiName}</p>` : ''}
@@ -137,14 +116,46 @@
       }
     } catch (err) {
       console.warn('Could not load student profile for dashboard:', err);
-      if (gridEl) {
-        gridEl.innerHTML = `
-          <div class="col-span-full py-2 text-center text-xs" style="color: var(--text-muted);">
-            Select your subjects from <a href="settings.html" class="text-cyan-400 underline">Settings</a>.
-          </div>
-        `;
-      }
     }
+  }
+
+  // =========================================
+  // NAYA: DYNAMIC STUDY PLAN GENERATOR
+  // =========================================
+  function loadStudyPlan(profile) {
+    const list = document.getElementById('studyPlanList');
+    if (!list) return;
+    
+    const subjects = profile.selectedSubjects || [];
+    if (subjects.length === 0) {
+      list.innerHTML = '<li class="py-3 text-center text-xs" style="color: var(--text-muted);">Set up subjects to get a study plan.</li>';
+      return;
+    }
+
+    // Dynamic logic: Takes user's subjects and assigns tasks
+    const timeSlots = ['45 min', '60 min', '30 min', '90 min'];
+    const actions = ['Revise Chapter 1', 'Practice Mock Test', 'Read Textbook', 'Solve PYQs'];
+    
+    let html = '';
+    const numTasks = Math.min(subjects.length, 3); 
+    
+    for (let i = 0; i < numTasks; i++) {
+      const sub = subjects[i];
+      const time = timeSlots[i % timeSlots.length];
+      const action = actions[i % actions.length];
+      const icon = sub.icon || '📚';
+      
+      html += `
+        <li class="flex justify-between items-center p-3 rounded-xl glass-inner mb-2 border border-white/5 hover:border-white/10 transition group cursor-pointer" onclick="window.location.href='test-select.html?subject=${encodeURIComponent(sub.code)}'">
+          <div class="flex items-center gap-3">
+            <span class="text-xl">${icon}</span>
+            <span class="text-sm font-semibold text-white group-hover:text-cyan-400 transition-colors">${sub.name} — ${action}</span>
+          </div>
+          <span class="text-xs font-bold text-slate-400 bg-slate-800/50 px-2 py-1 rounded-md">${time}</span>
+        </li>
+      `;
+    }
+    list.innerHTML = html;
   }
 
   // =========================================
@@ -160,7 +171,6 @@
       const notifications = res.notifications || [];
       const unreadCount = res.unreadCount || 0;
 
-      // Unread dot
       let dot = notifBtn.querySelector('.notif-dot');
       if (!dot) {
         dot = document.createElement('span');
@@ -170,7 +180,6 @@
       }
       dot.style.display = unreadCount > 0 ? 'block' : 'none';
 
-      // Panel content
       const listHtml = notifications.length === 0
         ? '<div class="p-4 text-center text-xs" style="color: var(--text-muted);">No new notifications</div>'
         : notifications.map((n) => `
@@ -191,35 +200,21 @@
           <p class="text-xs font-bold" style="color: var(--text-main);">Notifications</p>
           ${unreadCount > 0 ? `<span class="text-[10px] font-bold px-1.5 py-0.5 rounded" style="color: var(--text-link); background: var(--inner-glass-bg);">${unreadCount} new</span>` : ''}
         </div>
-        <div class="max-h-64 overflow-y-auto space-y-1 p-1">
-          ${listHtml}
-        </div>
+        <div class="max-h-64 overflow-y-auto space-y-1 p-1">${listHtml}</div>
       `;
 
-      notifBtn.onclick = (e) => {
-        e.stopPropagation();
-        notifPanel.classList.toggle('hidden');
-      };
-
-      document.addEventListener('click', (e) => {
-        if (!notifPanel.contains(e.target) && !notifBtn.contains(e.target)) {
-          notifPanel.classList.add('hidden');
-        }
-      });
-    } catch (e) {
-      console.warn('Could not load notifications:', e);
-    }
+      notifBtn.onclick = (e) => { e.stopPropagation(); notifPanel.classList.toggle('hidden'); };
+      document.addEventListener('click', (e) => { if (!notifPanel.contains(e.target) && !notifBtn.contains(e.target)) notifPanel.classList.add('hidden'); });
+    } catch (e) { console.warn('Could not load notifications:', e); }
   }
 
   window.handleNotifClick = async function(id, link) {
-    try {
-      await window.API.tests.markNotificationRead(id);
-    } catch (e) { /* silent */ }
+    try { await window.API.tests.markNotificationRead(id); } catch (e) { }
     if (link) window.location.href = link;
   };
 
   // =========================================
-  // 4. RECENT TESTS + MY RESULTS TAB BADGE
+  // 4. RECENT TESTS (MATCHES UI)
   // =========================================
   async function loadRecentTests() {
     const recentSec = document.getElementById('studentRecentTests');
@@ -244,64 +239,57 @@
       if (!ul) return;
 
       if (results.length === 0) {
-        ul.innerHTML = `
-          <li class="py-4 text-center text-xs" style="color: var(--text-muted);">
-            No tests attempted yet. Choose a subject above to start your first mock!
-          </li>
-        `;
+        ul.innerHTML = `<li class="py-4 text-center text-xs" style="color: var(--text-muted);">No tests attempted yet. Choose a subject above to start your first mock!</li>`;
         return;
       }
 
-      const topResults = results.slice(0, 5);
+      const topResults = results.slice(0, 4);
 
       ul.innerHTML = topResults.map((r) => {
         const score = r.score || {};
         const pct = score.percentage || 0;
-        const colorClass = pct >= 75 ? 'text-emerald-400' : (pct >= 50 ? 'text-amber-400' : 'text-red-400');
-        const title = r.chapterTitle || (r.chapterNumber ? `Ch ${r.chapterNumber}` : 'Full Test');
+        
+        // Badge color matching screenshot
+        let badgeClass = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+        if (pct < 50) badgeClass = 'bg-red-500/20 text-red-400 border-red-500/30';
+        else if (pct < 75) badgeClass = 'bg-amber-500/20 text-amber-400 border-amber-500/30';
+        
+        const title = r.chapterTitle || (r.chapterNumber ? `Ch ${r.chapterNumber}` : 'Mock');
 
         return `
           <li onclick="window.location.href='test-results.html?attemptId=${r.attemptId}'"
-              class="flex justify-between items-center text-xs border-b py-2 hover:bg-white/[0.02] px-1 rounded cursor-pointer group" style="border-color: var(--glass-border);">
-            <div class="flex-1 min-w-0 pr-2">
-              <span class="font-semibold group-hover:text-cyan-400 transition-colors block truncate" style="color: var(--text-main);">
-                ${r.subjectName || r.subjectCode} (${title})
-              </span>
-              <span class="text-[10px]" style="color: var(--text-muted);">
-                ${score.correct || 0}/${r.totalQuestions || 0} correct
-              </span>
+              class="flex justify-between items-center py-3 border-b border-white/5 hover:bg-white/[0.02] px-2 rounded cursor-pointer group transition-colors" style="border-color: var(--glass-border);">
+            <span class="text-sm font-semibold group-hover:text-cyan-400 transition-colors" style="color: var(--text-main);">
+              ${r.subjectName || r.subjectCode} (${title})
+            </span>
+            <div class="flex items-center gap-3">
+              <span class="text-xs font-bold" style="color: var(--text-muted);">${score.obtainedMarks || 0}/${score.totalMarks || 0}</span>
+              <span class="px-2.5 py-1 text-[10px] font-black uppercase rounded-full border ${badgeClass}">DONE</span>
             </div>
-            <span class="${colorClass} font-black text-sm shrink-0">${pct}%</span>
           </li>
         `;
       }).join('');
-    } catch (e) {
-      console.warn('Could not load recent tests:', e);
-    }
+    } catch (e) { console.warn('Could not load recent tests:', e); }
   }
 
   // =========================================
   // 5. INIT FUNCTION
   // =========================================
   function init() {
-    // 1) Force-show student-only sections
     var testSec = document.getElementById('studentTestSection');
     if (testSec) testSec.classList.remove('hidden');
 
     var recentSec = document.getElementById('studentRecentTests');
     if (recentSec) recentSec.classList.remove('hidden');
 
-    // 2) Sidebar role tag
     var roleTag = document.getElementById('sideRoleTag');
     if (roleTag) roleTag.textContent = 'Student';
 
-    // 3) Friendly welcome message (fallback)
     var welcomeMsg = document.getElementById('welcomeMsg');
     if (welcomeMsg && !welcomeMsg.textContent.trim()) {
       welcomeMsg.textContent = "Let's ace your next exam. Here's your progress.";
     }
     
-    // 4) Set Greeting based on time & User Name
     const hour = new Date().getHours();
     let greeting = 'Good morning';
     if (hour >= 12 && hour < 17) greeting = 'Good afternoon';
@@ -310,7 +298,6 @@
     const welcomeTimeEl = document.getElementById('welcomeTime');
     if (welcomeTimeEl) welcomeTimeEl.textContent = greeting;
 
-    // Try to fetch user name from API if available
     if (window.API && window.API.User) {
         const user = window.API.User.get();
         if (user && user.name) {
@@ -327,7 +314,6 @@
         }
     }
 
-    // 5) Load dynamic data
     loadDashboardStats();
     loadStudentAcademicData();
     loadNotifications();
