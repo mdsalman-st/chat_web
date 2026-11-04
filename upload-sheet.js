@@ -180,44 +180,63 @@
         return;
       }
 
-      // 👇 NAYA: IMAGE COMPRESSION LOGIC (Canvas API) 👇
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          let width = img.width;
-          let height = img.height;
-
-          // Max width 1600px (Isse photo ka size kam ho jayega)
-          const MAX_WIDTH = 1600;
-          if (width > MAX_WIDTH) {
-            height = Math.round((height * MAX_WIDTH) / width);
-            width = MAX_WIDTH;
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, height);
-
-          // Compress to JPEG at 70% quality
-          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
-          const base64 = compressedDataUrl.split(',')[1];
-
+      // 👇 FIX: PDF aur Image ka logic alag kar diya hai 👇
+      if (file.type === 'application/pdf') {
+        // PDF ko bina compress kiye direct upload karo
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const dataUrl = e.target.result;
+          const base64 = dataUrl.split(',')[1];
           uploadedPages.push({
             id: 'page_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
             file,
             base64,
-            mimeType: 'image/jpeg',
-            previewUrl: compressedDataUrl,
+            mimeType: file.type, // application/pdf
+            previewUrl: dataUrl,
           });
-
           renderPagesGrid();
         };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
+        reader.readAsDataURL(file);
+      } else {
+        // Image ko compress karo
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+
+            // Max width 1600px (Isse photo ka size kam ho jayega)
+            const MAX_WIDTH = 1600;
+            if (width > MAX_WIDTH) {
+              height = Math.round((height * MAX_WIDTH) / width);
+              width = MAX_WIDTH;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // Compress to JPEG at 70% quality
+            const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+            const base64 = compressedDataUrl.split(',')[1];
+
+            uploadedPages.push({
+              id: 'page_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+              file,
+              base64,
+              mimeType: 'image/jpeg',
+              previewUrl: compressedDataUrl,
+            });
+
+            renderPagesGrid();
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
     });
   }
 
@@ -246,31 +265,43 @@
     if (badge) badge.textContent = `${uploadedPages.length} page${uploadedPages.length > 1 ? 's' : ''} added`;
     if (submitBtn) submitBtn.disabled = false;
 
-    grid.innerHTML = uploadedPages.map((p, idx) => `
-      <div class="page-thumb relative rounded-xl overflow-hidden border border-white/10 bg-black/40 group">
-        <div class="aspect-[3/4] overflow-hidden flex items-center justify-center bg-ink-950">
-          <img src="${p.previewUrl}" alt="Page ${idx + 1}" class="w-full h-full object-cover">
-        </div>
+    grid.innerHTML = uploadedPages.map((p, idx) => {
+      // Check if it's a PDF to show an icon instead of broken image preview
+      const isPdf = p.mimeType === 'application/pdf';
+      
+      const previewContent = isPdf 
+        ? `<div class="flex flex-col items-center justify-center text-rose-400">
+             <svg class="w-10 h-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+             <span class="text-[10px] font-bold">PDF DOCUMENT</span>
+           </div>`
+        : `<img src="${p.previewUrl}" alt="Page ${idx + 1}" class="w-full h-full object-cover">`;
 
-        <span class="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-ink-950/80 backdrop-blur-md text-[10px] font-bold text-cyan-300 border border-white/10">
-          Page ${idx + 1}
-        </span>
+      return `
+        <div class="page-thumb relative rounded-xl overflow-hidden border border-white/10 bg-black/40 group">
+          <div class="aspect-[3/4] overflow-hidden flex items-center justify-center bg-ink-950">
+            ${previewContent}
+          </div>
 
-        <button onclick="removePage(${idx})" title="Remove page" class="absolute top-2 right-2 w-6 h-6 rounded-md bg-red-500/80 hover:bg-red-500 text-white flex items-center justify-center text-xs transition opacity-0 group-hover:opacity-100 cursor-pointer">
-          ✕
-        </button>
+          <span class="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-ink-950/80 backdrop-blur-md text-[10px] font-bold text-cyan-300 border border-white/10">
+            Page ${idx + 1}
+          </span>
 
-        <div class="absolute bottom-2 inset-x-2 flex items-center justify-between opacity-0 group-hover:opacity-100 transition">
-          <button onclick="movePage(${idx}, -1)" ${idx === 0 ? 'disabled' : ''} class="px-2 py-0.5 rounded bg-ink-950/80 text-[10px] text-white disabled:opacity-30 cursor-pointer">
-            ←
+          <button onclick="removePage(${idx})" title="Remove page" class="absolute top-2 right-2 w-6 h-6 rounded-md bg-red-500/80 hover:bg-red-500 text-white flex items-center justify-center text-xs transition opacity-0 group-hover:opacity-100 cursor-pointer">
+            ✕
           </button>
-          <span class="text-[9px] text-slate-400 font-semibold">Page ${idx + 1}/${uploadedPages.length}</span>
-          <button onclick="movePage(${idx}, 1)" ${idx === uploadedPages.length - 1 ? 'disabled' : ''} class="px-2 py-0.5 rounded bg-ink-950/80 text-[10px] text-white disabled:opacity-30 cursor-pointer">
-            →
-          </button>
+
+          <div class="absolute bottom-2 inset-x-2 flex items-center justify-between opacity-0 group-hover:opacity-100 transition">
+            <button onclick="movePage(${idx}, -1)" ${idx === 0 ? 'disabled' : ''} class="px-2 py-0.5 rounded bg-ink-950/80 text-[10px] text-white disabled:opacity-30 cursor-pointer">
+              ←
+            </button>
+            <span class="text-[9px] text-slate-400 font-semibold">Page ${idx + 1}/${uploadedPages.length}</span>
+            <button onclick="movePage(${idx}, 1)" ${idx === uploadedPages.length - 1 ? 'disabled' : ''} class="px-2 py-0.5 rounded bg-ink-950/80 text-[10px] text-white disabled:opacity-30 cursor-pointer">
+              →
+            </button>
+          </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   window.removePage = function (idx) {
@@ -325,7 +356,6 @@
     }
 
     try {
-      // Payload for backend (Backend will upload base64 to Cloudinary)
       const payload = {
         boardCode: currentProfile.board || 'bseb',
         classLevel: currentProfile.classLevel || '10',
@@ -339,7 +369,7 @@
         setCode,
         pages: uploadedPages.map((p, idx) => ({
           pageNumber: idx + 1,
-          imageBase64: p.base64, // Backend will handle this!
+          imageBase64: p.base64, 
           mimeType: p.mimeType,
         })),
       };
@@ -352,7 +382,6 @@
 
       activeSubmissionId = res.submissionId;
       
-      // Overlay band karo aur polling start karo
       if (overlay) overlay.classList.remove('active');
       
       startEvaluationPolling(activeSubmissionId);
@@ -366,7 +395,6 @@
         submitBtn.innerHTML = '<span>🚀 Check Copy with AI Vision</span><span>→</span>';
       }
     } finally {
-      // Chahe success ho ya error, overlay band ho jaye
       if (overlay) {
         overlay.classList.remove('active');
       }
