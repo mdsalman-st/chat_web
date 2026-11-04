@@ -254,7 +254,6 @@
     list.innerHTML = '<p class="text-sm text-slate-500">Loading questions...</p>';
     
     try {
-      // Fallback to /api/admin/questions if needed, assuming /api/tests/questions exists
       const res = await API.request('/api/admin/questions').catch(() => API.request('/api/tests/questions'));
       const questions = res.questions || [];
       
@@ -290,7 +289,7 @@
     const btn = $('ingestBtn');
     const originalText = btn.innerText;
     const fileInput = $('ingestPdf');
-    const overlay = $('cubeLoadingOverlay'); // 👈 3D Cube overlay
+    const overlay = $('cubeLoadingOverlay');
 
     if (!fileInput || !fileInput.files.length) {
       alert('Please select a PDF file first.');
@@ -300,7 +299,6 @@
     btn.innerText = '⏳ Uploading PDF...';
     btn.disabled = true;
 
-    // 👇 Show 3D Cube Animation
     if (overlay) overlay.classList.add('active');
 
     const formData = new FormData();
@@ -314,34 +312,21 @@
 
     try {
       const user = API.User.get();
-      const endpoint = (user.role === 'super_admin' || user.role === 'superadmin')
-        ? '/api/superadmin/papers/upload'
-        : '/api/admin/papers/upload';
+      const isSuperAdmin = (user.role === 'super_admin' || user.role === 'superadmin');
+      
+      // 👇 YAHAN API.JS WALA FUNCTION USE KIYA HAI 👇
+      const data = await API.admin.uploadPaper(formData, isSuperAdmin);
 
-      const token = API.Token.get ? API.Token.get() : localStorage.getItem('nexus_token'); 
+      showToast('✅ Paper uploaded successfully! AI is extracting text.');
+      $('ingestForm').reset(); 
+      loadAllPapers(); // Refresh list after upload
 
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
-        body: formData
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        showToast('✅ Paper uploaded successfully! AI is extracting text.');
-        $('ingestForm').reset(); 
-      } else {
-        alert(`❌ Upload Error: ${data.message}`);
-      }
     } catch (error) {
       console.error(error);
-      alert('❌ Network Error. Server check karein.');
+      alert(`❌ Upload Error: ${error.message}`);
     } finally {
       btn.innerText = originalText;
       btn.disabled = false;
-      
-      // 👇 Hide 3D Cube Animation (Success ya Error, dono mein)
       if (overlay) overlay.classList.remove('active');
     }
   };
@@ -442,7 +427,6 @@
   // =========================================
   async function loadAiHealth() {
     try {
-      // Assuming endpoint exists, else fallback to placeholders
       const res = await API.request('/api/admin/ai-health').catch(() => null);
       if (res) {
         if ($('geminiStatus')) $('geminiStatus').textContent = res.gemini?.status || 'Active';
@@ -451,7 +435,6 @@
         if ($('groqUsage')) $('groqUsage').textContent = `Rate Limit: ${res.groq?.rateLimit || 'OK'}`;
         if ($('failedJobsCount')) $('failedJobsCount').textContent = res.failedJobs || '0';
       } else {
-        // Fallback if API isn't ready
         if ($('geminiStatus')) $('geminiStatus').textContent = 'Active';
         if ($('geminiUsage')) $('geminiUsage').textContent = 'Usage: Live Tracking Pending';
       }
@@ -465,7 +448,6 @@
     if (!list) return;
     list.innerHTML = '<p class="text-sm text-slate-500">Loading logs...</p>';
     try {
-      // Assuming endpoint exists
       const res = await API.request('/api/admin/audit-logs').catch(() => ({ logs: [] }));
       const logs = res.logs || [];
       if (logs.length === 0) {

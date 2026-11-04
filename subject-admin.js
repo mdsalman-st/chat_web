@@ -80,7 +80,7 @@
     if (tabId === 'review') loadPendingReview();
     if (tabId === 'flags') loadFlags();
     if (tabId === 'my-papers') loadMyPapers();
-    if (tabId === 'manage-qs') loadQuestions(); // 👈 NAYA
+    if (tabId === 'manage-qs') loadQuestions();
   };
 
   // =========================================
@@ -111,26 +111,16 @@
     formData.append('examPhase', $('ingestPhase').value);
 
     try {
-      const token = (typeof API !== 'undefined' && API.Token.get) ? API.Token.get() : localStorage.getItem('nexus_token'); 
+      // 👇 YAHAN API.JS WALA FUNCTION USE KIYA HAI 👇
+      const data = await API.admin.uploadPaper(formData, false);
 
-      const response = await fetch('/api/admin/papers/upload', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
-        body: formData
-      });
+      showToast('✅ Paper uploaded successfully! AI is extracting text.');
+      $('ingestForm').reset(); 
+      loadMyPapers(); 
 
-      const data = await response.json();
-
-      if (response.ok) {
-        showToast('✅ Paper uploaded successfully! AI is extracting text.');
-        $('ingestForm').reset(); 
-        loadMyPapers(); 
-      } else {
-        alert(`❌ Upload Error: ${data.message}`);
-      }
     } catch (error) {
       console.error(error);
-      alert('❌ Network Error. Server check karein.');
+      alert(`❌ Upload Error: ${error.message}`);
     } finally {
       btn.innerText = originalText;
       btn.disabled = false;
@@ -194,7 +184,7 @@
   };
 
   // =========================================
-  // NAYA: MANAGE QUESTIONS (LIVE DATA)
+  // MANAGE QUESTIONS (LIVE DATA)
   // =========================================
   async function loadQuestions() {
     const list = $('manageQuestionsList');

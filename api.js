@@ -413,6 +413,15 @@
       return request('/api/admin/stats');
     },
     
+    // 👇 NAYA: File Upload Function (No BASE_URL needed) 👇
+    uploadPaper(formData, isSuperAdmin = false) {
+      const endpoint = isSuperAdmin ? '/api/superadmin/papers/upload' : '/api/admin/papers/upload';
+      return request(endpoint, { 
+        method: 'POST', 
+        body: formData 
+      });
+    },
+
     // User Management
     getUsers() {
       return request('/api/admin/users');
