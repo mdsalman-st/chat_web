@@ -13,37 +13,28 @@
   <script src="tailwind-config.js"></script>
   <link rel="stylesheet" href="vault.css">
 
-  <!-- 🔐 Bidirectional role guard — must be in <head> for early redirect -->
   <script src="role-guard.js" data-page="student"></script>
 
   <style>
-    /* =========================================
-       AUTO THEME VARIABLES (Dark & Light)
-       ========================================= */
     :root {
-      /* DARK MODE (Default) */
       --bg-color: #05070d;
       --bg-gradient: 
         radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15), transparent 40%),
         radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15), transparent 40%);
       --grid-color: rgba(255, 255, 255, 0.03);
-      
       --text-main: #ffffff;
       --text-muted: #94a3b8;
       --text-link: #22d3ee;
-      
       --glass-bg: rgba(255, 255, 255, 0.03);
       --glass-border: rgba(255, 255, 255, 0.08);
       --glass-border-top: rgba(255, 255, 255, 0.25);
       --glass-shadow: rgba(0, 0, 0, 0.6);
       --glass-inset: rgba(255, 255, 255, 0.1);
-      
       --inner-glass-bg: rgba(255, 255, 255, 0.02);
       --inner-glass-border: rgba(255, 255, 255, 0.05);
       --inner-glass-hover: rgba(255, 255, 255, 0.08);
     }
 
-    /* LIGHT MODE (Auto applies based on device settings) */
     @media (prefers-color-scheme: light) {
       :root {
         --bg-color: #eef2f6;
@@ -51,26 +42,20 @@
           radial-gradient(circle at 10% 20%, rgba(167, 139, 250, 0.3), transparent 40%),
           radial-gradient(circle at 90% 80%, rgba(56, 189, 248, 0.3), transparent 40%);
         --grid-color: rgba(0, 0, 0, 0.03);
-        
         --text-main: #0f172a;
         --text-muted: #475569;
         --text-link: #0284c7;
-        
         --glass-bg: rgba(255, 255, 255, 0.4);
         --glass-border: rgba(255, 255, 255, 0.6);
         --glass-border-top: rgba(255, 255, 255, 0.9);
         --glass-shadow: rgba(0, 0, 0, 0.05);
         --glass-inset: rgba(255, 255, 255, 0.8);
-        
         --inner-glass-bg: rgba(255, 255, 255, 0.3);
         --inner-glass-border: rgba(255, 255, 255, 0.5);
         --inner-glass-hover: rgba(255, 255, 255, 0.7);
       }
     }
 
-    /* =========================================
-       BASE STYLES
-       ========================================= */
     body {
       background-color: var(--bg-color);
       background-image: 
@@ -85,14 +70,10 @@
       transition: background-color 0.5s ease, color 0.5s ease;
     }
 
-    /* Particles */
     .particles { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
     .particle { position:absolute; border-radius:50%; background:rgba(34,211,238,0.4); box-shadow:0 0 8px rgba(34,211,238,0.8); animation:rise linear infinite; }
     @keyframes rise { 0%{transform:translateY(0);opacity:0} 10%{opacity:1} 90%{opacity:1} 100%{transform:translateY(-110vh);opacity:0} }
 
-    /* =========================================
-       LIQUID GLASS SYSTEM
-       ========================================= */
     .liquid-glass {
       background: var(--glass-bg);
       backdrop-filter: blur(30px) saturate(200%);
@@ -126,10 +107,8 @@
       transform: translateZ(20px);
     }
     .glass-inner:hover { background: var(--inner-glass-hover); }
-
     .glass-content { position: relative; z-index: 2; transform: translateZ(20px); }
 
-    /* Sidebar & Topbar overrides */
     .glass-nav {
       background: var(--glass-bg);
       backdrop-filter: blur(40px) saturate(150%);
@@ -138,13 +117,11 @@
       border-bottom: 1px solid var(--glass-border);
     }
 
-    /* Nav Items */
     .nav-item { display:flex; align-items:center; gap:0.75rem; padding:0.75rem 1rem; border-radius:1rem; color:var(--text-muted); font-size:0.875rem; font-weight:500; cursor:pointer; transition:all 0.2s ease; border:1px solid transparent; text-decoration:none; }
     .nav-item:hover { background:var(--inner-glass-bg); color:var(--text-main); }
     .nav-item.active { background:var(--inner-glass-hover); color:var(--text-main); border-color:var(--inner-glass-border); }
     .nav-icon { width:18px; height:18px; flex-shrink:0; }
 
-    /* Dropdown */
     .dropdown-panel { position:absolute; top:calc(100% + 8px); right:0; min-width:220px; background:var(--bg-color); border:1px solid var(--glass-border); border-radius:1rem; padding:0.5rem; box-shadow:0 20px 50px rgba(0,0,0,0.5); z-index:50; animation:slideInRight 0.2s forwards; }
     .dropdown-item { display:flex; align-items:center; gap:0.7rem; padding:0.6rem 0.75rem; border-radius:0.6rem; font-size:0.85rem; color:var(--text-muted); cursor:pointer; transition:all 0.15s ease; text-decoration:none; }
     .dropdown-item:hover { background:var(--inner-glass-bg); color:var(--text-main); }
@@ -198,12 +175,11 @@
         <a href="test-select.html" class="nav-item"><svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><span>Mock Tests</span></a>
         <a href="test-select.html?mode=full" class="nav-item"><svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg><span>My Exams</span></a>
         
-        <!-- NAYA TAB: MY RESULTS -->
         <a href="test-results.html" class="nav-item">
-  <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-      <span>My Results</span>
-  <span id="myResultsCount" class="hidden ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-400"></span>
-</a>
+          <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          <span>My Results</span>
+          <span id="myResultsCount" class="hidden ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-400"></span>
+        </a>
 
         <p class="px-3 pt-4 pb-1 text-[10px] font-bold uppercase tracking-[0.15em]" style="color: var(--text-muted);">Workspace</p>
         <a href="calendar.html" class="nav-item"><svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg><span>Calendar</span></a>
@@ -353,18 +329,9 @@
           </div>
         </div>
 
-        <!-- Main Grid (Widgets) -->
-        <div class="anim anim-5 grid grid-cols-1 lg:grid-cols-3 gap-5 mb-8">
-          <!-- Left Side Widgets -->
-          <div class="lg:col-span-2 space-y-5">
-            <div id="mainWidget" class="liquid-glass p-6 glass-content"></div>
-            <div id="secondaryWidget" class="liquid-glass p-6 glass-content"></div>
-          </div>
-
-          <!-- Right Side Widgets -->
+        <!-- Main Grid (Widgets) - Cleaned up, removed fake widgets -->
+        <div class="anim anim-5 grid grid-cols-1 lg:grid-cols-1 gap-5 mb-8">
           <div class="space-y-5">
-            <div id="sideWidget" class="liquid-glass p-6 glass-content"></div>
-
             <!-- Recent Tests Widget -->
             <div id="studentRecentTests" class="liquid-glass p-6 glass-content">
               <h3 class="text-base font-bold mb-4 flex items-center gap-2" style="color: var(--text-main);">
@@ -372,7 +339,6 @@
                 Recent AI Tests
               </h3>
               <ul class="space-y-2">
-                <!-- Fake data removed. JS will populate this. -->
                 <li class="py-3 text-center text-xs" style="color: var(--text-muted);">No recent tests found.</li>
               </ul>
               <button onclick="window.location.href='test-results.html'" class="w-full mt-3 py-2 text-xs font-bold rounded-lg glass-inner transition hover:opacity-80" style="color: var(--text-link);">View All Results</button>
@@ -390,9 +356,8 @@
     </div>
   </div>
 
-  <!-- App scripts -->
+  <!-- App scripts - dashboard.js REMOVED -->
   <script src="api.js"></script>
-  <script src="dashboard.js"></script>
   <script src="student-dashboard.js"></script>
 
   <!-- 3D TILT EFFECT JS -->

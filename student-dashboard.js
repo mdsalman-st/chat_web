@@ -328,7 +328,7 @@
     }
 
     // 5) Load dynamic data
-    loadDashboardStats(); // 👈 NAYA: Stats populate karega
+    loadDashboardStats();
     loadStudentAcademicData();
     loadNotifications();
     loadRecentTests();
