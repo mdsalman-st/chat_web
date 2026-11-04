@@ -313,7 +313,7 @@
 
     try {
       const user = API.User.get();
-      const isSuperAdmin = (user.role === 'super_admin' || user.role === 'superadmin');
+      const isSuperAdmin = Boolean(user && (user.role === 'super_admin' || user.role === 'superadmin' || (user.role === 'admin' && !user.assignedSubject)));
       
       await API.admin.uploadPaper(formData, isSuperAdmin);
 
@@ -341,7 +341,7 @@
 
     try {
       const user = API.User.get();
-      const isSuperAdmin = (user.role === 'super_admin' || user.role === 'superadmin');
+      const isSuperAdmin = Boolean(user && (user.role === 'super_admin' || user.role === 'superadmin' || (user.role === 'admin' && !user.assignedSubject)));
       
       // Agar Super Admin hai toh saare papers dikhao, agar normal admin hai toh uske apne
       const endpoint = isSuperAdmin ? '/api/superadmin/papers' : '/api/admin/papers';
@@ -387,7 +387,7 @@
     
     try {
       const user = API.User.get();
-      const isSuperAdmin = (user.role === 'super_admin' || user.role === 'superadmin');
+      const isSuperAdmin = Boolean(user && (user.role === 'super_admin' || user.role === 'superadmin' || (user.role === 'admin' && !user.assignedSubject)));
       const endpoint = isSuperAdmin ? `/api/superadmin/papers/${id}` : `/api/admin/papers/${id}`;
       
       await API.request(endpoint, { method: 'DELETE' });
