@@ -199,8 +199,8 @@
     try {
       const token = (typeof API !== 'undefined' && API.Token.get) ? API.Token.get() : localStorage.getItem('nexus_token'); 
       
-      // 👇 ROUTE FIXED AS PER BACKEND CONTROLLER 👇
-      const res = await fetch(`/api/tests/${currentAttemptId}/pdf`, {
+      // 👇 YAHAN API.BASE LAGA DIYA HAI 👇
+      const res = await fetch(`${API.base}/api/tests/${currentAttemptId}/pdf`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
