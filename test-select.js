@@ -88,8 +88,12 @@
         return;
       }
 
+      const userMedium = (currentProfile.medium || 'Hindi').toLowerCase();
       listGrid.innerHTML = chapters.map((ch) => {
         const isLive = ch.isLive || ch.statusLabel === 'Live';
+        // Show primary title based on user medium, secondary title in the other language
+        const primaryTitle = ch.title || ch.hindiTitle || '';
+        const secondaryTitle = (primaryTitle === ch.hindiTitle) ? '' : (ch.hindiTitle || '');
         return `
           <div class="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-cyan-500/30 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3 group">
             <div class="flex items-start gap-3">
@@ -98,9 +102,9 @@
               </span>
               <div>
                 <h4 class="text-sm font-bold text-white group-hover:text-cyan-300 transition-colors">
-                  ${esc(ch.title)}
+                  ${esc(primaryTitle)}
                 </h4>
-                ${ch.hindiTitle ? `<p class="text-xs text-slate-400 mt-0.5">${esc(ch.hindiTitle)}</p>` : ''}
+                ${secondaryTitle ? `<p class="text-xs text-slate-400 mt-0.5">${esc(secondaryTitle)}</p>` : ''}
                 <div class="flex items-center gap-2 mt-1.5">
                   <span class="text-[10px] text-slate-500 font-medium capitalize">
                     Cutoff: ${ch.phaseCutoff ? ch.phaseCutoff.replace('_', ' ') : 'Annual'}
