@@ -66,7 +66,8 @@
         currentProfile.classLevel || '10',
         currentSubjectCode,
         currentProfile.stream || null,
-        phase
+        phase,
+        currentProfile.medium || 'Hindi'
       );
 
       // FIX 1: Agar response aate-aate user ne subject change kar diya, toh purana data discard karo

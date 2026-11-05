@@ -118,6 +118,13 @@
     },
   };
 
+  const STUDENT_MEDIUMS = [
+    'Hindi', 'English', 'Assamese', 'Bengali', 'Bodo', 'Dogri', 'Gujarati',
+    'Kannada', 'Kashmiri', 'Konkani', 'Maithili', 'Malayalam', 'Manipuri',
+    'Marathi', 'Nepali', 'Odia', 'Punjabi', 'Sanskrit', 'Santali', 'Sindhi',
+    'Tamil', 'Telugu', 'Urdu',
+  ];
+
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -288,16 +295,10 @@
         <label class="block text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400 mb-2">
           Exam Medium / Language <span class="text-cyan-400">*</span>
         </label>
-        <div class="grid grid-cols-2 gap-3" id="mediumOptionGrid">
-          <label class="flex items-center gap-3 p-3 rounded-xl bg-ink-900/60 border border-cyan-500/40 cursor-pointer text-sm font-semibold text-white">
-            <input type="radio" name="student_medium" value="Hindi" checked class="text-cyan-400 focus:ring-0">
-            <span>🇮🇳 Hindi (हिन्दी)</span>
-          </label>
-          <label class="flex items-center gap-3 p-3 rounded-xl bg-ink-900/60 border border-white/10 hover:border-white/20 cursor-pointer text-sm font-semibold text-white">
-            <input type="radio" name="student_medium" value="English" class="text-cyan-400 focus:ring-0">
-            <span>🇬🇧 English</span>
-          </label>
-        </div>
+        <select id="student_medium" name="student_medium"
+                class="w-full px-4 py-3 rounded-xl bg-ink-900/60 border border-white/10 text-white text-sm custom-select pr-10 cursor-pointer focus:outline-none focus:border-cyan-400 transition-all">
+          ${STUDENT_MEDIUMS.map(medium => `<option value="${esc(medium)}"${medium === 'Hindi' ? ' selected' : ''}>${esc(medium)}</option>`).join('')}
+        </select>
       `;
       dynamicFields.appendChild(mediumWrap);
 
@@ -402,17 +403,6 @@
       classSelect.addEventListener('change', refreshSubjects);
       streamSelect.addEventListener('change', refreshSubjects);
 
-      // Medium radio styles
-      document.querySelectorAll('input[name="student_medium"]').forEach(r => {
-        r.addEventListener('change', () => {
-          document.querySelectorAll('#mediumOptionGrid label').forEach(lbl => {
-            const hasChecked = lbl.querySelector('input:checked');
-            lbl.classList.toggle('border-cyan-500/40', !!hasChecked);
-            lbl.classList.toggle('border-white/10', !hasChecked);
-          });
-        });
-      });
-
       // Initial load
       refreshSubjects();
 
@@ -507,7 +497,7 @@
           const classSelect = $('student_class');
           const otherInput = $('student_other_board');
           const streamSelect = $('student_stream');
-          const mediumChecked = document.querySelector('input[name="student_medium"]:checked');
+          const mediumSelect = $('student_medium');
           const goalInput = $('student_goal');
 
           const board = boardSelect ? boardSelect.value : 'bseb';
@@ -524,7 +514,7 @@
           const isSenior = classLevel === '11' || classLevel === '12';
           const stream = isSenior && streamSelect ? streamSelect.value : null;
           const streamName = isSenior && streamSelect ? streamSelect.options[streamSelect.selectedIndex]?.text : null;
-          const medium = mediumChecked ? mediumChecked.value : 'Hindi';
+          const medium = mediumSelect ? mediumSelect.value : 'Hindi';
 
           // Collect checked subjects
           const checkedSubjects = Array.from(document.querySelectorAll('input[name="subject_chk"]:checked')).map(chk => ({

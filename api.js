@@ -245,11 +245,12 @@
       if (stream) params.set('stream', stream);
       return request('/api/tests/boards/' + encodeURIComponent(boardCode) + '/subjects?' + params.toString());
     },
-    getChapters(boardCode, classLevel, subjectCode, stream = null, phase = null) {
+    getChapters(boardCode, classLevel, subjectCode, stream = null, phase = null, medium = null) {
       const params = new URLSearchParams({ subject: subjectCode });
       if (classLevel) params.set('class', classLevel);
       if (stream) params.set('stream', stream);
       if (phase) params.set('phase', phase);
+      if (medium) params.set('medium', medium);
       return request('/api/tests/boards/' + encodeURIComponent(boardCode) + '/chapters?' + params.toString());
     },
 
