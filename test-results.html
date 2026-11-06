@@ -206,17 +206,17 @@
                         <!-- Combined Breakdown -->
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
                             <div class="p-4 rounded-xl glass-inner bg-cyan-500/[0.03] border-cyan-500/20"><p class="text-2xl font-black text-cyan-400" id="rMcqScore">0/0</p><p class="text-[10px] text-slate-400 font-semibold uppercase mt-1">MCQ Score</p></div>
-                            <div class="p-4 rounded-xl glass-inner bg-amber-500/[0.03] border-amber-500/20"><p class="text-2xl font-black text-amber-400" id="rSubjScore">0/0</p><p class="text-[10px] text-slate-400 font-semibold uppercase mt-1">Subjective</p></div>
+                            <div id="subjectiveScoreCard" class="p-4 rounded-xl glass-inner bg-amber-500/[0.03] border-amber-500/20"><p class="text-2xl font-black text-amber-400" id="rSubjScore">0/0</p><p class="text-[10px] text-slate-400 font-semibold uppercase mt-1">Subjective</p></div>
                             <div class="p-4 rounded-xl glass-inner bg-emerald-500/[0.03] border-emerald-500/20"><p class="text-2xl font-black text-emerald-400" id="rCorrect">0</p><p class="text-[10px] text-slate-400 font-semibold uppercase mt-1">MCQ Correct</p></div>
                             <div class="p-4 rounded-xl glass-inner bg-red-500/[0.03] border-red-500/20"><p class="text-2xl font-black text-red-400" id="rIncorrect">0</p><p class="text-[10px] text-slate-400 font-semibold uppercase mt-1">MCQ Wrong</p></div>
                         </div>
 
-                        <div class="p-4 rounded-xl glass-inner mb-5">
+                        <div id="timeAnalysisCard" class="p-4 rounded-xl glass-inner mb-5">
                             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3">⏱️ Time Analysis</p>
                             <div class="grid grid-cols-3 gap-2 text-center">
                                 <div><p class="text-lg font-black text-white" id="rTimeTaken">0m</p><p class="text-[9px] text-slate-500 uppercase">Taken</p></div>
                                 <div><p class="text-lg font-black text-white" id="rAvgTime">0m</p><p class="text-[9px] text-slate-500 uppercase">Avg/Q</p></div>
-                                <div><p class="text-lg font-black text-emerald-400" id="rTimeSaved">0m</p><p class="text-[9px] text-slate-500 uppercase">Saved</p></div>
+                                <div><p class="text-lg font-black text-emerald-400" id="rTimeSaved">0m</p><p class="text-[9px] text-slate-500 uppercase" id="rTimeSavedLabel">Saved</p></div>
                             </div>
                         </div>
 
@@ -228,7 +228,7 @@
                 </div>
 
                 <!-- AI Analysis -->
-                <div class="liquid-glass p-6 mb-5">
+                <div id="aiAnalysisPanel" class="liquid-glass p-6 mb-5">
                     <div style="position:relative; z-index:2;">
                         <div class="flex items-center gap-2 mb-4"><span class="text-lg">🤖</span><h3 class="text-base font-bold text-white">AI Performance Analysis</h3></div>
                         <p class="text-sm text-slate-300 mb-5 leading-relaxed" id="aiRemark">Analysis loading...</p>

@@ -173,7 +173,7 @@
           📝 MCQ Section
         </button>
         <button onclick="switchExamTab('subjective')" id="tabBtn-subjective" class="px-4 py-2 rounded-t-lg text-sm font-semibold text-slate-400 hover:text-white transition-all flex items-center gap-2">
-          ✍️ Subjective Section <span id="subjectiveUploadStatus" class="hidden text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full">Uploaded</span>
+          ✍️ Written Questions & Answer Sheet <span id="subjectiveUploadStatusBadge" class="hidden text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full">Uploaded</span>
         </button>
       </div>
     </div>
@@ -257,6 +257,7 @@
             </span>
           </div>
           <p id="subjectiveAttemptGuidance" class="text-xs text-amber-200/80 mb-4"></p>
+          <p id="answerSheetAvailability" class="hidden text-xs text-amber-200/80 mb-4" role="status"></p>
           <div id="subjectiveQuestionsList" class="space-y-4">
             <p class="text-sm text-slate-500">Loading subjective questions...</p>
           </div>

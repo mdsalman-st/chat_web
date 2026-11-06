@@ -272,6 +272,12 @@
         body: payload,
       });
     },
+    prepareChapterMcqPractice(payload) {
+      return request('/api/tests/chapters/prepare-mcq-practice', {
+        method: 'POST',
+        body: payload,
+      });
+    },
     getJobStatus(jobId) {
       return request('/api/tests/jobs/' + encodeURIComponent(jobId));
     },

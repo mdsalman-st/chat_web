@@ -107,11 +107,12 @@
     const mcqScore = result.score || {};
     const subjScore = result.subjectiveScore || {};
     const ai = result.aiAnalysis || {};
+    const isMcqPractice = result.testType === 'chapter_mcq_practice';
     const pct = score.percentage || 0;
 
     // 1. Subject & Chapter
     $('resultSubject').textContent = result.subjectName || result.subjectCode;
-    $('resultChapter').textContent = result.chapterTitle || (result.chapterNumber ? `Chapter ${result.chapterNumber}` : 'Full Board Paper');
+    $('resultChapter').textContent = `${result.chapterTitle || (result.chapterNumber ? `Chapter ${result.chapterNumber}` : 'Full Board Paper')}${isMcqPractice ? ' · MCQ Practice' : ''}`;
 
     // 2. Score Ring (Combined)
     const ring = $('scoreRing');
@@ -124,7 +125,7 @@
 
     // 3. Performance Badge
     const badge = $('performanceBadge');
-    badge.textContent = ai.performanceLevel || 'Average';
+    badge.textContent = isMcqPractice ? 'Practice complete' : (ai.performanceLevel || 'Average');
     if (pct >= 75) badge.className = 'inline-flex px-4 py-1.5 rounded-full text-xs font-bold border bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
     else if (pct >= 50) badge.className = 'inline-flex px-4 py-1.5 rounded-full text-xs font-bold border bg-blue-500/20 text-blue-400 border-blue-500/30';
     else badge.className = 'inline-flex px-4 py-1.5 rounded-full text-xs font-bold border bg-red-500/20 text-red-400 border-red-500/30';
@@ -132,6 +133,7 @@
     // 4. Score Breakdown
     $('rMcqScore').textContent = `${mcqScore.obtainedMarks || 0}/${mcqScore.totalMarks || 0}`;
     $('rSubjScore').textContent = subjScore.totalMarks > 0 ? `${subjScore.obtainedMarks}/${subjScore.totalMarks}` : `N/A`;
+    $('subjectiveScoreCard').classList.toggle('hidden', isMcqPractice);
     $('rCorrect').textContent = mcqScore.correct || 0;
     $('rIncorrect').textContent = mcqScore.incorrect || 0;
 
@@ -139,7 +141,8 @@
     const durMin = Math.round((result.durationMs || 0) / 60000);
     $('rTimeTaken').textContent = `${durMin}m`;
     $('rAvgTime').textContent = `${Math.round(durMin / (result.totalQuestions || 1))}m`;
-    $('rTimeSaved').textContent = `${Math.max(0, 180 - durMin)}m`;
+    $('rTimeSaved').textContent = isMcqPractice ? '—' : `${Math.max(0, 180 - durMin)}m`;
+    $('rTimeSavedLabel').textContent = isMcqPractice ? 'Not timed' : 'Saved';
 
     // 6. PDF Card (Show if subjective was submitted)
     if (result.subjectiveDetails) {
@@ -150,6 +153,7 @@
     }
 
     // 7. AI Analysis
+    $('aiAnalysisPanel').classList.toggle('hidden', isMcqPractice);
     $('aiRemark').textContent = ai.overallRemark || 'Analysis not available.';
     const renderList = (id, items, fallback) => {
       const el = $(id);
@@ -264,12 +268,13 @@
 
     list.innerHTML = results.map(r => {
       const isFull = r.testType === 'full_paper';
+      const isMcqPractice = r.testType === 'chapter_mcq_practice';
       const pct = r.combinedScore ? r.combinedScore.percentage : (r.score?.percentage || 0);
       const color = pct >= 75 ? 'text-emerald-400' : pct >= 50 ? 'text-amber-400' : 'text-red-400';
       const date = new Date(r.finishedAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
       
-      const icon = isFull ? '📄' : '📝';
-      const typeLabel = isFull ? 'Full Paper' : 'Chapter Test';
+      const icon = isFull ? '📄' : isMcqPractice ? '✅' : '📝';
+      const typeLabel = isFull ? 'Full Paper' : isMcqPractice ? 'MCQ Practice' : 'Chapter Test';
       
       return `
         <div class="history-row grid grid-cols-1 sm:grid-cols-12 gap-4 px-6 py-4 items-center group" data-type="${isFull ? 'full' : 'chapter'}">
@@ -344,12 +349,31 @@
     }
   };
 
-  window.retakeTest = function() {
+  window.retakeTest = async function() {
     if (!currentResultData) return;
     
     if (currentResultData.testType === 'full_paper' && currentResultData.paperId) {
       window.location.href = `test-live.html?paperId=${currentResultData.paperId}&subject=${currentResultData.subjectCode}`;
     } else if (currentResultData.chapterNumber) {
+      if (currentResultData.testType === 'chapter_mcq_practice') {
+        try {
+          const prepared = await API.tests.prepareChapterMcqPractice({
+            subjectCode: currentResultData.subjectCode,
+            chapterNumber: currentResultData.chapterNumber,
+            isHardMode: !!currentResultData.isHardMode,
+          });
+          const jobId = prepared.generationJobId || prepared.jobId;
+          if (!prepared.ready) {
+            window.location.href = `test-select.html?subject=${encodeURIComponent(currentResultData.subjectCode)}`;
+            return;
+          }
+          window.location.href = `test-live.html?subject=${encodeURIComponent(currentResultData.subjectCode)}&chapter=${currentResultData.chapterNumber}&testType=chapter_mcq_practice${jobId ? `&jobId=${encodeURIComponent(jobId)}` : ''}${currentResultData.isHardMode ? '&hard=1' : ''}`;
+          return;
+        } catch (error) {
+          alert(error.message || 'Could not prepare MCQ practice.');
+          return;
+        }
+      }
       window.location.href = `test-live.html?subject=${currentResultData.subjectCode}&chapter=${currentResultData.chapterNumber}`;
     } else {
       window.location.href = 'test-select.html';

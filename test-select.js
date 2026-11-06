@@ -126,10 +126,16 @@
               </div>
             </div>
 
-            <div class="flex items-center gap-2 self-end sm:self-center shrink-0">
+            <div class="flex flex-col sm:flex-row items-end sm:items-center gap-2 self-end sm:self-center shrink-0">
               <button onclick="startChapterTest(${ch.chapterNumber}, '${encodeURIComponent(ch.title)}')"
                       class="px-4 py-2 rounded-xl bg-cyan-500/15 hover:bg-cyan-500 text-cyan-300 hover:text-ink-950 font-bold text-xs border border-cyan-500/30 hover:border-transparent transition-all flex items-center gap-1.5">
                 <span>Start Practice</span>
+                <span>→</span>
+              </button>
+              <button onclick="startChapterTest(${ch.chapterNumber}, '${encodeURIComponent(ch.title)}', true)"
+                      title="10 MCQs, automatically scored as soon as you submit"
+                      class="px-4 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500 text-emerald-300 hover:text-ink-950 font-bold text-xs border border-emerald-500/25 hover:border-transparent transition-all flex items-center gap-1.5">
+                <span>10 MCQ Practice</span>
                 <span>→</span>
               </button>
             </div>
@@ -310,7 +316,7 @@
     window.location.href = `test-live.html?paperId=${encodeURIComponent(paperId)}&subject=${encodeURIComponent(currentSubjectCode)}${isHardMode ? '&hard=1' : ''}`;
   };
 
-  window.startChapterTest = async function (chapterNumber, rawTitle) {
+  window.startChapterTest = async function (chapterNumber, rawTitle, mcqOnly = false) {
     const isHardMode = !!$('hardModeToggle')?.checked;
     const modal = $('lazySetupModal');
     const pBar = $('lazyProgressBar');
@@ -322,7 +328,10 @@
 
     try {
       // 1. Ask backend if questions exist or need lazy loading setup
-      const res = await API.tests.prepareChapter({
+      const prepare = mcqOnly
+        ? API.tests.prepareChapterMcqPractice.bind(API.tests)
+        : API.tests.prepareChapter.bind(API.tests);
+      const res = await prepare({
         subjectCode: currentSubjectCode,
         chapterNumber: Number(chapterNumber),
         isHardMode,
@@ -333,7 +342,8 @@
         // Questions are ready! Open Live Test runner directly
         const jobId = res.generationJobId || res.jobId;
         const jobQuery = jobId ? `&jobId=${encodeURIComponent(jobId)}` : '';
-        window.location.href = `test-live.html?subject=${encodeURIComponent(currentSubjectCode)}&chapter=${encodeURIComponent(chapterNumber)}${isHardMode ? '&hard=1' : ''}${jobQuery}`;
+        const typeQuery = mcqOnly ? '&testType=chapter_mcq_practice' : '';
+        window.location.href = `test-live.html?subject=${encodeURIComponent(currentSubjectCode)}&chapter=${encodeURIComponent(chapterNumber)}${isHardMode ? '&hard=1' : ''}${jobQuery}${typeQuery}`;
         return;
       }
 
@@ -365,8 +375,9 @@
             stopQuestionPolling();
             if (pMsg) pMsg.textContent = 'First questions are ready. Launching your test…';
             const jobQuery = res.jobId ? `&jobId=${encodeURIComponent(res.jobId)}` : '';
+            const typeQuery = mcqOnly ? '&testType=chapter_mcq_practice' : '';
             setTimeout(() => {
-              window.location.href = `test-live.html?subject=${encodeURIComponent(currentSubjectCode)}&chapter=${encodeURIComponent(chapterNumber)}${isHardMode ? '&hard=1' : ''}${jobQuery}`;
+              window.location.href = `test-live.html?subject=${encodeURIComponent(currentSubjectCode)}&chapter=${encodeURIComponent(chapterNumber)}${isHardMode ? '&hard=1' : ''}${jobQuery}${typeQuery}`;
             }, 750);
           } else if (job.status === 'failed') {
             stopQuestionPolling();

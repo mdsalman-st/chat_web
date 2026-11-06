@@ -22,7 +22,9 @@
   let savingState = false;
   let boardPatternSnapshot = null;
   let subjectiveRequired = false;
+  let isMcqPractice = false;
   let generationComplete = false;
+  let generationPaused = false;
   let stateSaveQueue = Promise.resolve();
   let selectedFiles = [];
   let subjectiveSubmissionId = null;
@@ -51,11 +53,20 @@
     status.classList.toggle('hidden', !message);
     status.classList.toggle('text-red-300', isError);
     status.classList.toggle('text-cyan-300', !isError);
+    $('subjectiveUploadStatusBadge')?.classList.toggle('hidden', !subjectiveSubmissionId);
   }
 
   function renderSelectedFiles() {
     const container = $('pagesGridContainer');
     const grid = $('pagesGrid');
+    const availability = $('answerSheetAvailability');
+    const waitingForQuestions = subjectiveRequired && !isMcqPractice && !generationComplete;
+    if (availability) {
+      availability.classList.toggle('hidden', !waitingForQuestions);
+      availability.textContent = generationPaused
+        ? 'Question generation is recovering automatically. Your answers are safe; answer-sheet upload unlocks when generation finishes.'
+        : 'Written questions are still being generated. You can prepare your answer sheet, and upload will unlock when generation finishes.';
+    }
     grid.replaceChildren();
     container.classList.toggle('hidden', selectedFiles.length === 0);
     $('pageCountBadge').textContent = `${selectedFiles.length} file${selectedFiles.length === 1 ? '' : 's'} added`;
@@ -481,6 +492,7 @@
     if (retryButton) retryButton.disabled = true;
     try {
       const result = await API.tests.retryGeneration(attemptId);
+      generationPaused = false;
       generationJobId = result.jobId || generationJobId;
       generationComplete = result.status === 'completed';
       setGenerationStatus(
@@ -530,20 +542,29 @@
       const job = result.generationJob;
       if (!job) {
         generationComplete = true;
+        generationPaused = false;
         setGenerationStatus('');
         stopQuestionSync();
       } else if (job.status === 'completed') {
         generationComplete = true;
+        generationPaused = false;
         renderSelectedFiles();
-        setGenerationStatus(`Question generation is complete. ${questions.length} MCQs and ${subjectiveQuestions.length} written questions are available.`);
+        setGenerationStatus(isMcqPractice
+          ? `All ${questions.length} MCQ practice questions are ready.`
+          : `Question generation is complete. ${questions.length} MCQs and ${subjectiveQuestions.length} written questions are available.`);
         stopQuestionSync();
       } else if (job.status === 'failed') {
         generationComplete = false;
-        setGenerationStatus(job.error || 'Question generation stopped. You can continue with the questions already loaded.', true);
+        generationPaused = true;
+        setGenerationStatus(
+          `Question generation is recovering automatically. Your answers are safe. Last error: ${job.error || 'temporary generation failure'}`,
+          true,
+        );
+        $('retryGenerationButton')?.classList.add('hidden');
         renderSelectedFiles();
-        stopQuestionSync();
       } else {
         generationComplete = false;
+        generationPaused = false;
         renderSelectedFiles();
         setGenerationStatus(job.progressMessage || `More MCQs are being generated (${job.verifiedCount || 0}/${job.targetCount || 0}).`);
       }
@@ -569,7 +590,12 @@
     attemptId = String(data.attemptId);
     questions = Array.isArray(data.questions) ? data.questions : [];
     subjectiveQuestions = Array.isArray(data.subjectiveQuestions) ? data.subjectiveQuestions : [];
-    subjectiveRequired = !!data.subjectiveRequired;
+    isMcqPractice = data.testType === 'chapter_mcq_practice';
+    subjectiveRequired = !isMcqPractice && (
+      !!data.subjectiveRequired
+      || !!data.boardPatternSnapshot?.hasShortAnswer
+      || !!data.boardPatternSnapshot?.hasLongAnswer
+    );
     answers = new Map((data.answers || [])
       .filter((answer) => answer.questionId && answer.selectedOption)
       .map((answer) => [String(answer.questionId), String(answer.selectedOption).toUpperCase()]));
@@ -599,7 +625,9 @@
     }
 
     $('testTitle').textContent = data.subjectName || 'Digital Board Exam';
-    $('testSubtitle').textContent = examCompleted ? 'Exam submitted' : (data.chapterTitle || data.paperCode || 'Exam in progress');
+    $('testSubtitle').textContent = examCompleted
+      ? (isMcqPractice ? 'Practice submitted' : 'Exam submitted')
+      : `${data.chapterTitle || data.paperCode || 'Exam in progress'}${isMcqPractice ? ' · 10-question MCQ practice' : ''}`;
     $('loadingState').classList.add('hidden');
     $('testUI').classList.remove('hidden');
     $('testUI').classList.add('flex');
@@ -612,7 +640,7 @@
     // Show/hide subjective tab based on availability
     const subjectiveTab = $('tabBtn-subjective');
     if (subjectiveTab) {
-      subjectiveTab.classList.toggle('hidden', subjectiveQuestions.length === 0 && !subjectiveRequired);
+      subjectiveTab.classList.toggle('hidden', isMcqPractice || (subjectiveQuestions.length === 0 && !subjectiveRequired));
     }
     
     renderSubjective();
@@ -671,6 +699,7 @@
         data = await API.tests.startTest({
           subjectCode,
           chapterNumber: chapter ? Number(chapter) : undefined,
+          testType: params.get('testType') || 'chapter_practice',
           isHardMode: params.get('hard') === '1',
           generationJobId: params.get('jobId') || undefined,
         });
@@ -705,6 +734,7 @@
 
   window.switchExamTab = async function (section) {
     if (!['mcq', 'subjective'].includes(section) || savingAnswer || savingState) return;
+    if (section === 'subjective' && isMcqPractice) return;
     if (section === 'subjective' && !subjectiveQuestions.length) return;
     savingState = true;
     try {
