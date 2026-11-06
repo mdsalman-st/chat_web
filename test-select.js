@@ -371,7 +371,11 @@
           if (pPercent) pPercent.textContent = (Number(job.progressPercent) || 0) + '%';
           if (pMsg) pMsg.textContent = job.progressMessage || 'Generating questions…';
 
-          if (Number(job.verifiedCount) >= minimumQuestions || job.status === 'completed') {
+          const availableCount = Math.max(
+            Number(job.availableCount) || 0,
+            Number(job.verifiedCount) || 0,
+          );
+          if (availableCount >= minimumQuestions || job.status === 'completed') {
             stopQuestionPolling();
             if (pMsg) pMsg.textContent = 'First questions are ready. Launching your test…';
             const jobQuery = res.jobId ? `&jobId=${encodeURIComponent(res.jobId)}` : '';

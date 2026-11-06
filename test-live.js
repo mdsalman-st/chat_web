@@ -21,10 +21,13 @@
   let savingAnswer = false;
   let savingState = false;
   let boardPatternSnapshot = null;
+  let examMedium = 'English';
   let subjectiveRequired = false;
   let isMcqPractice = false;
   let generationComplete = false;
   let generationPaused = false;
+  let generationStatusMessage = '';
+  let waitingForNextQuestion = false;
   let stateSaveQueue = Promise.resolve();
   let selectedFiles = [];
   let subjectiveSubmissionId = null;
@@ -35,6 +38,12 @@
   function isUploadWindowOpen() {
     if (subjectiveUploadDeadlineAt) {
       return Date.now() <= new Date(subjectiveUploadDeadlineAt).getTime();
+    }
+
+    async function advanceToAvailableQuestion() {
+      if (!waitingForNextQuestion || savingAnswer || savingState || currentIndex >= questions.length - 1) return;
+      waitingForNextQuestion = false;
+      await window.navigateQuestion(1);
     }
     const windowBase = deadlineAt || (examCompleted && finishedAt ? new Date(finishedAt).getTime() : null);
     return !windowBase || Date.now() <= windowBase + 5 * 60 * 1000;
@@ -291,6 +300,19 @@
     loading.append(panel);
   }
 
+  function renderQuestionWaitStatus() {
+    const waitStatus = $('questionWaitStatus');
+    if (!waitStatus) return;
+    const waitingAtEnd = questions.length > 0
+      && currentIndex === questions.length - 1
+      && !!generationJobId
+      && !generationComplete;
+    waitStatus.classList.toggle('hidden', !waitingAtEnd);
+    waitStatus.textContent = waitingAtEnd
+      ? `You’re on the last question currently available. Your answers are saved. ${generationStatusMessage || 'More questions are being prepared and will appear here automatically.'}${waitingForNextQuestion ? ' You’ll move to the next question automatically when it arrives.' : ' Review earlier questions, or choose “Save & Next” to continue automatically when it arrives.'}`
+      : '';
+  }
+
   function renderQuestion() {
     const question = questions[currentIndex];
     if (!question) return;
@@ -298,17 +320,31 @@
     $('qNumber').textContent = `Q.${question.questionNumber || currentIndex + 1}`;
     $('qDifficulty').textContent = String(question.difficulty || 'MEDIUM').toUpperCase();
     $('qMarks').textContent = `+${question.marks || 1} Mark${Number(question.marks || 1) === 1 ? '' : 's'}`;
-    $('qText').textContent = question.questionText || '';
-    $('qHindiText').textContent = question.hindiQuestionText || '';
+    const hindiMedium = examMedium.toLowerCase() === 'hindi';
+    const questionText = hindiMedium
+      ? question.hindiQuestionText || question.questionText
+      : question.questionText || question.hindiQuestionText;
+    $('qText').textContent = questionText || '';
+    $('qText').lang = hindiMedium ? 'hi' : 'en';
+    $('qHindiText').textContent = hindiMedium ? '' : question.hindiQuestionText || '';
+    $('qHindiText').classList.toggle('hidden', hindiMedium || !question.hindiQuestionText);
     $('prevBtn').disabled = examCompleted || currentIndex === 0 || savingAnswer || savingState;
-    $('nextBtn').disabled = examCompleted || savingAnswer || savingState;
-    $('skipBtn').disabled = examCompleted || savingAnswer || savingState;
+    const waitingAtEnd = currentIndex === questions.length - 1
+      && !!generationJobId
+      && !generationComplete;
+    renderQuestionWaitStatus();
+    $('nextBtn').disabled = examCompleted || savingAnswer || savingState || (waitingAtEnd && waitingForNextQuestion);
+    $('nextBtn').textContent = waitingAtEnd && waitingForNextQuestion ? 'Waiting for next question…' : 'Save & Next';
+    $('skipBtn').disabled = examCompleted || savingAnswer || savingState || (waitingAtEnd && waitingForNextQuestion);
 
     const options = $('optionsContainer');
     options.replaceChildren();
     (question.options || []).forEach((option) => {
       const key = option.key || option.optionKey || '';
-      const text = option.text || option.value || '';
+      const text = (hindiMedium ? option.hindiText : option.text)
+        || option.text
+        || option.value
+        || '';
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'option-btn w-full p-4 text-left text-sm text-slate-200 flex items-center gap-3';
@@ -370,6 +406,7 @@
     } finally {
       savingAnswer = false;
       renderQuestion();
+      await advanceToAvailableQuestion();
     }
   }
 
@@ -407,9 +444,12 @@
       title.textContent = `Question ${question.questionNumber || index + 1} · ${questionType} · ${question.marks || 2} marks`;
       const prompt = document.createElement('p');
       prompt.className = 'text-sm text-white leading-relaxed';
-      prompt.textContent = question.questionText || '';
+      const hindiMedium = examMedium.toLowerCase() === 'hindi';
+      prompt.textContent = hindiMedium
+        ? question.hindiQuestionText || question.questionText || ''
+        : question.questionText || question.hindiQuestionText || '';
       card.append(title, prompt);
-      if (question.hindiQuestionText) {
+      if (!hindiMedium && question.hindiQuestionText) {
         const hindi = document.createElement('p');
         hindi.className = 'text-sm text-slate-400 mt-2 leading-relaxed';
         hindi.textContent = question.hindiQuestionText;
@@ -427,6 +467,11 @@
       if (examCompleted) {
         display.textContent = 'Submitted';
         display.title = 'Exam submitted';
+        return;
+      }
+      if (deadlineAt && waitingForNextQuestion && generationJobId && !generationComplete) {
+        display.textContent = 'Paused';
+        display.title = 'Exam timer is paused while waiting for the next generated question';
         return;
       }
       if (!deadlineAt) {
@@ -477,13 +522,16 @@
   }
 
   function setGenerationStatus(message, isError = false) {
+    generationStatusMessage = message || '';
     const status = $('questionGenerationStatus');
-    if (!status) return;
-    status.textContent = message;
-    status.classList.toggle('hidden', !message);
-    status.classList.toggle('text-red-300', isError);
-    status.classList.toggle('text-cyan-300', !isError);
+    if (status) {
+      status.textContent = message;
+      status.classList.toggle('hidden', !message);
+      status.classList.toggle('text-red-300', isError);
+      status.classList.toggle('text-cyan-300', !isError);
+    }
     $('retryGenerationButton')?.classList.toggle('hidden', !isError || !generationJobId || examCompleted);
+    renderQuestionWaitStatus();
   }
 
   async function retryQuestionGeneration() {
@@ -513,6 +561,7 @@
     generationSyncInFlight = true;
     try {
       const result = await API.tests.syncAttemptQuestions(attemptId);
+      if (result.deadlineAt) deadlineAt = new Date(result.deadlineAt).getTime();
       if (result.subjectiveUploadDeadlineAt) {
         subjectiveUploadDeadlineAt = result.subjectiveUploadDeadlineAt;
       }
@@ -522,6 +571,7 @@
       if (addedQuestions.length) {
         questions.push(...addedQuestions);
         renderQuestion();
+        await advanceToAvailableQuestion();
       }
 
       const knownSubjectiveIds = new Set(subjectiveQuestions.map((question) => String(question.id)));
@@ -548,6 +598,7 @@
       } else if (job.status === 'completed') {
         generationComplete = true;
         generationPaused = false;
+        waitingForNextQuestion = false;
         renderSelectedFiles();
         setGenerationStatus(isMcqPractice
           ? `All ${questions.length} MCQ practice questions are ready.`
@@ -610,11 +661,13 @@
       : 'mcq';
     if (!subjectiveQuestions.length) currentSection = 'mcq';
     deadlineAt = data.deadlineAt ? new Date(data.deadlineAt).getTime() : null;
+    waitingForNextQuestion = !!data.generationWaitStartedAt;
     subjectiveUploadDeadlineAt = data.subjectiveUploadDeadlineAt || null;
     timeLimitMs = Number(data.timeLimitMs) || 0;
     startedAt = data.startedAt ? new Date(data.startedAt).getTime() : Date.now();
     finishedAt = data.finishedAt || null;
     boardPatternSnapshot = data.boardPatternSnapshot || null;
+    examMedium = data.medium || 'English';
     examCompleted = data.status === 'completed';
     generationJobId = examCompleted ? null : (data.generationJobId || null);
     generationComplete = !generationJobId;
@@ -713,11 +766,40 @@
   window.navigateQuestion = async function (offset) {
     if (savingAnswer || savingState) return;
     const nextIndex = currentIndex + offset;
-    if (nextIndex < 0 || nextIndex >= questions.length) return;
+    if (nextIndex < 0) return;
+    if (nextIndex >= questions.length) {
+      if (offset > 0 && generationJobId && !generationComplete) {
+        waitingForNextQuestion = true;
+        savingState = true;
+        renderQuestion();
+        try {
+          const state = await persistAttemptState({
+            currentQuestionIndex: currentIndex,
+            currentSection,
+            generationWaiting: true,
+          });
+          if (state.deadlineAt) deadlineAt = new Date(state.deadlineAt).getTime();
+        } catch (error) {
+          waitingForNextQuestion = false;
+          setGenerationStatus(error.message || 'Could not pause the exam timer while waiting for questions.', true);
+          syncGeneratedQuestions();
+        } finally {
+          savingState = false;
+          renderQuestion();
+        }
+      }
+      return;
+    }
+    waitingForNextQuestion = false;
     savingState = true;
     renderQuestion();
     try {
-      await persistAttemptState({ currentQuestionIndex: nextIndex, currentSection });
+      const state = await persistAttemptState({
+        currentQuestionIndex: nextIndex,
+        currentSection,
+        generationWaiting: false,
+      });
+      if (state.deadlineAt) deadlineAt = new Date(state.deadlineAt).getTime();
       currentIndex = nextIndex;
     } catch (error) {
       console.error('Could not save current question position:', error);
@@ -738,7 +820,13 @@
     if (section === 'subjective' && !subjectiveQuestions.length) return;
     savingState = true;
     try {
-      await persistAttemptState({ currentQuestionIndex: currentIndex, currentSection: section });
+      const state = await persistAttemptState({
+        currentQuestionIndex: currentIndex,
+        currentSection: section,
+        generationWaiting: false,
+      });
+      if (state.deadlineAt) deadlineAt = new Date(state.deadlineAt).getTime();
+      waitingForNextQuestion = false;
       switchSection(section);
     } catch (error) {
       console.error('Could not save current exam section:', error);
