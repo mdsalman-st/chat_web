@@ -279,7 +279,7 @@
       });
     },
     getJobStatus(jobId) {
-      return request('/api/tests/jobs/' + encodeURIComponent(jobId));
+      return request('/api/tests/jobs/' + encodeURIComponent(jobId), { cache: 'no-store' });
     },
     getChapterQuestions(chapterNumber, queryParams = {}) {
       const params = new URLSearchParams(queryParams);
