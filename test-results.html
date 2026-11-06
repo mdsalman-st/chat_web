@@ -157,6 +157,12 @@
                     <h2 class="text-xs font-bold text-cyan-400 uppercase tracking-widest">Latest Result</h2>
                 </div>
 
+                <div id="resultPending" class="hidden liquid-glass p-6 mb-5">
+                    <h3 id="resultPendingTitle" class="text-base font-bold text-white mb-2">Result is being prepared</h3>
+                    <p id="resultPendingMessage" class="text-sm text-slate-300"></p>
+                    <a id="uploadPendingSheetLink" class="hidden inline-block mt-4 px-4 py-2 rounded-lg bg-cyan-500 text-black text-xs font-bold" href="#">Open answer-sheet upload</a>
+                </div>
+
                 <!-- PDF Card (Show only if subjective was uploaded) -->
                 <div id="pdfCard" class="liquid-glass p-5 mb-5 hidden">
                     <div style="position:relative; z-index:2;" class="flex flex-col md:flex-row items-center justify-between gap-4">

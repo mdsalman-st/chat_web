@@ -15,6 +15,13 @@
   let currentSubjectCode = null;
   let activeMode = 'chapter'; // 'chapter' or 'full'
   let pollingInterval = null; // Global scope for polling
+  let pollingGeneration = 0;
+
+  function stopQuestionPolling() {
+    if (pollingInterval) clearInterval(pollingInterval);
+    pollingInterval = null;
+    pollingGeneration++;
+  }
 
   window.setTestMode = function (mode) {
     activeMode = mode;
@@ -310,11 +317,8 @@
     const pPercent = $('lazyProgressPercent');
     const pMsg = $('lazyProgressMsg');
 
-    // FIX 3: Clear any existing polling before starting a new one (prevents double-click bug)
-    if (pollingInterval) {
-      clearInterval(pollingInterval);
-      pollingInterval = null;
-    }
+    stopQuestionPolling();
+    const currentPollingGeneration = pollingGeneration;
 
     try {
       // 1. Ask backend if questions exist or need lazy loading setup
@@ -322,12 +326,14 @@
         subjectCode: currentSubjectCode,
         chapterNumber: Number(chapterNumber),
         isHardMode,
-        targetCount: 10,
       });
 
-      if (res.ready) {
+      const minimumQuestions = Number(res.minStartCount) || 3;
+      if (res.ready || Number(res.availableCount) >= minimumQuestions || Number(res.verifiedCount) >= minimumQuestions) {
         // Questions are ready! Open Live Test runner directly
-        window.location.href = `test-live.html?subject=${encodeURIComponent(currentSubjectCode)}&chapter=${encodeURIComponent(chapterNumber)}${isHardMode ? '&hard=1' : ''}`;
+        const jobId = res.generationJobId || res.jobId;
+        const jobQuery = jobId ? `&jobId=${encodeURIComponent(jobId)}` : '';
+        window.location.href = `test-live.html?subject=${encodeURIComponent(currentSubjectCode)}&chapter=${encodeURIComponent(chapterNumber)}${isHardMode ? '&hard=1' : ''}${jobQuery}`;
         return;
       }
 
@@ -339,46 +345,39 @@
         if (pMsg) pMsg.textContent = res.progressMessage || 'Preparing questions…';
       }
 
-      // FIX 2: Polling Limits (Agar 60 seconds tak complete na ho toh ruk jao)
-      let pollCount = 0;
-      const maxPolls = 30; // 30 * 2000ms = 60 seconds
+      let requestInFlight = false;
 
       pollingInterval = setInterval(async () => {
-        pollCount++;
-
-        if (pollCount > maxPolls) {
-          clearInterval(pollingInterval);
-          pollingInterval = null;
-          alert('Server is taking too long to generate questions. Please try again after some time.');
-          modal?.classList.add('hidden');
-          return;
-        }
+        if (requestInFlight || currentPollingGeneration !== pollingGeneration) return;
+        requestInFlight = true;
 
         try {
           const jobRes = await API.tests.getJobStatus(res.jobId);
+          if (currentPollingGeneration !== pollingGeneration) return;
           const job = jobRes.job;
           if (!job) return;
 
-          if (pBar) pBar.style.width = Math.max(15, job.progressPercent) + '%';
-          if (pPercent) pPercent.textContent = job.progressPercent + '%';
-          if (pMsg) pMsg.textContent = job.progressMessage;
+          if (pBar) pBar.style.width = Math.max(15, Number(job.progressPercent) || 0) + '%';
+          if (pPercent) pPercent.textContent = (Number(job.progressPercent) || 0) + '%';
+          if (pMsg) pMsg.textContent = job.progressMessage || 'Generating questions…';
 
-          if (job.status === 'completed') {
-            clearInterval(pollingInterval);
-            pollingInterval = null;
-            if (pMsg) pMsg.textContent = 'Questions verified! Launching practice session…';
+          if (Number(job.verifiedCount) >= minimumQuestions || job.status === 'completed') {
+            stopQuestionPolling();
+            if (pMsg) pMsg.textContent = 'First questions are ready. Launching your test…';
+            const jobQuery = res.jobId ? `&jobId=${encodeURIComponent(res.jobId)}` : '';
             setTimeout(() => {
-              window.location.href = `test-live.html?subject=${encodeURIComponent(currentSubjectCode)}&chapter=${encodeURIComponent(chapterNumber)}${isHardMode ? '&hard=1' : ''}`;
+              window.location.href = `test-live.html?subject=${encodeURIComponent(currentSubjectCode)}&chapter=${encodeURIComponent(chapterNumber)}${isHardMode ? '&hard=1' : ''}${jobQuery}`;
             }, 750);
           } else if (job.status === 'failed') {
-            clearInterval(pollingInterval);
-            pollingInterval = null;
+            stopQuestionPolling();
             alert(job.error || 'Failed to generate questions. Please try again in a little while.');
             modal?.classList.add('hidden');
           }
         } catch (e) {
+          if (currentPollingGeneration !== pollingGeneration) return;
           console.warn('Polling error:', e);
-          // Agar network error aaye, toh loop na roko, agle attempt me try karega.
+        } finally {
+          requestInFlight = false;
         }
       }, 2000);
 

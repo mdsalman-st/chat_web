@@ -6,6 +6,7 @@
   let currentAttemptId = null;
   let allHistoryResults = [];
   let currentResultData = null; 
+  let resultPollTimer = null;
 
   async function init() {
     if (!API.Token.exists()) { window.location.href = 'auth.html'; return; }
@@ -18,13 +19,13 @@
       allHistoryResults = historyRes.results || [];
       
       let latestResult = null;
-      if (currentAttemptId) {
-        const singleRes = await API.tests.getResult(currentAttemptId);
-        latestResult = singleRes.result;
-      } else if (allHistoryResults.length > 0) {
-        const singleRes = await API.tests.getResult(allHistoryResults[0].attemptId);
-        latestResult = singleRes.result;
-        currentAttemptId = latestResult.attemptId; 
+      const targetAttemptId = currentAttemptId || allHistoryResults[0]?.attemptId;
+      let pendingResult = null;
+      if (targetAttemptId) {
+        currentAttemptId = targetAttemptId;
+        const singleRes = await API.tests.getResult(targetAttemptId);
+        if (singleRes.resultAvailable) latestResult = singleRes.result;
+        else pendingResult = singleRes;
       }
 
       $('loadingResults').classList.add('hidden');
@@ -33,16 +34,69 @@
       if (latestResult) {
         currentResultData = latestResult;
         renderLatestResult(latestResult);
+      } else if (pendingResult) {
+        renderPendingResult(pendingResult);
       } else {
         $('latestResultSection').innerHTML = '<p class="text-center text-slate-500 py-10">No recent result found. Take a test to see your analysis!</p>';
       }
 
       renderHistory(allHistoryResults);
+      if (pendingResult) startResultPolling();
 
     } catch (err) {
       console.error('Init error:', err);
       $('loadingResults').innerHTML = `<p class="text-red-400">Error loading results: ${err.message}</p>`;
     }
+  }
+
+  function renderPendingResult(state) {
+    const pending = $('resultPending');
+    pending.classList.remove('hidden');
+    $('resultPendingTitle').textContent = state.subjectiveStatus === 'awaiting_upload'
+      ? 'Answer-sheet upload is still open'
+      : state.subjectiveStatus === 'review_required'
+        ? 'Answer sheet needs review'
+        : state.subjectiveStatus === 'failed'
+          ? 'Answer-sheet evaluation needs attention'
+          : 'Result is being prepared';
+    const releaseTime = state.resultReleaseAt
+      ? new Date(state.resultReleaseAt).toLocaleString('en-IN')
+      : 'after evaluation is complete';
+    $('resultPendingMessage').textContent = state.message || `Your result will be available after evaluation and at or after ${releaseTime}. This page will check for updates automatically.`;
+    const uploadLink = $('uploadPendingSheetLink');
+    const canOpenExam = ['awaiting_upload', 'failed', 'review_required', 'evaluation_missing'].includes(state.subjectiveStatus);
+    uploadLink.textContent = state.subjectiveStatus === 'awaiting_upload'
+      ? 'Open answer-sheet upload'
+      : state.subjectiveStatus === 'failed'
+        ? 'Retry answer-sheet evaluation'
+        : state.subjectiveStatus === 'review_required'
+          ? 'Correct and re-upload answer sheet'
+        : 'Re-upload answer sheet';
+    uploadLink.classList.toggle('hidden', !canOpenExam);
+    if (canOpenExam) uploadLink.href = `test-live.html?attemptId=${encodeURIComponent(currentAttemptId)}`;
+  }
+
+  function startResultPolling() {
+    if (resultPollTimer) return;
+    resultPollTimer = window.setInterval(async () => {
+      try {
+        const response = await API.tests.getResult(currentAttemptId);
+        if (response.resultAvailable && response.result) {
+          window.clearInterval(resultPollTimer);
+          resultPollTimer = null;
+          currentResultData = response.result;
+          $('resultPending').classList.add('hidden');
+          renderLatestResult(response.result);
+          const historyResponse = await API.tests.getRecentResults(20);
+          allHistoryResults = historyResponse.results || [];
+          renderHistory(allHistoryResults);
+        } else {
+          renderPendingResult(response);
+        }
+      } catch (error) {
+        console.error('Result refresh failed:', error);
+      }
+    }, 30000);
   }
 
   // =========================================
@@ -227,11 +281,11 @@
             </div>
           </div>
           <div class="col-span-2 text-center hidden sm:block">
-            <span class="px-2 py-1 rounded-md bg-white/5 text-slate-300 text-[10px] font-bold">Completed</span>
+            <span class="px-2 py-1 rounded-md bg-white/5 text-slate-300 text-[10px] font-bold">${r.resultAvailable ? 'Completed' : 'Processing'}</span>
           </div>
           <div class="col-span-2 text-center text-[11px] text-slate-400 hidden sm:block">${date}</div>
           <div class="col-span-2 text-center">
-            <span class="text-sm font-black ${color}">${pct}%</span>
+            <span class="text-sm font-black ${r.resultAvailable ? color : 'text-slate-400'}">${r.resultAvailable ? `${pct}%` : 'Pending'}</span>
           </div>
           <div class="col-span-2 flex justify-end gap-2">
             <a href="test-results.html?attemptId=${r.attemptId}" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/20 text-slate-300 flex items-center justify-center border border-white/10 transition" title="View">👁️</a>

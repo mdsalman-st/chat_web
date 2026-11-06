@@ -310,6 +310,25 @@
         body: payload,
       });
     },
+    getAttemptState(attemptId) {
+      return request('/api/tests/' + encodeURIComponent(attemptId) + '/state');
+    },
+    syncAttemptQuestions(attemptId) {
+      return request('/api/tests/' + encodeURIComponent(attemptId) + '/questions/sync', {
+        method: 'POST',
+      });
+    },
+    retryGeneration(attemptId) {
+      return request('/api/tests/' + encodeURIComponent(attemptId) + '/generation/retry', {
+        method: 'POST',
+      });
+    },
+    updateAttemptState(attemptId, payload) {
+      return request('/api/tests/' + encodeURIComponent(attemptId) + '/state', {
+        method: 'PATCH',
+        body: payload,
+      });
+    },
 
     // Phase 4: Diagnostic PDF Report, Asynchronous Analysis Queue & Notifications
     getPdfToken(attemptId) {
