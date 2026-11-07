@@ -35,15 +35,16 @@
   let uploadingSheet = false;
   let examCompleted = false;
 
+  // ✅ FIX 1: advanceToAvailableQuestion को top-level पर move किया
+  async function advanceToAvailableQuestion() {
+    if (!waitingForNextQuestion || savingAnswer || savingState || currentIndex >= questions.length - 1) return;
+    waitingForNextQuestion = false;
+    await window.navigateQuestion(1);
+  }
+
   function isUploadWindowOpen() {
     if (subjectiveUploadDeadlineAt) {
       return Date.now() <= new Date(subjectiveUploadDeadlineAt).getTime();
-    }
-
-    async function advanceToAvailableQuestion() {
-      if (!waitingForNextQuestion || savingAnswer || savingState || currentIndex >= questions.length - 1) return;
-      waitingForNextQuestion = false;
-      await window.navigateQuestion(1);
     }
     const windowBase = deadlineAt || (examCompleted && finishedAt ? new Date(finishedAt).getTime() : null);
     return !windowBase || Date.now() <= windowBase + 5 * 60 * 1000;
@@ -475,7 +476,6 @@
         return;
       }
       if (!deadlineAt) {
-        // No deadline - show elapsed time
         const elapsedSeconds = Math.floor((Date.now() - startedAt) / 1000);
         const hours = Math.floor(elapsedSeconds / 3600);
         const minutes = Math.floor((elapsedSeconds % 3600) / 60);
@@ -505,12 +505,11 @@
         ? `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
         : `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
       display.title = 'Time remaining';
-      
-      // Warning colors
-      if (remainingSeconds <= 300) { // 5 minutes
+
+      if (remainingSeconds <= 300) {
         display.classList.add('text-red-400');
         display.classList.remove('text-amber-400');
-      } else if (remainingSeconds <= 600) { // 10 minutes
+      } else if (remainingSeconds <= 600) {
         display.classList.add('text-amber-400');
         display.classList.remove('text-red-400');
       }
@@ -556,18 +555,22 @@
     }
   }
 
+  // ✅ FIX 2: पूरा syncGeneratedQuestions अब एक ही try/catch/finally में है
   async function syncGeneratedQuestions() {
     if (!generationJobId || generationSyncInFlight || !attemptId) return;
     generationSyncInFlight = true;
+
     try {
       const result = await API.tests.syncAttemptQuestions(attemptId);
       if (result.deadlineAt) deadlineAt = new Date(result.deadlineAt).getTime();
       if (result.subjectiveUploadDeadlineAt) {
         subjectiveUploadDeadlineAt = result.subjectiveUploadDeadlineAt;
       }
+
       const knownIds = new Set(questions.map((question) => String(question.id)));
       const addedQuestions = (result.addedQuestions || [])
         .filter((question) => question.id && !knownIds.has(String(question.id)));
+
       if (addedQuestions.length) {
         questions.push(...addedQuestions);
         renderQuestion();
@@ -620,6 +623,7 @@
         setGenerationStatus(job.progressMessage || `More MCQs are being generated (${job.verifiedCount || 0}/${job.targetCount || 0}).`);
       }
     } catch (error) {
+      console.error("Sync failed:", error);
       setGenerationStatus(error.message || 'Could not check for new questions. Updates will retry automatically.', true);
     } finally {
       generationSyncInFlight = false;
@@ -651,7 +655,6 @@
       .filter((answer) => answer.questionId && answer.selectedOption)
       .map((answer) => [String(answer.questionId), String(answer.selectedOption).toUpperCase()]));
 
-    // Restore resume state
     const restoredIndex = Number(data.currentQuestionIndex);
     currentIndex = Number.isInteger(restoredIndex)
       ? Math.min(Math.max(restoredIndex, 0), Math.max(questions.length - 1, 0))
@@ -689,13 +692,12 @@
     attemptUrl.search = '';
     attemptUrl.searchParams.set('attemptId', attemptId);
     window.history.replaceState({ attemptId }, '', attemptUrl);
-    
-    // Show/hide subjective tab based on availability
+
     const subjectiveTab = $('tabBtn-subjective');
     if (subjectiveTab) {
       subjectiveTab.classList.toggle('hidden', isMcqPractice || (subjectiveQuestions.length === 0 && !subjectiveRequired));
     }
-    
+
     renderSubjective();
     renderSelectedFiles();
     if (subjectiveSubmissionId) startSubmissionStatusPolling();
@@ -728,7 +730,6 @@
         return;
       }
 
-      // Check if we're resuming an existing attempt
       const resumeAttemptId = params.get('attemptId');
       if (resumeAttemptId) {
         attemptId = resumeAttemptId;
