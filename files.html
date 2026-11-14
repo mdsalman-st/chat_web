@@ -32,7 +32,7 @@
   <link rel="dns-prefetch" href="https://fonts.gstatic.com">
   <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
 
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com" defer></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -115,7 +115,7 @@
             <p class="text-base font-black text-white leading-tight">Nexus</p>
             <p class="text-[10px] font-semibold uppercase tracking-[0.15em] text-cyan-400" id="sideRoleTag">...</p>
           </div>
-          <button class="lg:hidden ml-auto text-slate-400 hover:text-white" onclick="toggleSidebar()">
+          <button class="lg:hidden ml-auto text-slate-400 hover:text-white" onclick="toggleSidebar()" aria-label="Toggle navigation menu">
             <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
         </div>
@@ -182,7 +182,7 @@
       <!-- TOPBAR -->
       <header class="sticky top-0 z-30 backdrop-blur-xl bg-ink-950/70 border-b border-white/[0.06]">
         <div class="px-4 sm:px-6 py-3 flex items-center gap-3">
-          <button class="lg:hidden w-9 h-9 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-slate-400 hover:text-white" onclick="toggleSidebar()">
+          <button class="lg:hidden w-9 h-9 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-slate-400 hover:text-white" onclick="toggleSidebar()" aria-label="Toggle navigation menu">
             <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
           </button>
 
@@ -204,7 +204,7 @@
 
             <!-- Notifications -->
             <div class="relative">
-              <button id="notifBtn" class="relative w-9 h-9 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] flex items-center justify-center text-slate-400 hover:text-white transition-all">
+              <button id="notifBtn" class="relative w-9 h-9 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] flex items-center justify-center text-slate-400 hover:text-white transition-all" aria-label="Notifications">
                 <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 00-4-5.7V5a2 2 0 10-4 0v.3A6 6 0 006 11v3.2c0 .5-.2 1-.6 1.4L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                 <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-cyan-400 border-2 border-ink-950"></span>
               </button>
@@ -341,10 +341,10 @@
 
             <!-- View toggle -->
             <div class="flex items-center p-0.5 rounded-xl bg-white/[0.04] border border-white/[0.08]">
-              <button id="viewGridBtn" onclick="setViewMode('grid')" class="p-1.5 rounded-lg bg-cyan-500/20 text-cyan-300 text-xs" title="Grid View">
+              <button id="viewGridBtn" aria-label="Grid view" onclick="setViewMode('grid')" class="p-1.5 rounded-lg bg-cyan-500/20 text-cyan-300 text-xs" title="Grid View">
                 <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
               </button>
-              <button id="viewListBtn" onclick="setViewMode('list')" class="p-1.5 rounded-lg text-slate-400 hover:text-white text-xs" title="List View">
+              <button id="viewListBtn" aria-label="List view" onclick="setViewMode('list')" class="p-1.5 rounded-lg text-slate-400 hover:text-white text-xs" title="List View" aria-label="Action button">
                 <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
               </button>
             </div>
@@ -489,9 +489,9 @@
   </div>
 
   <!-- Scripts -->
-  <script src="api.js"></script>
-  <script src="socket-client.js"></script>
-  <script src="vault.js"></script>
-  <script src="files.js"></script>
+  <script src="api.js" defer></script>
+  <script src="socket-client.js" defer></script>
+  <script src="vault.js" defer></script>
+  <script src="files.js" defer></script>
 </body>
 </html>

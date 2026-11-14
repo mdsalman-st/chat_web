@@ -19,7 +19,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com" defer></script>
   <script>
     tailwind.config = {
       theme: {
@@ -272,7 +272,7 @@
   <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 translate-y-4 opacity-0 transition-all duration-300 px-5 py-3 rounded-xl text-sm font-semibold text-white z-50 pointer-events-none"></div>
 
   <!-- Scripts -->
-  <script src="api.js"></script>
+  <script src="api.js" defer></script>
   <script>
     /* ---------- Toast ---------- */
     function showToast(msg, type = 'info') {
