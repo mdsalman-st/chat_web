@@ -3,7 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="description" content="Nexus — Adaptive AI Workspace for every profession. One workspace that rebuilds itself around you.">
+  <meta name="description" content="Nexus — India's premier AI-powered exam preparation & adaptive workspace for BSEB, CBSE, UP Board students. Real exam patterns, 40-mark practice tests & instant AI evaluation.">
+  <meta name="keywords" content="BSEB Class 12 exam, CBSE mock test, UP board exam test, commerce class 12, AI study workspace, adaptive test prep">
+  <meta name="author" content="Nexus EdTech">
+  <link rel="canonical" href="https://chatweb-olive-theta.vercel.app/">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://chatweb-olive-theta.vercel.app/">
+  <meta property="og:title" content="Nexus — AI-Powered Board Exam Preparation & Adaptive Workspace">
+  <meta property="og:description" content="Master BSEB, CBSE & UP Board exams with AI-crafted mock tests, chapter-wise practice, and instant answer evaluations. Free forever for students.">
+  <meta property="og:image" content="https://chatweb-olive-theta.vercel.app/icon-512.svg">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://chatweb-olive-theta.vercel.app/">
+  <meta name="twitter:title" content="Nexus — Your Work. Your Space.">
+  <meta name="twitter:description" content="Adaptive AI Workspace & Mock Test Platform for Indian Board Students.">
+  <meta name="twitter:image" content="https://chatweb-olive-theta.vercel.app/icon-512.svg">
+
+  <!-- Theme & PWA -->
   <meta name="theme-color" content="#05070d" media="(prefers-color-scheme: dark)">
   <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
   <meta name="color-scheme" content="dark light">
@@ -13,7 +32,8 @@
   <meta name="apple-mobile-web-app-title" content="Nexus">
   <meta name="application-name" content="Nexus">
   <meta name="format-detection" content="telephone=no">
-  <title>Nexus — Your Work. Your Space.</title>
+
+  <title>Nexus — AI-Powered Board Exam Preparation & Adaptive Workspace</title>
 
   <!-- Preload critical resources -->
   <link rel="preload" as="style" href="style.css">
@@ -22,27 +42,80 @@
   <!-- Fonts with preconnect for faster loading -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;600;700;800&display=swap">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 
   <!-- Styles -->
   <link rel="stylesheet" href="style.css">
 
-  <!-- PWA Manifest -->
+  <!-- PWA Manifest & Icons -->
   <link rel="manifest" href="manifest.json">
-  
-  <!-- Icons -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <link rel="apple-touch-icon" href="apple-touch-icon.svg">
-    <link rel="icon" type="image/svg+xml" sizes="192x192" href="icon-192.svg">
-    <link rel="icon" type="image/svg+xml" sizes="512x512" href="icon-512.svg">
+  <link rel="apple-touch-icon" href="apple-touch-icon.svg">
+  <link rel="icon" type="image/svg+xml" sizes="192x192" href="icon-192.svg">
+  <link rel="icon" type="image/svg+xml" sizes="512x512" href="icon-512.svg">
   
-  <!-- DNS Prefetch for external resources -->
+  <!-- DNS Prefetch -->
   <link rel="dns-prefetch" href="https://fonts.googleapis.com">
   <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+
+  <!-- Schema.org Structured Data (JSON-LD) for 100% SEO -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://chatweb-olive-theta.vercel.app/#website",
+        "url": "https://chatweb-olive-theta.vercel.app/",
+        "name": "Nexus",
+        "description": "AI-Powered Board Exam Preparation and Adaptive Workspace",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://chatweb-olive-theta.vercel.app/test-select.html?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "EducationalOrganization",
+        "@id": "https://chatweb-olive-theta.vercel.app/#organization",
+        "name": "Nexus",
+        "url": "https://chatweb-olive-theta.vercel.app/",
+        "logo": "https://chatweb-olive-theta.vercel.app/icon-512.svg",
+        "description": "Adaptive AI-powered education workspace and board exam testing platform for BSEB, CBSE, and UP Board students.",
+        "sameAs": [
+          "https://github.com/mdsalman-st"
+        ]
+      }
+    ]
+  }
+  </script>
 </head>
 
 <body>
+
+  <!-- ================================
+       STICKY PROFESSIONAL HEADER
+       ================================ -->
+  <header class="site-header" role="banner">
+    <div class="site-header-inner">
+      <a href="index.html" class="site-logo" aria-label="Nexus Home">
+        <span class="site-logo-icon">⚡</span>
+        <span>Nexus</span>
+      </a>
+
+      <nav class="site-nav" role="navigation" aria-label="Main Navigation">
+        <a href="#boards" class="site-nav-link">Exam Boards</a>
+        <a href="#features" class="site-nav-link">Features</a>
+        <a href="#how-it-works" class="site-nav-link">How It Works</a>
+        <a href="test-select.html" class="site-nav-link">Mock Tests</a>
+      </nav>
+
+      <div class="site-actions">
+        <a href="auth.html" class="btn-signin">Sign In</a>
+        <a href="profession.html" class="btn-header-cta">Get Started Free</a>
+      </div>
+    </div>
+  </header>
 
   <!-- Background Layers -->
   <div class="bg-grid"></div>
@@ -57,8 +130,10 @@
   <div class="role-pill role-pill-3">📈 Trader</div>
   <div class="role-pill role-pill-4">🎨 Creator</div>
 
-  <!-- Main Content -->
-  <main class="hero">
+  <!-- ================================
+       HERO SECTION
+       ================================ -->
+  <main class="hero" style="padding-top: 7rem;">
 
     <!-- Brand Badge -->
     <div class="anim anim-badge">
@@ -70,7 +145,7 @@
     </div>
 
     <!-- Tagline -->
-    <div class="anim anim-badge" style="animation-delay: 0.3s;">
+    <div class="anim anim-badge" style="animation-delay: 0.2s;">
       <div class="tagline-badge badge-shimmer">
         <span class="tagline-text">✨ One workspace. Every profession.</span>
       </div>
@@ -85,10 +160,9 @@
 
     <!-- Subheading -->
     <p class="anim anim-sub hero-sub">
-      An adaptive workspace that rebuilds itself around you —
-      whether you study, build, trade, teach, or create.
-      Pick your role. Get a custom interface.
-      Everything else adapts.
+      An adaptive AI workspace that rebuilds itself around you.
+      Master your board exams (BSEB, CBSE, UP Board) with official 2026 patterns,
+      40-marks chapter practice tests, and instantaneous AI evaluation.
     </p>
 
     <!-- Stats -->
@@ -98,19 +172,19 @@
         <div class="stat-label">Active Users</div>
       </div>
       <div class="stat stat-mid">
-        <div class="stat-value">20+</div>
-        <div class="stat-label">Professions</div>
+        <div class="stat-value">40+</div>
+        <div class="stat-label">Marks Practice Tests</div>
       </div>
       <div class="stat">
         <div class="stat-value">99%</div>
-        <div class="stat-label">Uptime</div>
+        <div class="stat-label">Exam Readiness</div>
       </div>
     </div>
 
     <!-- CTA -->
     <div class="anim anim-btn">
-      <a href="profession.html" class="cta pulse-ring">
-        <span class="cta-text">Get Started</span>
+      <a href="profession.html" class="cta pulse-ring" aria-label="Start practicing now">
+        <span class="cta-text">Start Free Practice</span>
         <svg class="cta-icon" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
         </svg>
@@ -119,18 +193,259 @@
 
     <!-- Footnote -->
     <p class="anim anim-footnote hero-footnote">
-      Free forever • No credit card • Setup in 60 seconds
+      Free forever • No credit card • Instant setup in 30 seconds
     </p>
 
     <!-- Scroll Cue -->
     <div class="scroll-cue">
-      <span class="scroll-label">Explore</span>
+      <span class="scroll-label">Explore More</span>
       <span>↓</span>
     </div>
 
   </main>
 
-  <!-- Script -->
+  <!-- ================================
+       SECTION 1: SUPPORTED BOARDS
+       ================================ -->
+  <section class="landing-section" id="boards">
+    <div class="section-header">
+      <span class="section-badge">Exam Excellence</span>
+      <h2 class="section-title">Designed for Your Official Board Pattern</h2>
+      <p class="section-desc">
+        Practice with the exact official blueprint, marking scheme, and question distribution for Indian educational boards.
+      </p>
+    </div>
+
+    <div class="boards-grid">
+      <!-- BSEB -->
+      <article class="board-card">
+        <span class="board-badge-tag">BSEB 2026 Pattern</span>
+        <h3 class="board-card-title">Bihar Board (Class 12)</h3>
+        <p class="board-card-desc">Complete Commerce, Science & Arts preparation aligned with Bihar School Examination Board.</p>
+        <ul class="board-feature-list">
+          <li>50% Extra MCQ Choice (Attempt 50 of 100)</li>
+          <li>2-Mark Short & 5-Mark Long Questions</li>
+          <li>New 40-Mark Chapter-Wise Tests</li>
+          <li>Hindi & English Medium Support</li>
+        </ul>
+        <a href="test-select.html" class="board-cta-link">Practice BSEB Tests →</a>
+      </article>
+
+      <!-- CBSE -->
+      <article class="board-card">
+        <span class="board-badge-tag">CBSE Standard</span>
+        <h3 class="board-card-title">CBSE Board Exam</h3>
+        <p class="board-card-desc">Competency-based tests, assertion-reasoning, and analytical questions for CBSE students.</p>
+        <ul class="board-feature-list">
+          <li>20 MCQs with Analytical Options</li>
+          <li>Case-Study & Application Questions</li>
+          <li>40-Mark Chapter Focus Modules</li>
+          <li>NCERT Aligned Curriculum</li>
+        </ul>
+        <a href="test-select.html" class="board-cta-link">Practice CBSE Tests →</a>
+      </article>
+
+      <!-- UP BOARD -->
+      <article class="board-card">
+        <span class="board-badge-tag">UPMSP Official</span>
+        <h3 class="board-card-title">UP Board (Madhyamik)</h3>
+        <p class="board-card-desc">Targeted question papers following UP Board guidelines and Hindi-first explanations.</p>
+        <ul class="board-feature-list">
+          <li>Official UPMSP Question Hierarchy</li>
+          <li>Full Subjective Answer Evaluation</li>
+          <li>Bilingual Hindi & English Papers</li>
+          <li>Chapter-wise Weightage Analysis</li>
+        </ul>
+        <a href="test-select.html" class="board-cta-link">Practice UP Board Tests →</a>
+      </article>
+
+      <!-- 40-MARKS CHAPTER TEST -->
+      <article class="board-card" style="border-color: rgba(34, 211, 238, 0.4); background: rgba(34, 211, 238, 0.04);">
+        <span class="board-badge-tag" style="background: rgba(34, 211, 238, 0.25); color: #fff;">New Innovation</span>
+        <h3 class="board-card-title">40-Mark Chapter Tests</h3>
+        <p class="board-card-desc">Quick, high-yield practice sessions tailored to master individual chapters without fatigue.</p>
+        <ul class="board-feature-list">
+          <li>Balanced MCQ + Short + Long format</li>
+          <li>Fast 30-minute revision rounds</li>
+          <li>Instant AI grading & feedback</li>
+          <li>Save time & boost retention</li>
+        </ul>
+        <a href="test-select.html" class="board-cta-link">Try Chapter Practice →</a>
+      </article>
+    </div>
+  </section>
+
+  <!-- ================================
+       SECTION 2: CORE FEATURES
+       ================================ -->
+  <section class="landing-section" id="features">
+    <div class="section-header">
+      <span class="section-badge">Power Features</span>
+      <h2 class="section-title">Built for Peak Productivity</h2>
+      <p class="section-desc">
+        Everything you need to study smarter, identify weak chapters, and track exam readiness in real time.
+      </p>
+    </div>
+
+    <div class="features-grid">
+      <!-- Feature 1 -->
+      <div class="feature-box">
+        <div class="feature-icon-box">🤖</div>
+        <h3 class="feature-box-title">AI Adaptive Question Engine</h3>
+        <p class="feature-box-desc">
+          Multiple failover AI models (Groq, Gemini, NVIDIA NIM) generate fresh, high-quality board questions so you never repeat the same paper twice.
+        </p>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="feature-box">
+        <div class="feature-icon-box">📊</div>
+        <h3 class="feature-box-title">Deep Performance Analytics</h3>
+        <p class="feature-box-desc">
+          Pinpoint your strongest and weakest chapters with visual metrics, accuracy scorecards, and time-management recommendations.
+        </p>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="feature-box">
+        <div class="feature-icon-box">✍️</div>
+        <h3 class="feature-box-title">Instant Subjective Evaluation</h3>
+        <p class="feature-box-desc">
+          Submit written short & long answers and get instant step-by-step scoring with model solutions based on official board rubrics.
+        </p>
+      </div>
+
+      <!-- Feature 4 -->
+      <div class="feature-box">
+        <div class="feature-icon-box">📱</div>
+        <h3 class="feature-box-title">100% Mobile & Offline PWA</h3>
+        <p class="feature-box-desc">
+          Study smoothly on any device — low-end smartphone, tablet, or desktop. Install as a Progressive Web App (PWA) with zero lag.
+        </p>
+      </div>
+
+      <!-- Feature 5 -->
+      <div class="feature-box">
+        <div class="feature-icon-box">📝</div>
+        <h3 class="feature-box-title">Integrated Smart Notes & Tasks</h3>
+        <p class="feature-box-desc">
+          Keep your revision notes, daily study to-do lists, and exam calendars organized in one cohesive workspace.
+        </p>
+      </div>
+
+      <!-- Feature 6 -->
+      <div class="feature-box">
+        <div class="feature-icon-box">🛡️</div>
+        <h3 class="feature-box-title">Zero Ads & 100% Free</h3>
+        <p class="feature-box-desc">
+          Zero banner ads, zero spam, and no paywalls. A pure, distraction-free learning environment built for serious students.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================
+       SECTION 3: HOW IT WORKS
+       ================================ -->
+  <section class="landing-section" id="how-it-works">
+    <div class="section-header">
+      <span class="section-badge">Simple Process</span>
+      <h2 class="section-title">How Nexus Prepares You for 95%+</h2>
+      <p class="section-desc">
+        A seamless 3-step loop designed to transform exam anxiety into unstoppable confidence.
+      </p>
+    </div>
+
+    <div class="steps-grid">
+      <div class="step-item">
+        <div class="step-number">01</div>
+        <h3 class="step-item-title">Select Board & Chapter</h3>
+        <p class="step-item-desc">Choose BSEB, CBSE or UP Board with your preferred medium (English or Hindi) and pick your target subject.</p>
+      </div>
+
+      <div class="step-item">
+        <div class="step-number">02</div>
+        <h3 class="step-item-title">Solve Live Tests</h3>
+        <p class="step-item-desc">Take realistic timed mock tests with official board marking schemes, countdown timers, and instant question navigation.</p>
+      </div>
+
+      <div class="step-item">
+        <div class="step-number">03</div>
+        <h3 class="step-item-title">Review AI Insights</h3>
+        <p class="step-item-desc">Analyze your score, read model explanations for mistakes, and practice weak areas until you master every concept.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================
+       SITE FOOTER
+       ================================ -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <!-- Brand Col -->
+        <div>
+          <div class="footer-brand-title">
+            <span style="color: #22d3ee;">⚡</span> Nexus
+          </div>
+          <p class="footer-brand-desc">
+            India's adaptive AI-powered workspace and exam preparation platform. Empowering students with official blueprints, smart practice, and deep analytics.
+          </p>
+          <div class="footer-badge-flag">
+            <span>🇮🇳</span> Made with pride for Indian Students
+          </div>
+        </div>
+
+        <!-- Links 1 -->
+        <div>
+          <h4 class="footer-col-title">Exam Boards</h4>
+          <ul class="footer-links">
+            <li><a href="test-select.html">BSEB Bihar Board (12th)</a></li>
+            <li><a href="test-select.html">CBSE Board Exam Prep</a></li>
+            <li><a href="test-select.html">UP Board (Madhyamik)</a></li>
+            <li><a href="test-select.html">40-Mark Chapter Tests</a></li>
+          </ul>
+        </div>
+
+        <!-- Links 2 -->
+        <div>
+          <h4 class="footer-col-title">Workspace</h4>
+          <ul class="footer-links">
+            <li><a href="student-dashboard.html">Student Dashboard</a></li>
+            <li><a href="tasks.html">Study Tasks Planner</a></li>
+            <li><a href="notes.html">Revision Notes</a></li>
+            <li><a href="analytics.html">Performance Analytics</a></li>
+          </ul>
+        </div>
+
+        <!-- Links 3 -->
+        <div>
+          <h4 class="footer-col-title">Support & Legal</h4>
+          <ul class="footer-links">
+            <li><a href="#" onclick="document.getElementById('nexusFeedbackTrigger')?.click(); return false;">Student Feedback</a></li>
+            <li><a href="pages.html">Help & FAQ</a></li>
+            <li><a href="settings.html">Account Settings</a></li>
+            <li><a href="auth.html">Sign In / Register</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p class="footer-copy">
+          &copy; 2026 Nexus Platform. All rights reserved. Free & Open Education.
+        </p>
+        <div class="footer-badges">
+          <span class="footer-badge-item">🔒 End-to-End Encrypted</span>
+          <span class="footer-badge-item">⚡ 100/100 PageSpeed Ready</span>
+          <span class="footer-badge-item">📱 PWA Enabled</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="api.js"></script>
   <script src="index.js"></script>
+  <script src="feedback.js"></script>
 </body>
 </html>

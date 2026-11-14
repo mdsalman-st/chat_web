@@ -502,6 +502,21 @@
   };
 
   /* --------------------------------------------------------------------------
+     FEEDBACK
+     -------------------------------------------------------------------------- */
+  const feedback = {
+    submit(data) {
+      return request('/api/feedback', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    },
+    list(limit = 50) {
+      return request(`/api/feedback?limit=${limit}`);
+    }
+  };
+
+  /* --------------------------------------------------------------------------
      EXPORT
      -------------------------------------------------------------------------- */
   window.API = {
@@ -513,7 +528,8 @@
     notes,
     tests,
     subjective,
-    admin, // <-- NAYA MODULE EXPORT KIYA
+    admin,
+    feedback,
     health,
     request,
   };
