@@ -15,6 +15,29 @@
   <meta name="format-detection" content="telephone=no">
   <title>Sign In — MAJID</title>
 
+  <!-- ⚡ AUTO-REDIRECT IF ALREADY LOGGED IN -->
+  <script>
+    (function () {
+      try {
+        var token = localStorage.getItem('nexus_token') || localStorage.getItem('token');
+        var rawUser = localStorage.getItem('nexus_user') || localStorage.getItem('user');
+        if (token && rawUser) {
+          var user = JSON.parse(rawUser);
+          if (user && user.role) {
+            var r = String(user.role).toLowerCase();
+            if (r === 'super_admin' || r === 'admin') {
+              window.location.replace('admin-dashboard.html');
+            } else if (r === 'student') {
+              window.location.replace('student-dashboard.html');
+            } else {
+              window.location.replace('dashboard.html');
+            }
+          }
+        }
+      } catch (e) {}
+    })();
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
@@ -341,7 +364,9 @@
         setTimeout(() => {
           document.body.style.transition = 'opacity 0.35s ease';
           document.body.style.opacity = '0';
-          setTimeout(() => { window.location.href = 'dashboard.html'; }, 320);
+          const role = String(res.user?.role || '').toLowerCase();
+          const target = (role === 'super_admin' || role === 'admin') ? 'admin-dashboard.html' : (role === 'student' ? 'student-dashboard.html' : 'dashboard.html');
+          setTimeout(() => { window.location.href = target; }, 320);
         }, 600);
       } catch (err) {
         console.error(err);
@@ -398,7 +423,10 @@
 
     /* ---------- If already logged in → redirect ---------- */
     if (API.Token.exists()) {
-      window.location.href = 'dashboard.html';
+      var u = API.User.get();
+      var r = String(u?.role || '').toLowerCase();
+      var target = (r === 'super_admin' || r === 'admin') ? 'admin-dashboard.html' : (r === 'student' ? 'student-dashboard.html' : 'dashboard.html');
+      window.location.replace(target);
     }
 
     /* ---------- Smart tab default ---------- */

@@ -15,6 +15,29 @@
   <meta name="format-detection" content="telephone=no">
   <title>Choose Your Role — MAJID</title>
 
+  <!-- ⚡ AUTO-REDIRECT IF ALREADY LOGGED IN -->
+  <script>
+    (function () {
+      try {
+        var token = localStorage.getItem('nexus_token') || localStorage.getItem('token');
+        var rawUser = localStorage.getItem('nexus_user') || localStorage.getItem('user');
+        if (token && rawUser) {
+          var user = JSON.parse(rawUser);
+          if (user && user.role) {
+            var r = String(user.role).toLowerCase();
+            if (r === 'super_admin' || r === 'admin') {
+              window.location.replace('admin-dashboard.html');
+            } else if (r === 'student') {
+              window.location.replace('student-dashboard.html');
+            } else {
+              window.location.replace('dashboard.html');
+            }
+          }
+        }
+      } catch (e) {}
+    })();
+  </script>
+
   <!-- Preload critical resources -->
   <link rel="preload" as="style" href="style.css">
   <link rel="preload" as="script" href="index.js">
