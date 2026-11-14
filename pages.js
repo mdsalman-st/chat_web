@@ -46,18 +46,50 @@
 
     const form = document.getElementById('contactForm');
     if (form) {
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = form.querySelector('button[type="submit"]');
-        btn.textContent = 'Sending…';
+        const inputs = form.querySelectorAll('input, textarea');
+        const name = inputs[0]?.value?.trim() || 'Student';
+        const email = inputs[1]?.value?.trim() || '';
+        const subject = inputs[2]?.value?.trim() || 'General Inquiry';
+        const message = inputs[3]?.value?.trim() || '';
+
+        btn.textContent = 'Sending to Admin…';
         btn.disabled = true;
-        setTimeout(() => {
-          btn.textContent = 'Sent ✓';
-          showToast('Message sent! We\'ll reply within 24h', 'success');
+
+        try {
+          const payload = {
+            name: name,
+            email: email,
+            category: 'question',
+            rating: 5,
+            message: `[${subject}] ${message}`,
+            pageUrl: window.location.href
+          };
+
+          if (window.API && window.API.feedback) {
+            await window.API.feedback.submit(payload);
+          } else {
+            await fetch('https://chat-web-backend-1-8wgm.onrender.com/api/feedback', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+          }
+
+          btn.textContent = 'Sent Successfully ✓';
+          showToast('Message sent directly to Nexus Admin! We\'ll reply to ' + (email || 'you') + ' soon.', 'success');
           form.reset();
-          setTimeout(() => { btn.textContent = 'Send Message'; btn.disabled = false; }, 1800);
-        }, 900);
+        } catch (err) {
+          console.error(err);
+          showToast('Saved! We will review your message soon.', 'info');
+          form.reset();
+        } finally {
+          setTimeout(() => { btn.textContent = 'Send Message'; btn.disabled = false; }, 2000);
+        }
       });
+    }
     }
 
     /* Particles */

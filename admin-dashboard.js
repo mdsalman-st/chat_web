@@ -71,7 +71,7 @@
     'question-bank': 'Question Bank Management', 'ingest': 'Ingest Official Paper',
     'my-papers': 'Manage All Papers',
     'review': 'AI Question Review', 'ai-health': 'AI & System Health', 
-    'broadcast': 'Broadcast Notifications', 'audit': 'System Audit Logs', 'profile': 'Admin Settings'
+    'broadcast': 'Broadcast Notifications', 'feedbacks': 'Student Feedback & Ratings', 'audit': 'System Audit Logs', 'profile': 'Admin Settings'
   };
   
   window.switchTab = function(tabId) {
@@ -524,3 +524,92 @@
     if (confirm('Sign out?')) { API.Token.remove(); window.location.href = 'index.html'; }
   };
 })();
+  // =========================================
+  // STUDENT FEEDBACK LOGIC
+  // =========================================
+  window.loadAdminFeedbacks = async function() {
+    const listEl = $('adminFeedbacksList');
+    if (!listEl) return;
+    listEl.innerHTML = '<p class="text-sm text-slate-500 text-center py-8">Loading student feedbacks...</p>';
+
+    try {
+      const res = await API.feedback.list(100);
+      const items = res.feedback || [];
+
+      // Calculate stats
+      const total = items.length;
+      $('fbStatTotal').textContent = total;
+
+      if (total === 0) {
+        $('fbStatRating').textContent = '5.0 ★';
+        $('fbStatBugs').textContent = '0';
+        $('fbStatIdeas').textContent = '0';
+        listEl.innerHTML = '<div class="neu-inner p-8 text-center text-slate-500"><p class="text-2xl mb-2">🎉</p><p class="text-sm font-semibold">No feedback received yet.</p><p class="text-xs mt-1">Student reviews and bug reports will appear here in real-time.</p></div>';
+        return;
+      }
+
+      let ratingSum = 0;
+      let ratingCount = 0;
+      let bugs = 0;
+      let ideas = 0;
+
+      items.forEach(it => {
+        if (it.rating) {
+          ratingSum += it.rating;
+          ratingCount++;
+        }
+        if (it.category === 'bug') bugs++;
+        if (it.category === 'feature') ideas++;
+      });
+
+      const avg = ratingCount > 0 ? (ratingSum / ratingCount).toFixed(1) : '5.0';
+      $('fbStatRating').textContent = avg + ' ★';
+      $('fbStatBugs').textContent = bugs;
+      $('fbStatIdeas').textContent = ideas;
+
+      listEl.innerHTML = items.map(fb => {
+        const dateStr = fb.createdAt ? new Date(fb.createdAt).toLocaleDateString('en-IN', {
+          day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        }) : 'Just now';
+
+        const categoryBadges = {
+          'rating': '<span class="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 font-bold">⭐ Rating</span>',
+          'bug': '<span class="text-xs px-2.5 py-0.5 rounded-full bg-red-500/20 text-red-400 font-bold">🐞 Bug Report</span>',
+          'feature': '<span class="text-xs px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-400 font-bold">💡 Suggestion</span>',
+          'question': '<span class="text-xs px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-400 font-bold">❓ Query</span>',
+          'general': '<span class="text-xs px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-400 font-bold">💬 General</span>'
+        };
+
+        const stars = '★'.repeat(fb.rating || 5) + '☆'.repeat(Math.max(0, 5 - (fb.rating || 5)));
+
+        return `
+          <div class="neu-card p-5 transition-all">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+              <div class="flex items-center gap-3">
+                <span class="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 font-bold flex items-center justify-center text-xs">
+                  ${(fb.name || 'S').charAt(0).toUpperCase()}
+                </span>
+                <div>
+                  <h4 class="text-sm font-bold text-slate-800 leading-tight">${fb.name || 'Anonymous Student'}</h4>
+                  <p class="text-xs text-slate-500">${fb.email || 'No email provided'}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                ${categoryBadges[fb.category] || categoryBadges.general}
+                <span class="text-amber-400 text-xs font-bold tracking-widest">${stars}</span>
+                <span class="text-[11px] text-slate-400">${dateStr}</span>
+              </div>
+            </div>
+            <div class="neu-inner p-3.5 text-xs text-slate-700 leading-relaxed rounded-xl mt-2">
+              ${fb.message}
+            </div>
+            ${fb.pageUrl ? `<p class="text-[10px] text-slate-400 mt-2">Page: <span class="font-mono text-blue-500">${fb.pageUrl}</span></p>` : ''}
+          </div>
+        `;
+      }).join('');
+
+    } catch (err) {
+      console.error('Error loading feedbacks:', err);
+      listEl.innerHTML = '<div class="neu-inner p-6 text-center text-red-500 text-sm">Failed to load feedbacks from database.</div>';
+    }
+  };
