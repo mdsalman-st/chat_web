@@ -507,5 +507,63 @@
 
   <script src="api.js" defer></script> 
   <script src="admin-dashboard.js" defer></script>
+
+  <!-- EMAIL CHANGE MODAL -->
+  <div id="emailChangeModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="neu-card p-6 w-full max-w-md">
+      <h3 class="text-lg font-black text-slate-800 mb-2">Change Admin Email Address</h3>
+      <p class="text-xs text-slate-500 mb-4">A 6-digit OTP will be sent to the new email address to verify ownership.</p>
+      <div id="emailStep1">
+        <div class="mb-4">
+          <label class="text-xs font-bold text-slate-500 block mb-1">New Email Address</label>
+          <input type="email" id="newAdminEmailInput" class="neu-inner w-full px-4 py-2.5 text-sm" placeholder="newadmin@gmail.com">
+        </div>
+        <div class="flex gap-2 justify-end">
+          <button type="button" onclick="closeEmailChangeModal()" class="neu-btn px-4 py-2 text-xs">Cancel</button>
+          <button type="button" onclick="requestAdminEmailOtp()" id="btnReqEmailOtp" class="neu-btn px-4 py-2 text-xs text-blue-600">Send OTP</button>
+        </div>
+      </div>
+      <div id="emailStep2" class="hidden">
+        <div class="mb-4">
+          <label class="text-xs font-bold text-slate-500 block mb-1">Enter 6-Digit OTP</label>
+          <input type="text" id="emailChangeOtp" maxlength="6" class="neu-inner w-full px-4 py-2.5 text-sm text-center font-mono font-bold tracking-widest" placeholder="123456">
+        </div>
+        <div class="flex gap-2 justify-end">
+          <button type="button" onclick="closeEmailChangeModal()" class="neu-btn px-4 py-2 text-xs">Cancel</button>
+          <button type="button" onclick="verifyAdminEmailOtp()" id="btnVerifyEmailOtp" class="neu-btn px-4 py-2 text-xs text-emerald-600">Verify & Update Email</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASSWORD CHANGE MODAL -->
+  <div id="adminPasswordModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="neu-card p-6 w-full max-w-md">
+      <h3 class="text-lg font-black text-slate-800 mb-2">Change Admin Password with OTP</h3>
+      <p class="text-xs text-slate-500 mb-4">For security, an OTP will be sent to your registered email before changing the password.</p>
+      <div id="pwdStep1">
+        <p class="text-xs text-slate-600 mb-4">Click below to send OTP to your current email.</p>
+        <div class="flex gap-2 justify-end">
+          <button type="button" onclick="closeAdminPasswordModal()" class="neu-btn px-4 py-2 text-xs">Cancel</button>
+          <button type="button" onclick="requestAdminPwdOtp()" id="btnReqPwdOtp" class="neu-btn px-4 py-2 text-xs text-blue-600">Send Password OTP</button>
+        </div>
+      </div>
+      <div id="pwdStep2" class="hidden">
+        <div class="mb-3">
+          <label class="text-xs font-bold text-slate-500 block mb-1">6-Digit OTP Code</label>
+          <input type="text" id="adminPwdOtp" maxlength="6" class="neu-inner w-full px-4 py-2 text-sm text-center font-mono font-bold tracking-widest" placeholder="123456">
+        </div>
+        <div class="mb-4">
+          <label class="text-xs font-bold text-slate-500 block mb-1">New Password (8+ chars, upper/lower/symbol)</label>
+          <input type="password" id="adminNewPassword" class="neu-inner w-full px-4 py-2 text-sm" placeholder="••••••••">
+        </div>
+        <div class="flex gap-2 justify-end">
+          <button type="button" onclick="closeAdminPasswordModal()" class="neu-btn px-4 py-2 text-xs">Cancel</button>
+          <button type="button" onclick="verifyAdminPwdOtp()" id="btnVerifyPwdOtp" class="neu-btn px-4 py-2 text-xs text-emerald-600">Update Password</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

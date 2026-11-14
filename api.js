@@ -157,6 +157,58 @@
       return request('/api/auth/check-username/' + encodeURIComponent(username));
     },
 
+    forgotPassword(email) {
+      return request('/api/auth/forgot-password', {
+        method: 'POST',
+        body: { email },
+      });
+    },
+
+    resetPassword(email, otp, newPassword) {
+      return request('/api/auth/reset-password', {
+        method: 'POST',
+        body: { email, otp, newPassword },
+      });
+    },
+
+    requestEmailChange(newEmail) {
+      return request('/api/auth/request-email-change', {
+        method: 'POST',
+        body: { newEmail },
+      });
+    },
+
+    verifyEmailChange(otp) {
+      return request('/api/auth/verify-email-change', {
+        method: 'POST',
+        body: { otp },
+      });
+    },
+
+    requestPasswordOtp() {
+      return request('/api/auth/request-password-otp', {
+        method: 'POST',
+      });
+    },
+
+    verifyPasswordOtp(otp, newPassword) {
+      return request('/api/auth/verify-password-otp', {
+        method: 'POST',
+        body: { otp, newPassword },
+      });
+    },
+
+    getPlatformConfig() {
+      return request('/api/auth/platform-config');
+    },
+
+    updatePlatformConfig(payload) {
+      return request('/api/auth/platform-config', {
+        method: 'PUT',
+        body: payload,
+      });
+    },
+
     logout() {
       Token.remove();
     },

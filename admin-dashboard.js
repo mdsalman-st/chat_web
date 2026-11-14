@@ -613,3 +613,160 @@
       listEl.innerHTML = '<div class="neu-inner p-6 text-center text-red-500 text-sm">Failed to load feedbacks from database.</div>';
     }
   };
+
+
+  // =========================================
+  // ADMIN OTP & SOCIAL MEDIA SETTINGS
+  // =========================================
+  window.openEmailChangeModal = function() {
+    $('emailChangeModal').classList.remove('hidden');
+    $('emailStep1').classList.remove('hidden');
+    $('emailStep2').classList.add('hidden');
+    $('newAdminEmailInput').focus();
+  };
+  window.closeEmailChangeModal = function() {
+    $('emailChangeModal').classList.add('hidden');
+  };
+
+  window.openAdminPasswordModal = function() {
+    $('adminPasswordModal').classList.remove('hidden');
+    $('pwdStep1').classList.remove('hidden');
+    $('pwdStep2').classList.add('hidden');
+  };
+  window.closeAdminPasswordModal = function() {
+    $('adminPasswordModal').classList.add('hidden');
+  };
+
+  window.requestAdminEmailOtp = async function() {
+    const newEmail = $('newAdminEmailInput').value.trim();
+    if (!newEmail || !/^[^s@]+@[^s@]+.[^s@]+$/.test(newEmail)) {
+      alert('Please enter a valid email address');
+      return;
+    }
+    const btn = $('btnReqEmailOtp');
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+
+    try {
+      const res = await API.auth.requestEmailChange(newEmail);
+      alert(res.message || 'OTP sent successfully');
+      if (res.devOtp) alert('Verification OTP: ' + res.devOtp);
+      $('emailStep1').classList.add('hidden');
+      $('emailStep2').classList.remove('hidden');
+    } catch (err) {
+      alert(err.message || 'Failed to request email OTP');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Send OTP';
+    }
+  };
+
+  window.verifyAdminEmailOtp = async function() {
+    const otp = $('emailChangeOtp').value.trim();
+    if (!otp || otp.length !== 6) {
+      alert('Enter 6-digit OTP code');
+      return;
+    }
+    const btn = $('btnVerifyEmailOtp');
+    btn.disabled = true;
+    btn.textContent = 'Verifying…';
+
+    try {
+      const res = await API.auth.verifyEmailChange(otp);
+      alert('Email updated successfully! Please re-login with your new email.');
+      closeEmailChangeModal();
+      API.auth.logout();
+      window.location.href = 'auth.html';
+    } catch (err) {
+      alert(err.message || 'OTP verification failed');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Verify & Update Email';
+    }
+  };
+
+  window.requestAdminPwdOtp = async function() {
+    const btn = $('btnReqPwdOtp');
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+
+    try {
+      const res = await API.auth.requestPasswordOtp();
+      alert(res.message || 'OTP sent to your registered email');
+      if (res.devOtp) alert('Password Reset OTP: ' + res.devOtp);
+      $('pwdStep1').classList.add('hidden');
+      $('pwdStep2').classList.remove('hidden');
+    } catch (err) {
+      alert(err.message || 'Failed to send OTP');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Send Password OTP';
+    }
+  };
+
+  window.verifyAdminPwdOtp = async function() {
+    const otp = $('adminPwdOtp').value.trim();
+    const newPassword = $('adminNewPassword').value;
+
+    if (!otp || otp.length !== 6) {
+      alert('Enter 6-digit OTP');
+      return;
+    }
+    if (!newPassword || newPassword.length < 8) {
+      alert('Password must be 8+ characters');
+      return;
+    }
+    const btn = $('btnVerifyPwdOtp');
+    btn.disabled = true;
+    btn.textContent = 'Updating…';
+
+    try {
+      const res = await API.auth.verifyPasswordOtp(otp, newPassword);
+      alert(res.message || 'Password changed successfully!');
+      closeAdminPasswordModal();
+    } catch (err) {
+      alert(err.message || 'Failed to update password');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Update Password';
+    }
+  };
+
+  window.handleUpdateProfileName = async function() {
+    const name = $('profileName').value.trim();
+    if (!name) return alert('Name cannot be empty');
+    try {
+      await API.auth.updateDetails({ name });
+      alert('Admin name updated successfully');
+    } catch (err) {
+      alert(err.message || 'Failed to update name');
+    }
+  };
+
+  // Load & Save Social Links
+  window.loadPlatformSettings = async function() {
+    try {
+      const res = await API.auth.getPlatformConfig();
+      if (res && res.config && res.config.socialLinks) {
+        if ($('socialTelegram')) $('socialTelegram').value = res.config.socialLinks.telegram || '';
+        if ($('socialWhatsapp')) $('socialWhatsapp').value = res.config.socialLinks.whatsapp || '';
+        if ($('socialYoutube')) $('socialYoutube').value = res.config.socialLinks.youtube || '';
+        if ($('socialInstagram')) $('socialInstagram').value = res.config.socialLinks.instagram || '';
+      }
+    } catch (e) {}
+  };
+
+  window.saveSocialLinks = async function() {
+    try {
+      const socialLinks = {
+        telegram: $('socialTelegram')?.value.trim() || '',
+        whatsapp: $('socialWhatsapp')?.value.trim() || '',
+        youtube: $('socialYoutube')?.value.trim() || '',
+        instagram: $('socialInstagram')?.value.trim() || ''
+      };
+      await API.auth.updatePlatformConfig({ socialLinks });
+      alert('Social media links saved successfully to platform database!');
+    } catch (err) {
+      alert(err.message || 'Failed to save social media links');
+    }
+  };
