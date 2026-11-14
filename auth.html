@@ -42,7 +42,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 
-  <script src="https://cdn.tailwindcss.com" defer></script>
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -94,7 +94,7 @@
     .orb-1 { animation:float1 18s ease-in-out infinite; }
     .orb-2 { animation:float2 22s ease-in-out infinite; }
 
-    .anim { opacity:0; animation-fill-mode:forwards; animation-timing-function:cubic-bezier(0.16,1,0.3,1); }
+    .anim { opacity: 1; animation-fill-mode:forwards; animation-timing-function:cubic-bezier(0.16,1,0.3,1); }
     .anim-1 { animation:fadeUp 0.7s 0.10s forwards; }
     .anim-2 { animation:fadeUp 0.7s 0.25s forwards; }
     .anim-3 { animation:fadeUp 0.7s 0.40s forwards; }
@@ -299,7 +299,7 @@
   <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 translate-y-4 opacity-0 transition-all duration-300 px-5 py-3 rounded-xl text-sm font-semibold text-white z-50 pointer-events-none"></div>
 
   <!-- Scripts -->
-  <script src="api.js" defer></script>
+  <script src="api.js"></script>
   <script>
     /* ---------- Toast ---------- */
     function showToast(msg, type = 'info') {
