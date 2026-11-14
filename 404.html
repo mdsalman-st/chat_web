@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Page Not Found — Nexus AI Workspace">
+  <meta name="theme-color" content="#05070d">
+  <title>404 — Page Not Found | Nexus</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+  <style>
+    .error-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem 1.5rem;
+      position: relative;
+      z-index: 10;
+    }
+    .error-code {
+      font-size: clamp(5rem, 15vw, 9rem);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.05em;
+      background: linear-gradient(135deg, #06b6d4, #3b82f6, #8b5cf6);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 1rem;
+    }
+    .error-title {
+      font-size: clamp(1.4rem, 3.5vw, 2.2rem);
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 0.75rem;
+    }
+    .error-desc {
+      font-size: 1rem;
+      color: #94a3b8;
+      max-width: 440px;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+    .error-btn-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <main class="error-container">
+    <div class="error-code">404</div>
+    <h1 class="error-title">Lost in Cyberspace?</h1>
+    <p class="error-desc">
+      The page you're looking for doesn't exist, has been moved, or took a study break.
+    </p>
+
+    <div class="error-btn-group">
+      <a href="index.html" class="cta pulse-ring" style="min-width: 160px; justify-content: center;">
+        <span>← Back to Home</span>
+      </a>
+      <a href="test-select.html" class="btn-signin" style="min-width: 140px; text-align: center; display: inline-flex; align-items: center; justify-content: center;">
+        <span>Mock Tests</span>
+      </a>
+    </div>
+  </main>
+</body>
+</html>
