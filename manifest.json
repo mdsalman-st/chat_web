@@ -1,0 +1,53 @@
+{
+  "name": "Nexus — Adaptive AI Workspace",
+  "short_name": "Nexus",
+  "description": "An adaptive workspace that rebuilds itself around you — whether you study, build, trade, teach, or create.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#05070d",
+  "theme_color": "#05070d",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["productivity", "utilities", "business"],
+  "icons": [
+    {
+        "src": "icon-192.svg",
+      "sizes": "192x192",
+        "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+        "src": "icon-512.svg",
+      "sizes": "512x512",
+        "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Open your personalized dashboard",
+      "url": "/dashboard.html",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Tasks",
+      "short_name": "Tasks",
+      "description": "Manage your tasks",
+      "url": "/tasks.html",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Notes",
+      "short_name": "Notes",
+      "description": "Take notes",
+      "url": "/notes.html",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}
