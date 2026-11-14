@@ -316,6 +316,12 @@
     window.location.href = `test-live.html?paperId=${encodeURIComponent(paperId)}&subject=${encodeURIComponent(currentSubjectCode)}${isHardMode ? '&hard=1' : ''}`;
   };
 
+  window.stopQuestionPolling = stopQuestionPolling;
+  window.closeLazyModal = function () {
+    stopQuestionPolling();
+    $('lazySetupModal')?.classList.add('hidden');
+  };
+
   window.startChapterTest = async function (chapterNumber, rawTitle, mcqOnly = false) {
     const isHardMode = !!$('hardModeToggle')?.checked;
     const modal = $('lazySetupModal');
@@ -354,16 +360,18 @@
       // 2. Open lazy loading setup dialog and poll background job
       if (modal) {
         modal.classList.remove('hidden');
-        if (pBar) pBar.style.width = (res.progressPercent || 15) + '%';
-        if (pPercent) pPercent.textContent = (res.progressPercent || 15) + '%';
-        if (pMsg) pMsg.textContent = res.progressMessage || 'Preparing questions…';
+        if (pBar) pBar.style.width = '20%';
+        if (pPercent) pPercent.textContent = '20%';
+        if (pMsg) pMsg.textContent = 'AI is preparing questions… (takes ~15-20s)';
       }
 
       let requestInFlight = false;
+      let pollTick = 0;
 
       pollingInterval = setInterval(async () => {
         if (requestInFlight || currentPollingGeneration !== pollingGeneration) return;
         requestInFlight = true;
+        pollTick++;
 
         try {
           const jobRes = await API.tests.getJobStatus(jobId);
@@ -371,10 +379,22 @@
           const job = jobRes.job;
           if (!job) return;
 
-          const progressValue = Math.max(15, Number(job.progressPercent) || 0);
+          const estimatedProgress = Math.min(88, 20 + pollTick * 7);
+          const progressValue = Math.max(estimatedProgress, Number(job.progressPercent) || 0);
           if (pBar) pBar.style.width = progressValue + '%';
           if (pPercent) pPercent.textContent = progressValue + '%';
-          if (pMsg) pMsg.textContent = job.progressMessage || 'Generating questions…';
+          
+          const animatedMsgs = [
+            'AI is crafting questions according to board syllabus…',
+            'Generating Hindi & English bilingual translations…',
+            'Validating options and curriculum accuracy…',
+            'Finalizing questions, almost ready…'
+          ];
+          if (pMsg) {
+            pMsg.textContent = (job.progressMessage && !job.progressMessage.includes('Waiting for question generation'))
+              ? job.progressMessage
+              : animatedMsgs[pollTick % animatedMsgs.length];
+          }
 
           const availableCount = Math.max(
             Number(job.availableCount) || 0,
@@ -382,12 +402,15 @@
           );
           if (availableCount >= minimumQuestions || job.status === 'completed') {
             stopQuestionPolling();
-            if (pMsg) pMsg.textContent = 'First questions are ready. Launching your test…';
+            if (pBar) pBar.style.width = '100%';
+            if (pPercent) pPercent.textContent = '100%';
+            if (pMsg) pMsg.textContent = 'Questions are ready! Launching your test…';
             const jobQuery = jobId ? `&jobId=${encodeURIComponent(jobId)}` : '';
             const typeQuery = mcqOnly ? '&testType=chapter_mcq_practice' : '';
             setTimeout(() => {
               window.location.href = `test-live.html?subject=${encodeURIComponent(currentSubjectCode)}&chapter=${encodeURIComponent(chapterNumber)}${isHardMode ? '&hard=1' : ''}${jobQuery}${typeQuery}`;
             }, 750);
+            return;
           } else if (job.status === 'failed') {
             stopQuestionPolling();
             const friendlyError = /not enough questions generated|question generation failed|temporarily unavailable|rate limit|high demand|temporary outage/i.test(String(job.error || ''))
