@@ -280,6 +280,21 @@
     }
   };
 
+  function getFriendlyQuestionErrorMessage(error) {
+    const raw = error?.message || error?.error || error?.data?.error || 'Could not load this exam.';
+    const text = String(raw).trim();
+    if (!text) return 'Could not load this exam.';
+
+    const lower = text.toLowerCase();
+    if (lower.includes('not enough questions generated') || lower.includes('question generation failed')
+      || lower.includes('temporarily unavailable') || lower.includes('rate limit')
+      || lower.includes('high demand') || lower.includes('temporary outage')) {
+      return 'The server is working, but the AI question engine is temporarily overloaded. Please go back and try again in a moment.';
+    }
+
+    return text;
+  }
+
   function showError(error) {
     const loading = $('loadingState');
     if (!loading) return;
@@ -290,7 +305,7 @@
 
     const message = document.createElement('p');
     message.className = 'text-sm font-semibold text-red-300';
-    message.textContent = error?.message || 'Could not load this exam.';
+    message.textContent = getFriendlyQuestionErrorMessage(error);
     panel.append(message);
 
     const back = document.createElement('a');

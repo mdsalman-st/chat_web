@@ -338,13 +338,17 @@
       });
 
       const minimumQuestions = Number(res.minStartCount) || 3;
+      const jobId = res.generationJobId || res.jobId || res.job?.id;
       if (res.ready || Number(res.availableCount) >= minimumQuestions || Number(res.verifiedCount) >= minimumQuestions) {
         // Questions are ready! Open Live Test runner directly
-        const jobId = res.generationJobId || res.jobId;
         const jobQuery = jobId ? `&jobId=${encodeURIComponent(jobId)}` : '';
         const typeQuery = mcqOnly ? '&testType=chapter_mcq_practice' : '';
         window.location.href = `test-live.html?subject=${encodeURIComponent(currentSubjectCode)}&chapter=${encodeURIComponent(chapterNumber)}${isHardMode ? '&hard=1' : ''}${jobQuery}${typeQuery}`;
         return;
+      }
+
+      if (!jobId) {
+        throw new Error('Question generation started but the generated job reference was missing. Please retry.');
       }
 
       // 2. Open lazy loading setup dialog and poll background job
@@ -362,13 +366,14 @@
         requestInFlight = true;
 
         try {
-          const jobRes = await API.tests.getJobStatus(res.jobId);
+          const jobRes = await API.tests.getJobStatus(jobId);
           if (currentPollingGeneration !== pollingGeneration) return;
           const job = jobRes.job;
           if (!job) return;
 
-          if (pBar) pBar.style.width = Math.max(15, Number(job.progressPercent) || 0) + '%';
-          if (pPercent) pPercent.textContent = (Number(job.progressPercent) || 0) + '%';
+          const progressValue = Math.max(15, Number(job.progressPercent) || 0);
+          if (pBar) pBar.style.width = progressValue + '%';
+          if (pPercent) pPercent.textContent = progressValue + '%';
           if (pMsg) pMsg.textContent = job.progressMessage || 'Generating questions…';
 
           const availableCount = Math.max(
@@ -378,14 +383,17 @@
           if (availableCount >= minimumQuestions || job.status === 'completed') {
             stopQuestionPolling();
             if (pMsg) pMsg.textContent = 'First questions are ready. Launching your test…';
-            const jobQuery = res.jobId ? `&jobId=${encodeURIComponent(res.jobId)}` : '';
+            const jobQuery = jobId ? `&jobId=${encodeURIComponent(jobId)}` : '';
             const typeQuery = mcqOnly ? '&testType=chapter_mcq_practice' : '';
             setTimeout(() => {
               window.location.href = `test-live.html?subject=${encodeURIComponent(currentSubjectCode)}&chapter=${encodeURIComponent(chapterNumber)}${isHardMode ? '&hard=1' : ''}${jobQuery}${typeQuery}`;
             }, 750);
           } else if (job.status === 'failed') {
             stopQuestionPolling();
-            alert(job.error || 'Failed to generate questions. Please try again in a little while.');
+            const friendlyError = /not enough questions generated|question generation failed|temporarily unavailable|rate limit|high demand|temporary outage/i.test(String(job.error || ''))
+              ? 'The AI question engine is temporarily overloaded. Please try again in a moment.'
+              : (job.error || 'Failed to generate questions. Please try again in a little while.');
+            alert(friendlyError);
             modal?.classList.add('hidden');
           }
         } catch (e) {
