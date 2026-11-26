@@ -79,6 +79,7 @@
 
   <!-- Styles -->
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="human-polish.css">
 
   <!-- PWA Manifest & Icons -->
   <link rel="manifest" href="manifest.json">
@@ -150,18 +151,9 @@
     </div>
   </header>
 
-  <!-- Background Layers -->
+  <!-- Background Layers (Subtle Apple-style ambient wash) -->
   <div class="bg-grid"></div>
   <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
-  <div class="particles" id="particles"></div>
-
-  <!-- Floating Role Pills -->
-  <div class="role-pill role-pill-1">🎓 Student</div>
-  <div class="role-pill role-pill-2">💼 Employee</div>
-  <div class="role-pill role-pill-3">📈 Trader</div>
-  <div class="role-pill role-pill-4">🎨 Creator</div>
 
   <!-- ================================
        HERO SECTION
@@ -171,31 +163,29 @@
     <!-- Brand Badge -->
     <div class="anim anim-badge">
       <div class="brand-badge">
-        <div class="brand-logo logo-pulse">⚡</div>
+        <img src="logo.jpg" alt="MAJID" style="width: 24px; height: 24px; border-radius: 6px; object-fit: contain; background: #fff; padding: 1px;">
         <span class="brand-name">MAJID</span>
-        <span class="brand-tag">Adaptive AI</span>
+        <span class="brand-tag">Board Exam Prep</span>
       </div>
     </div>
 
     <!-- Tagline -->
-    <div class="anim anim-badge" style="animation-delay: 0.2s;">
-      <div class="tagline-badge badge-shimmer">
-        <span class="tagline-text">✨ One workspace. Every profession.</span>
+    <div class="anim anim-badge" style="animation-delay: 0.15s;">
+      <div class="tagline-badge">
+        <span class="tagline-text">BSEB • CBSE • UP Board (2026 Pattern)</span>
       </div>
     </div>
 
     <!-- Heading -->
     <h1 class="anim anim-title hero-title">
-      Your Work.
+      Practice Board Exams.
       <br>
-      <span class="grad-text">Your Space.</span>
+      <span class="grad-text">Master Every Chapter.</span>
     </h1>
 
     <!-- Subheading -->
     <p class="anim anim-sub hero-sub">
-      An adaptive AI workspace that rebuilds itself around you.
-      Master your board exams (BSEB, CBSE, UP Board) with official 2026 patterns,
-      40-marks chapter practice tests, and instantaneous AI evaluation.
+      Chapter-wise 40-mark mock tests, full 100-mark board papers, and step-by-step evaluation for Class 10 &amp; 12 students.
     </p>
 
     <!-- Highlights (Real Platform Facts) -->
@@ -313,65 +303,77 @@
        ================================ -->
   <section class="landing-section" id="features">
     <div class="section-header">
-      <span class="section-badge">Power Features</span>
-      <h2 class="section-title">Built for Peak Productivity</h2>
+      <span class="section-badge">Core Features</span>
+      <h2 class="section-title">Built for Real Board Prep</h2>
       <p class="section-desc">
-        Everything you need to study smarter, identify weak chapters, and track exam readiness in real time.
+        Everything you need to practice weak chapters, write better answers, and track your exam readiness.
       </p>
     </div>
 
     <div class="features-grid">
       <!-- Feature 1 -->
       <div class="feature-box">
-        <div class="feature-icon-box">🤖</div>
-        <h3 class="feature-box-title">AI Adaptive Question Engine</h3>
+        <div class="feature-icon-box">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        </div>
+        <h3 class="feature-box-title">Fresh Chapter Questions</h3>
         <p class="feature-box-desc">
-          Multiple failover AI models (Groq, Gemini, NVIDIA NIM) generate fresh, high-quality board questions so you never repeat the same paper twice.
+          Questions generated directly from your chapter syllabus so you get fresh practice sets instead of memorizing the same paper.
         </p>
       </div>
 
       <!-- Feature 2 -->
       <div class="feature-box">
-        <div class="feature-icon-box">📊</div>
-        <h3 class="feature-box-title">Deep Performance Analytics</h3>
+        <div class="feature-icon-box">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        </div>
+        <h3 class="feature-box-title">Subject &amp; Chapter Analytics</h3>
         <p class="feature-box-desc">
-          Pinpoint your strongest and weakest chapters with visual metrics, accuracy scorecards, and time-management recommendations.
+          Pinpoint your strongest and weakest chapters with clear accuracy scorecards and past test history.
         </p>
       </div>
 
       <!-- Feature 3 -->
       <div class="feature-box">
-        <div class="feature-icon-box">✍️</div>
-        <h3 class="feature-box-title">Instant Subjective Evaluation</h3>
+        <div class="feature-icon-box">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+        </div>
+        <h3 class="feature-box-title">Handwritten Answer Checking</h3>
         <p class="feature-box-desc">
-          Submit written short & long answers and get instant step-by-step scoring with model solutions based on official board rubrics.
+          Upload photos of your written short &amp; long answers and get step-by-step marking with model solutions.
         </p>
       </div>
 
       <!-- Feature 4 -->
       <div class="feature-box">
-        <div class="feature-icon-box">📱</div>
-        <h3 class="feature-box-title">100% Mobile & Offline PWA</h3>
+        <div class="feature-icon-box">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+        </div>
+        <h3 class="feature-box-title">Smooth on Any Phone</h3>
         <p class="feature-box-desc">
-          Study smoothly on any device — low-end smartphone, tablet, or desktop. Install as a Progressive Web App (PWA) with zero lag.
+          Built to run cleanly on budget smartphones, tablets, and desktops with zero lag.
         </p>
       </div>
 
       <!-- Feature 5 -->
       <div class="feature-box">
-        <div class="feature-icon-box">📝</div>
-        <h3 class="feature-box-title">Integrated Smart Notes & Tasks</h3>
+        <div class="feature-icon-box">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+        </div>
+        <h3 class="feature-box-title">Notes, Tasks &amp; Study Planner</h3>
         <p class="feature-box-desc">
-          Keep your revision notes, daily study to-do lists, and exam calendars organized in one cohesive workspace.
+          Keep your revision notes, daily study to-do lists, and exam dates organized in one place.
         </p>
       </div>
 
       <!-- Feature 6 -->
       <div class="feature-box">
-        <div class="feature-icon-box">🛡️</div>
-        <h3 class="feature-box-title">Zero Ads & 100% Free</h3>
+        <div class="feature-icon-box">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        </div>
+        <h3 class="feature-box-title">Zero Ads &amp; Distraction-Free</h3>
         <p class="feature-box-desc">
-          Zero banner ads, zero spam, and no paywalls. A pure, distraction-free learning environment built for serious students.
+          No banner ads, no popups, and no paywalls — a calm study environment built for serious students.
         </p>
       </div>
     </div>
@@ -383,9 +385,9 @@
   <section class="landing-section" id="how-it-works">
     <div class="section-header">
       <span class="section-badge">Simple Process</span>
-      <h2 class="section-title">How MAJID Prepares You for 95%+</h2>
+      <h2 class="section-title">How MAJID Works</h2>
       <p class="section-desc">
-        A seamless 3-step loop designed to transform exam anxiety into unstoppable confidence.
+        Three simple steps to test your preparation before the real board exam.
       </p>
     </div>
 
@@ -430,8 +432,12 @@
           </div>
 
           <div class="footer-social-links" style="display: flex; gap: 10px; margin-top: 1rem;">
-            <a href="https://youtube.com/@majidedtech" target="_blank" rel="noopener noreferrer" style="width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; color: #f87171; text-decoration: none; border: 1px solid rgba(255,255,255,0.1); font-size: 14px;" aria-label="Subscribe on YouTube">📺</a>
-            <a href="https://instagram.com/majid_edtech" target="_blank" rel="noopener noreferrer" style="width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; color: #f472b6; text-decoration: none; border: 1px solid rgba(255,255,255,0.1); font-size: 14px;" aria-label="Follow on Instagram">📸</a>
+            <a href="https://youtube.com/@majidedtech" target="_blank" rel="noopener noreferrer" style="width: 34px; height: 34px; border-radius: 10px; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; color: #f87171; text-decoration: none; border: 1px solid rgba(255,255,255,0.1);" aria-label="Subscribe on YouTube">
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            </a>
+            <a href="https://instagram.com/majid_edtech" target="_blank" rel="noopener noreferrer" style="width: 34px; height: 34px; border-radius: 10px; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; color: #f472b6; text-decoration: none; border: 1px solid rgba(255,255,255,0.1);" aria-label="Follow on Instagram">
+              <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+            </a>
           </div>
 
         </div>

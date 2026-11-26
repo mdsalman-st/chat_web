@@ -1,0 +1,185 @@
+/* ==========================================================================
+   MAJID — Human & Apple Liquid Glass Design Polish
+   Preserves 100% Apple Liquid Glass aesthetic while removing AI-template
+   noise (neon glows, particles, rainbow text, heavy 900 weights, jitter).
+   ========================================================================== */
+
+/* 1. Calm Ambient Background (No loud neon orbs or floating particles) */
+.particles,
+.particle {
+  display: none !important;
+}
+
+.orb,
+.orb-1,
+.orb-2,
+.orb-3 {
+  opacity: 0.14 !important;
+  filter: blur(140px) !important;
+  animation: none !important;
+}
+
+/* 2. Apple Liquid Glass — Specular Edges & Concentric Corners */
+.liquid-glass {
+  border-radius: 20px !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.22) !important;
+  box-shadow:
+    0 16px 36px -12px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+  transform-style: flat !important;
+  transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease !important;
+}
+
+@media (prefers-color-scheme: light) {
+  .liquid-glass {
+    border: 1px solid rgba(255, 255, 255, 0.65) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.95) !important;
+    box-shadow:
+      0 12px 32px -10px rgba(15, 23, 42, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+  }
+}
+
+/* Concentric Inner Cards (Outer 20px -> Inner 12px) */
+.glass-inner,
+.nx-card {
+  border-radius: 12px !important;
+  transform: none !important;
+  transition: background-color 0.2s ease, border-color 0.2s ease !important;
+}
+
+.glass-content {
+  transform: none !important;
+}
+
+/* 3. Human Typography (Balanced weights & readable tracking) */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.font-black {
+  font-weight: 700 !important;
+  letter-spacing: -0.02em;
+}
+
+.tracking-\[0\.15em\] {
+  letter-spacing: 0.06em !important;
+}
+
+/* Replace AI rainbow gradient text with crisp solid headline color */
+.grad-text {
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+  -webkit-text-fill-color: currentColor !important;
+  color: #f8fafc !important;
+}
+
+@media (prefers-color-scheme: light) {
+  .grad-text {
+    color: #0f172a !important;
+  }
+}
+
+/* 4. Human Apple-Style Buttons (No neon glow or bouncy hover scale) */
+button,
+.nav-item,
+a.rounded-xl,
+a.rounded-lg {
+  transition: background-color 0.18s ease, border-color 0.18s ease, opacity 0.18s ease, transform 0.12s ease !important;
+}
+
+button:active,
+.nav-item:active {
+  transform: scale(0.98);
+}
+
+.hover\:scale-105:hover {
+  transform: none !important;
+}
+
+.pulse-ring::after {
+  display: none !important;
+}
+
+/* Clean Sidebar Navigation Corners */
+.nav-item {
+  border-radius: 10px !important;
+}
+
+/* Clean Status Dot (No harsh neon glow) */
+.status-dot {
+  box-shadow: none !important;
+}
+
+/* 5. Landing Page (index.html) Apple-Style Buttons & Glass Cards */
+.cta,
+.btn-header-cta {
+  background: #ffffff !important;
+  color: #090d16 !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+}
+
+.cta:hover,
+.btn-header-cta:hover {
+  background: #f1f5f9 !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3) !important;
+  transform: translateY(-1px) !important;
+}
+
+.cta:active,
+.btn-header-cta:active {
+  transform: scale(0.98) !important;
+}
+
+.board-card,
+.feature-box,
+.step-item {
+  border-radius: 20px !important;
+  background: rgba(255, 255, 255, 0.035) !important;
+  backdrop-filter: blur(24px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(160%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow:
+    0 12px 32px -12px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+.board-card:hover,
+.feature-box:hover {
+  border-color: rgba(255, 255, 255, 0.16) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  transform: translateY(-2px) !important;
+}
+
+.feature-icon-box {
+  border-radius: 12px !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #38bdf8 !important;
+}
+
+.brand-badge,
+.tagline-badge {
+  border-radius: 9999px !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+.brand-name {
+  font-weight: 700 !important;
+  letter-spacing: -0.01em !important;
+}
+
+.hero-title {
+  font-weight: 700 !important;
+  letter-spacing: -0.035em !important;
+}

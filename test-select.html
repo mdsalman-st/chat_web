@@ -172,6 +172,7 @@
     }
     select option { background: #0f1424; color: #fff; }
   </style>
+  <link rel="stylesheet" href="human-polish.css">
 </head>
 
 <body class="min-h-screen relative antialiased">
@@ -414,25 +415,6 @@
   <script src="test-select.js" defer></script>
 
   <!-- 3D TILT EFFECT -->
-  <script>
-    const cards = document.querySelectorAll('.liquid-glass');
-    cards.forEach(card => {
-      card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left; 
-        const y = e.clientY - rect.top;  
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        const rotateX = ((y - centerY) / centerY) * -4;
-        const rotateY = ((x - centerX) / centerX) * 4;
-        
-        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.01, 1.01, 1.01)`;
-      });
-      card.addEventListener('mouseleave', () => {
-        card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
-      });
-    });
-  </script>
   <script src="feedback.js" defer></script>
 </body>
 </html>
