@@ -319,6 +319,34 @@
     loadStudentAcademicData();
     loadNotifications();
     loadRecentTests();
+    loadSocialLinks();
+  }
+
+  async function loadSocialLinks() {
+    const wrap = document.getElementById('dashSocialLinks');
+    if (!wrap || !window.API?.auth?.getPlatformConfig) return;
+    try {
+      const res = await window.API.auth.getPlatformConfig();
+      const links = res?.config?.socialLinks || {};
+      const map = [
+        ['socialLinkTelegram', links.telegram],
+        ['socialLinkWhatsapp', links.whatsapp],
+        ['socialLinkYoutube', links.youtube],
+        ['socialLinkInstagram', links.instagram],
+      ];
+      let anyShown = false;
+      map.forEach(([id, url]) => {
+        const el = document.getElementById(id);
+        if (el && url && /^https?:\/\//i.test(url.trim())) {
+          el.href = url.trim();
+          el.classList.remove('hidden');
+          anyShown = true;
+        }
+      });
+      if (anyShown) wrap.classList.remove('hidden');
+    } catch (e) {
+      console.warn('Could not load social links:', e);
+    }
   }
 
   if (document.readyState === 'loading') {
