@@ -1,24 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <defs>
-    <linearGradient id="navyBg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#0f2342"/>
-      <stop offset="100%" stop-color="#071224"/>
-    </linearGradient>
-    <linearGradient id="majidGold" x1="16" y1="16" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#fde68a"/>
-      <stop offset="45%" stop-color="#e5b842"/>
-      <stop offset="100%" stop-color="#b47b14"/>
-    </linearGradient>
-    <linearGradient id="majidGoldLight" x1="20" y1="16" x2="44" y2="38" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#fef3c7"/>
-      <stop offset="100%" stop-color="#f59e0b"/>
-    </linearGradient>
-  </defs>
-  <!-- MAJID Deep Navy Squircle (Matches logo.jpg) -->
-  <rect width="64" height="64" rx="16" fill="url(#navyBg)"/>
-  <rect x="0.75" y="0.75" width="62.5" height="62.5" rx="15.25" stroke="#e5b842" stroke-opacity="0.28" stroke-width="1.5"/>
-  <!-- Iconic Golden Geometric M (Open Book Wings) -->
-  <path d="M16 46V21.5C16 19.567 17.567 18 19.5 18H21.2C22.25 18 23.24 18.49 23.88 19.32L32 29.9L40.12 19.32C40.76 18.49 41.75 18 42.8 18H44.5C46.433 18 48 19.567 48 21.5V46H41.8V28.8L34.3 38.4C33.15 39.88 30.85 39.88 29.7 38.4L22.2 28.8V46H16Z" fill="url(#majidGold)"/>
-  <!-- Subtle Golden Book Glow Dot at Center -->
-  <circle cx="32" cy="15.5" r="2.5" fill="url(#majidGoldLight)"/>
+  <!-- Flat Deep Navy Canvas (Matches logo.jpg ink) -->
+  <rect width="64" height="64" rx="14" fill="#0a1628"/>
+  <!-- Architectural Minimal M (Crisp White + Flat Champagne Gold) -->
+  <path d="M16 45V19H22.2L32 33.2L41.8 19H48V45H42V28.4L32 42.2L22 28.4V45H16Z" fill="#ffffff"/>
+  <path d="M22.2 19L32 33.2L41.8 19L32 27.6L22.2 19Z" fill="#d4a843"/>
 </svg>
