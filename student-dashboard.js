@@ -329,8 +329,6 @@
       const res = await window.API.auth.getPlatformConfig();
       const links = res?.config?.socialLinks || {};
       const map = [
-        ['socialLinkTelegram', links.telegram],
-        ['socialLinkWhatsapp', links.whatsapp],
         ['socialLinkYoutube', links.youtube],
         ['socialLinkInstagram', links.instagram],
       ];
