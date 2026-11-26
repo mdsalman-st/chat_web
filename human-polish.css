@@ -183,3 +183,55 @@ button:active,
   font-weight: 700 !important;
   letter-spacing: -0.035em !important;
 }
+
+/* 6. Global Tailwind Neon & Gradient Overrides (All 21 Pages) */
+.nx-card,
+.glass-card {
+  border-radius: 20px !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.18) !important;
+  box-shadow:
+    0 12px 32px -12px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Remove neon cyan/blue glow shadows */
+[class*="shadow-cyan"],
+[class*="shadow-blue"] {
+  --tw-shadow-color: rgba(0, 0, 0, 0.25) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Calm primary gradient buttons into clean Apple-style solid buttons */
+button[class*="from-cyan-"],
+a[class*="from-cyan-"],
+button[class*="from-blue-"],
+a[class*="from-blue-"] {
+  background-image: none !important;
+  background-color: #0284c7 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22) !important;
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+}
+
+button[class*="from-cyan-"]:hover,
+a[class*="from-cyan-"]:hover,
+button[class*="from-blue-"]:hover,
+a[class*="from-blue-"]:hover {
+  background-color: #0369a1 !important;
+}
+
+/* Consistent human inputs across all pages */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="url"],
+input[type="date"],
+input[type="time"],
+select,
+textarea {
+  border-radius: 12px !important;
+}
