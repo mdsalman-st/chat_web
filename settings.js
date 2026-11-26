@@ -125,7 +125,7 @@
 
   function updateUIWithUser(user) {
     const name = user.name || 'User';
-    const email = user.email || 'user@example.com';
+    const email = user.email || '';
     const role = user.role || 'workspace';
     const initial = name.charAt(0).toUpperCase();
 
@@ -371,7 +371,7 @@
       const me = await API.auth.me();
       currentUser = me.user || {};
     } catch (e) {
-      currentUser = API.User.get() || { name: 'User', email: 'user@example.com', role: 'workspace' };
+      currentUser = API.User.get() || { name: 'User', email: '', role: 'workspace' };
     }
 
     updateUIWithUser(currentUser);

@@ -530,7 +530,7 @@
     if ($('avatarLetter')) $('avatarLetter').textContent = name.charAt(0).toUpperCase();
     if ($('profileName')) $('profileName').textContent = name;
     if ($('panelName')) $('panelName').textContent = state.user.name || 'User';
-    if ($('panelEmail')) $('panelEmail').textContent = state.user.email || 'user@example.com';
+    if ($('panelEmail')) $('panelEmail').textContent = state.user.email || '';
     if ($('sideRoleTag')) $('sideRoleTag').textContent = state.role;
 
     let searchTimeout;

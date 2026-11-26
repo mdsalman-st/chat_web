@@ -79,7 +79,7 @@
     if (panelName) panelName.textContent = state.user.name || 'User';
 
     const panelEmail = $('panelEmail');
-    if (panelEmail) panelEmail.textContent = state.user.email || 'user@example.com';
+    if (panelEmail) panelEmail.textContent = state.user.email || '';
 
     const sideRoleTag = $('sideRoleTag');
     if (sideRoleTag) sideRoleTag.textContent = `${cfg.icon} ${state.role}`;

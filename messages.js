@@ -401,7 +401,7 @@
     $('avatarLetter').textContent = name.charAt(0).toUpperCase();
     $('profileName').textContent = name;
     $('panelName').textContent = state.user.name || 'User';
-    $('panelEmail').textContent = state.user.email || 'user@example.com';
+    $('panelEmail').textContent = state.user.email || '';
     $('sideRoleTag').textContent = state.role;
 
     // Seed contact list lazily (so previews appear)
