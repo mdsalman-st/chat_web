@@ -1,9 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <!-- Crisp White Squircle -->
-  <rect width="64" height="64" rx="16" fill="#ffffff"/>
-  <rect x="0.75" y="0.75" width="62.5" height="62.5" rx="15.25" stroke="#e2e8f0" stroke-width="1.5"/>
-  <!-- Original MAJID Bold Geometric M (MAJID Royal Blue + Deep Slate) -->
-  <path d="M16 46V21C16 19.3431 17.3431 18 19 18H21.5L32 32.5L42.5 18H45C46.6569 18 48 19.3431 48 21V46H42V29.5L34.2 40C33.1 41.4 30.9 41.4 29.8 40L22 29.5V46H16Z" fill="#0f172a"/>
-  <!-- MAJID Sky-Blue Accent Fold -->
-  <path d="M21.5 18L32 32.5L42.5 18L32 39.5L21.5 18Z" fill="#0284c7"/>
+  <defs>
+    <linearGradient id="navyBg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0f2342"/>
+      <stop offset="100%" stop-color="#071224"/>
+    </linearGradient>
+    <linearGradient id="majidGold" x1="16" y1="16" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fde68a"/>
+      <stop offset="45%" stop-color="#e5b842"/>
+      <stop offset="100%" stop-color="#b47b14"/>
+    </linearGradient>
+    <linearGradient id="majidGoldLight" x1="20" y1="16" x2="44" y2="38" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fef3c7"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+  <!-- MAJID Deep Navy Squircle (Matches logo.jpg) -->
+  <rect width="64" height="64" rx="16" fill="url(#navyBg)"/>
+  <rect x="0.75" y="0.75" width="62.5" height="62.5" rx="15.25" stroke="#e5b842" stroke-opacity="0.28" stroke-width="1.5"/>
+  <!-- Iconic Golden Geometric M (Open Book Wings) -->
+  <path d="M16 46V21.5C16 19.567 17.567 18 19.5 18H21.2C22.25 18 23.24 18.49 23.88 19.32L32 29.9L40.12 19.32C40.76 18.49 41.75 18 42.8 18H44.5C46.433 18 48 19.567 48 21.5V46H41.8V28.8L34.3 38.4C33.15 39.88 30.85 39.88 29.7 38.4L22.2 28.8V46H16Z" fill="url(#majidGold)"/>
+  <!-- Subtle Golden Book Glow Dot at Center -->
+  <circle cx="32" cy="15.5" r="2.5" fill="url(#majidGoldLight)"/>
 </svg>
