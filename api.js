@@ -591,6 +591,8 @@
     const bd = document.getElementById('sidebarBackdrop');
     if (!sb) return;
     const isOpen = sb.classList.toggle('open');
+    sb.classList.toggle('-translate-x-full', !isOpen);
+    sb.classList.toggle('translate-x-0', isOpen);
     if (bd) bd.classList.toggle('hidden', !isOpen);
   };
 
