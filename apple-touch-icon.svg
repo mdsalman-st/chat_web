@@ -1,17 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <defs>
-    <linearGradient id="majidBg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#111827"/>
-      <stop offset="100%" stop-color="#070b14"/>
-    </linearGradient>
-    <linearGradient id="majidAccent" x1="16" y1="18" x2="48" y2="46" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#ffffff"/>
-      <stop offset="100%" stop-color="#e2e8f0"/>
-    </linearGradient>
-  </defs>
-  <rect width="64" height="64" rx="16" fill="url(#majidBg)"/>
-  <rect x="0.75" y="0.75" width="62.5" height="62.5" rx="15.25" stroke="#ffffff" stroke-opacity="0.14" stroke-width="1.5"/>
-  <!-- Clean Geometric M + Open Book Fold -->
-  <path d="M17 45V21.5C17 19.8431 18.3431 18.5 20 18.5C21.0235 18.5 21.9765 19.0217 22.5286 19.8843L32 34.6833L41.4714 19.8843C42.0235 19.0217 42.9765 18.5 44 18.5C45.6569 18.5 47 19.8431 47 21.5V45" stroke="url(#majidAccent)" stroke-width="5.2" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="32" cy="45" r="3" fill="#38bdf8"/>
+  <!-- Google-style crisp white squircle -->
+  <rect width="64" height="64" rx="16" fill="#ffffff"/>
+  <rect x="0.75" y="0.75" width="62.5" height="62.5" rx="15.25" stroke="#e2e8f0" stroke-width="1.5"/>
+  <!-- 4-Color Geometric M (Google Palette) -->
+  <!-- Left Vertical Pillar (Blue) -->
+  <path d="M16 46V21C16 19.3431 17.3431 18 19 18H22V46H16Z" fill="#4285F4"/>
+  <!-- Left Diagonal to Center (Red) -->
+  <path d="M16.8 19.2C17.8 17.9 19.8 17.9 21 19.1L32 31.5V39.5L16.5 22C15.9 21.2 16 20 16.8 19.2Z" fill="#EA4335"/>
+  <!-- Center to Right Diagonal (Yellow) -->
+  <path d="M47.2 19.2C46.2 17.9 44.2 17.9 43 19.1L32 31.5V39.5L47.5 22C48.1 21.2 48 20 47.2 19.2Z" fill="#FBBC05"/>
+  <!-- Right Vertical Pillar (Green) -->
+  <path d="M42 18H45C46.6569 18 48 19.3431 48 21V46H42V18Z" fill="#34A853"/>
 </svg>
