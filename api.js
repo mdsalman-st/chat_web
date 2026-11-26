@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * API.JS — Shared API Client for Nexus Frontend
+ * API.JS — Shared API Client for MAJID Frontend
  * ============================================================================
  * Har page isko use karega. Token management + all API calls.
  * ============================================================================

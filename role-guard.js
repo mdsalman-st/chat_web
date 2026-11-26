@@ -1,5 +1,5 @@
 /**
- * Nexus — Role Guard (bidirectional)
+ * MAJID — Role Guard (bidirectional)
  * -----------------------------------------------------------------------------
  * Usage (place in <head> BEFORE the body renders):
  *
@@ -71,8 +71,8 @@
   // ── Same-tab manual role change (optional hook) ───────────────────────────
   // Agar aap apne code me role update karte ho (e.g. settings page),
   // to ye helper call karo:
-  //   window.NexusRoleGuard.refresh()
-  window.NexusRoleGuard = {
+  //   window.MajidRoleGuard.refresh()
+  window.MajidRoleGuard = {
     refresh: function () {
       var newRole = getUserRole();
       if (pageType === 'student' && newRole && newRole !== 'student') {

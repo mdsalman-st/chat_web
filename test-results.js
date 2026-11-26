@@ -305,7 +305,7 @@
   // =========================================
   window.shareResult = function() {
     if (navigator.share) {
-      navigator.share({ title: 'My Nexus Result', text: 'Check out my score!', url: window.location.href }).catch(()=>{});
+      navigator.share({ title: 'My MAJID Result', text: 'Check out my score!', url: window.location.href }).catch(()=>{});
     } else {
       navigator.clipboard.writeText(window.location.href);
       showToast('📋 Link copied to clipboard!');
@@ -336,7 +336,7 @@
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `Nexus_Report_${currentAttemptId}.pdf`;
+      a.download = `MAJID_Report_${currentAttemptId}.pdf`;
       document.body.appendChild(a);
       a.click();
       a.remove();

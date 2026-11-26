@@ -1,5 +1,5 @@
 /**
- * TEST-SELECT.JS — Nexus Subject & Chapter Selection Flow
+ * TEST-SELECT.JS — MAJID Subject & Chapter Selection Flow
  * Reads student's saved academic profile (never re-asking board/class/medium).
  * Only displays subjects enrolled by the student.
  * Dynamically queries board-specific chapters with phase cutoffs.

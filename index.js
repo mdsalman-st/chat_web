@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * NEXUS — Welcome Page Script
+ * MAJID — Welcome Page Script
  * ============================================================================
  * Handles:
  * 1. Floating particle generation (optimized for device capabilities)
@@ -194,7 +194,7 @@
         const observer = new PerformanceObserver((list) => {
           for (const entry of list.getEntries()) {
             if (entry.duration > 50) {
-              console.warn('[Nexus] Long task detected:', entry.duration.toFixed(2) + 'ms');
+              console.warn('[MAJID] Long task detected:', entry.duration.toFixed(2) + 'ms');
             }
           }
         });
@@ -206,7 +206,7 @@
 
     // Log device info in development
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      console.log('[Nexus] Device Capabilities:', {
+      console.log('[MAJID] Device Capabilities:', {
         isMobile: DeviceCapabilities.isMobile,
         isTablet: DeviceCapabilities.isTablet,
         isTouch: DeviceCapabilities.isTouch,
@@ -267,7 +267,7 @@
           : (diffY > 0 ? 'up' : 'down');
         
         // Dispatch custom event for other scripts to use
-        document.dispatchEvent(new CustomEvent('nexus:swipe', { 
+        document.dispatchEvent(new CustomEvent('majid:swipe', { 
           detail: { direction, diffX, diffY } 
         }));
       }

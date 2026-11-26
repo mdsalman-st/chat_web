@@ -9,7 +9,7 @@
   </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="description" content="Subject & Curriculum Management — Nexus">
+  <meta name="description" content="Subject & Curriculum Management — MAJID">
   <meta name="theme-color" content="#05070d" media="(prefers-color-scheme: dark)">
   <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
   <meta name="color-scheme" content="dark light">
@@ -190,7 +190,7 @@
         <div class="flex items-center gap-4">
           <button onclick="toggleTheme()" class="w-10 h-10 rounded-xl glass-inner flex items-center justify-center text-lg" id="themeBtn">🌙</button>
           <div class="flex items-center gap-3 px-4 py-2 glass-inner rounded-full">
-            <span class="text-xs font-semibold text-white" id="topEmail">teacher@nexus.com</span>
+            <span class="text-xs font-semibold text-white" id="topEmail">teacher@majid.com</span>
             <div class="w-8 h-8 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center font-bold text-xs" id="topAvatar">T</div>
           </div>
         </div>
@@ -205,28 +205,28 @@
             <div class="liquid-glass p-6">
               <div style="position:relative; z-index:2;">
                 <p class="text-xs font-bold text-slate-400 uppercase mb-2">My Questions</p>
-                <h3 class="text-4xl font-black text-white">1,240</h3>
+                <h3 class="text-4xl font-black text-white" id="statMyQuestions">0</h3>
                 <p class="text-[10px] text-emerald-400 mt-2 font-bold">Live in database</p>
               </div>
             </div>
             <div class="liquid-glass p-6">
               <div style="position:relative; z-index:2;">
                 <p class="text-xs font-bold text-slate-400 uppercase mb-2">Pending AI Drafts</p>
-                <h3 class="text-4xl font-black text-amber-400">45</h3>
+                <h3 class="text-4xl font-black text-amber-400" id="statPendingDrafts">0</h3>
                 <p class="text-[10px] text-slate-400 mt-2 font-bold">Needs your approval</p>
               </div>
             </div>
             <div class="liquid-glass p-6">
               <div style="position:relative; z-index:2;">
                 <p class="text-xs font-bold text-slate-400 uppercase mb-2">Books/Notes</p>
-                <h3 class="text-4xl font-black text-blue-400">12</h3>
+                <h3 class="text-4xl font-black text-blue-400" id="statMaterials">0</h3>
                 <p class="text-[10px] text-slate-400 mt-2 font-bold">Materials uploaded</p>
               </div>
             </div>
             <div class="liquid-glass p-6">
               <div style="position:relative; z-index:2;">
                 <p class="text-xs font-bold text-slate-400 uppercase mb-2">Reported Qs</p>
-                <h3 class="text-4xl font-black text-red-400">3</h3>
+                <h3 class="text-4xl font-black text-red-400" id="statReportedQs">0</h3>
                 <p class="text-[10px] text-slate-400 mt-2 font-bold">Needs fixing</p>
               </div>
             </div>

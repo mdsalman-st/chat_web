@@ -28,49 +28,13 @@
     amber:   { bg: 'bg-amber-500/20 text-amber-300 border border-amber-500/30' }
   };
 
-  /* Seed initial events if none found */
+  /* Load saved events (no fake defaults) */
   function getStoredEvents() {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) return JSON.parse(saved);
     } catch (e) {}
-
-    const now = new Date();
-    const y = now.getFullYear();
-    const m = String(now.getMonth() + 1).padStart(2, '0');
-    const d = String(now.getDate()).padStart(2, '0');
-
-    const defaults = [
-      {
-        id: 'ev-1',
-        title: 'Project Sprint Review',
-        date: `${y}-${m}-${d}`,
-        time: '11:00',
-        category: 'work',
-        color: 'cyan',
-        desc: 'Review upcoming deliverables with team.'
-      },
-      {
-        id: 'ev-2',
-        title: 'Nexus System Sync',
-        date: `${y}-${m}-${String(Math.min(28, now.getDate() + 2)).padStart(2, '0')}`,
-        time: '15:30',
-        category: 'meeting',
-        color: 'violet',
-        desc: 'Architecture sync and feature review.'
-      },
-      {
-        id: 'ev-3',
-        title: 'Q2 Goal Assessment',
-        date: `${y}-${m}-${String(Math.min(28, now.getDate() + 4)).padStart(2, '0')}`,
-        time: '18:00',
-        category: 'deadline',
-        color: 'rose',
-        desc: 'Final submission deadline.'
-      }
-    ];
-    saveEvents(defaults);
-    return defaults;
+    return [];
   }
 
   function saveEvents(evs) {

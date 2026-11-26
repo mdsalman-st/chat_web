@@ -22,7 +22,7 @@
     employee:   { label:'Department', placeholder:'e.g. Marketing' },
     trader:     { label:'Strategy',   placeholder:'e.g. Swing Trade' },
     creator:    { label:'Content Topic', placeholder:'e.g. Productivity' },
-    developer:  { label:'Project',    placeholder:'e.g. nexus-core' },
+    developer:  { label:'Project',    placeholder:'e.g. majid-core' },
     freelancer: { label:'Client',     placeholder:'e.g. Acme Inc' },
     teacher:    { label:'Class',      placeholder:'e.g. Class 10-A' },
     doctor:     { label:'Patient',    placeholder:'e.g. Ravi Kumar' },

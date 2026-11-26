@@ -21,7 +21,7 @@
     employee:   { label:'Project',  type:'text',   icon:'💼', placeholder:'e.g. Q4 Report' },
     trader:     { label:'Symbol / Market', type:'text', icon:'📈', placeholder:'e.g. RELIANCE' },
     creator:    { label:'Platform', type:'select', icon:'🎨', options:['YouTube','Instagram','LinkedIn','Blog','Other'] },
-    developer:  { label:'Project / Repo', type:'text', icon:'💻', placeholder:'e.g. nexus-core' },
+    developer:  { label:'Project / Repo', type:'text', icon:'💻', placeholder:'e.g. majid-core' },
     freelancer: { label:'Client',   type:'text',   icon:'🧑‍💻', placeholder:'e.g. Acme Inc' },
     teacher:    { label:'Class / Batch', type:'text', icon:'📚', placeholder:'e.g. Class 10-A' },
     doctor:     { label:'Patient / Ward', type:'text', icon:'🩺', placeholder:'e.g. Ravi Kumar' },

@@ -37,60 +37,7 @@
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) return JSON.parse(saved);
     } catch (e) {}
-
-    const now = new Date();
-    const dStr = now.toISOString().split('T')[0];
-
-    const defaults = [
-      {
-        id: 'file-1',
-        name: 'Nexus_Architecture_Overview.pdf',
-        size: 1450000,
-        type: 'application/pdf',
-        category: 'document',
-        date: dStr,
-        content: null
-      },
-      {
-        id: 'file-2',
-        name: 'System_Dashboard_Mockup.png',
-        size: 840000,
-        type: 'image/png',
-        category: 'image',
-        date: dStr,
-        content: null
-      },
-      {
-        id: 'file-3',
-        name: 'database_schema_v2.json',
-        size: 45000,
-        type: 'application/json',
-        category: 'code',
-        date: dStr,
-        content: '{\n  "version": "2.1.0",\n  "database": "nexus_production",\n  "collections": ["users", "tasks", "notes", "rooms"]\n}'
-      },
-      {
-        id: 'file-4',
-        name: 'Workspace_Assets_Archive.zip',
-        size: 3800000,
-        type: 'application/zip',
-        category: 'archive',
-        date: dStr,
-        content: null
-      },
-      {
-        id: 'file-5',
-        name: 'Sprint_Planning_Notes.docx',
-        size: 512000,
-        type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        category: 'document',
-        date: dStr,
-        content: null
-      }
-    ];
-
-    saveFiles(defaults);
-    return defaults;
+    return [];
   }
 
   function saveFiles(list) {
@@ -376,7 +323,7 @@
       if (file.content) {
         dl.href = file.content;
       } else {
-        const blob = new Blob([`Nexus File: ${file.name}\nSize: ${file.size} bytes`], { type: file.type });
+        const blob = new Blob([`MAJID File: ${file.name}\nSize: ${file.size} bytes`], { type: file.type });
         dl.href = URL.createObjectURL(blob);
       }
     }
@@ -393,7 +340,7 @@
     if (file.content) {
       a.href = file.content;
     } else {
-      const blob = new Blob([`Nexus File: ${file.name}`], { type: file.type });
+      const blob = new Blob([`MAJID File: ${file.name}`], { type: file.type });
       a.href = URL.createObjectURL(blob);
     }
     a.click();

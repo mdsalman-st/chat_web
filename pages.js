@@ -79,7 +79,7 @@
           }
 
           btn.textContent = 'Sent Successfully ✓';
-          showToast('Message sent directly to Nexus Admin! We\'ll reply to ' + (email || 'you') + ' soon.', 'success');
+          showToast('Message sent directly to MAJID Admin! We\'ll reply to ' + (email || 'you') + ' soon.', 'success');
           form.reset();
         } catch (err) {
           console.error(err);
@@ -90,8 +90,6 @@
         }
       });
     }
-    }
-
     /* Particles */
     const wrap = document.getElementById('particles');
     if (wrap) {

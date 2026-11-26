@@ -16,109 +16,9 @@
     contactSearch: '',
   };
 
-  /* ---------- Role-Based Contacts ---------- */
-  const ROLE_CONTACTS = {
-    student: [
-      { id:'c1', name:'Priya Sharma', role:'Classmate', icon:'👩', color:'#ec4899', online:true },
-      { id:'c2', name:'Mr. Verma', role:'Physics Teacher', icon:'👨‍🏫', color:'#22d3ee', online:false },
-      { id:'c3', name:'Study Group', role:'Group • 6 members', icon:'👥', color:'#8b5cf6', online:true },
-      { id:'c4', name:'Ankit', role:'Classmate', icon:'👨', color:'#f59e0b', online:false },
-    ],
-    employee: [
-      { id:'c1', name:'Sarah Chen', role:'Product Manager', icon:'👩‍💼', color:'#ec4899', online:true },
-      { id:'c2', name:'Alex Kumar', role:'Backend Dev', icon:'👨‍💻', color:'#22d3ee', online:true },
-      { id:'c3', name:'Team Standup', role:'Group • 12 members', icon:'👥', color:'#8b5cf6', online:true },
-      { id:'c4', name:'Riya (HR)', role:'Human Resources', icon:'👩', color:'#f59e0b', online:false },
-    ],
-    trader: [
-      { id:'c1', name:'Rajesh Bhai', role:'Broker', icon:'👨‍💼', color:'#f59e0b', online:true },
-      { id:'c2', name:'Analysis Desk', role:'Group • 4 members', icon:'👥', color:'#8b5cf6', online:true },
-      { id:'c3', name:'Sanjay', role:'Trading Buddy', icon:'👨', color:'#22d3ee', online:false },
-    ],
-    creator: [
-      { id:'c1', name:'Maya', role:'Video Editor', icon:'👩‍🎨', color:'#ec4899', online:true },
-      { id:'c2', name:'Brand X', role:'Sponsor Client', icon:'🏢', color:'#f59e0b', online:false },
-      { id:'c3', name:'Content Team', role:'Group • 5 members', icon:'👥', color:'#8b5cf6', online:true },
-    ],
-    developer: [
-      { id:'c1', name:'Sarah (PM)', role:'Product Manager', icon:'👩‍💼', color:'#ec4899', online:true },
-      { id:'c2', name:'Alex', role:'Backend Dev', icon:'👨‍💻', color:'#22d3ee', online:true },
-      { id:'c3', name:'Priya', role:'UI Designer', icon:'👩‍🎨', color:'#a78bfa', online:false },
-      { id:'c4', name:'Dev Team', role:'Group • 8 members', icon:'👥', color:'#8b5cf6', online:true },
-    ],
-    freelancer: [
-      { id:'c1', name:'Acme Inc', role:'Client', icon:'🏢', color:'#f59e0b', online:true },
-      { id:'c2', name:'TechBlog', role:'Client', icon:'📰', color:'#22d3ee', online:false },
-      { id:'c3', name:'Freelance Hub', role:'Community', icon:'👥', color:'#8b5cf6', online:true },
-    ],
-    teacher: [
-      { id:'c1', name:'Principal', role:'School Head', icon:'👨‍💼', color:'#f59e0b', online:false },
-      { id:'c2', name:'Ms. Kavita', role:'Fellow Teacher', icon:'👩‍🏫', color:'#ec4899', online:true },
-      { id:'c3', name:'Class 10-A', role:'Group • 42 students', icon:'👥', color:'#8b5cf6', online:true },
-    ],
-    doctor: [
-      { id:'c1', name:'Nurse Priya', role:'Ward 3', icon:'👩‍⚕️', color:'#ec4899', online:true },
-      { id:'c2', name:'Dr. Mehta', role:'Colleague', icon:'👨‍⚕️', color:'#22d3ee', online:false },
-      { id:'c3', name:'Ward 3 Staff', role:'Group • 9 members', icon:'👥', color:'#8b5cf6', online:true },
-    ],
-    other: [
-      { id:'c1', name:'Contact One', role:'Team', icon:'👤', color:'#22d3ee', online:true },
-      { id:'c2', name:'Group Chat', role:'Group • 3 members', icon:'👥', color:'#8b5cf6', online:true },
-    ],
-  };
-
-  /* ---------- Preloaded messages per role ---------- */
-  const ROLE_SEEDS = {
-    student: {
-      c1: [
-        { text:'Hey! Did you solve the physics numerical?', type:'in', time:-3600 },
-        { text:'Haan, mostly. Question 4 thoda tricky tha', type:'out', time:-3500 },
-        { text:'Can you send the steps? I\'m stuck 😅', type:'in', time:-3400 },
-      ],
-      c2: [
-        { text:'Rahul, submit your practical file tomorrow.', type:'in', time:-7200 },
-      ],
-      c3: [
-        { text:'Study session at 6 PM today 📚', type:'in', time:-1800 },
-      ],
-    },
-    employee: {
-      c1: [
-        { text:'Can you review the Q4 report draft?', type:'in', time:-2400 },
-        { text:'Sure, checking it now', type:'out', time:-2300 },
-      ],
-      c2: [
-        { text:'Deployed the API changes to staging ✅', type:'in', time:-5400 },
-      ],
-      c3: [
-        { text:'Standup in 15 min, everyone join', type:'in', time:-900 },
-      ],
-    },
-    developer: {
-      c1: [
-        { text:'PR #241 needs your review', type:'in', time:-1500 },
-        { text:'On it 👍', type:'out', time:-1400 },
-      ],
-      c2: [
-        { text:'Fixed the login bug, pushed to main', type:'in', time:-3600 },
-      ],
-      c3: [
-        { text:'New mockups uploaded to Figma 🎨', type:'in', time:-4800 },
-      ],
-      c4: [
-        { text:'Deploy at 3 PM today, heads up', type:'in', time:-600 },
-      ],
-    },
-    doctor: {
-      c1: [
-        { text:'Bed 12 patient BP is elevated', type:'in', time:-1200 },
-      ],
-      c2: [
-        { text:'Can you take the 4 PM consult?', type:'in', time:-3600 },
-      ],
-    },
-    default: {},
-  };
+  /* ---------- Role-Based Contacts (No Fake Data) ---------- */
+  const ROLE_CONTACTS = {};
+  const ROLE_SEEDS = { default: {} };
 
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -151,40 +51,12 @@
 
   /* ---------- Data Helpers ---------- */
   function getContacts() {
-    return ROLE_CONTACTS[state.role] || ROLE_CONTACTS.other;
+    return ROLE_CONTACTS[state.role] || [];
   }
 
   function seedIfEmpty(contactId) {
     const store = loadStore();
-    if (store[contactId]) return store[contactId];
-
-    // Seed from role seeds
-    const seeds = (ROLE_SEEDS[state.role] || ROLE_SEEDS.default)[contactId];
-    let messages = [];
-
-    if (seeds) {
-      messages = seeds.map((s, i) => ({
-        id: 'msg_' + Date.now() + '_' + i,
-        text: s.text,
-        type: s.type,
-        timestamp: Date.now() + (s.time * 1000),
-      }));
-    } else {
-      // Default welcome
-      const contact = getContacts().find(c => c.id === contactId);
-      if (contact) {
-        messages = [{
-          id: 'msg_' + Date.now(),
-          text: `This is the beginning of your conversation with ${contact.name}.`,
-          type: 'in',
-          timestamp: Date.now() - 60000,
-        }];
-      }
-    }
-
-    store[contactId] = messages;
-    saveStore(store);
-    return messages;
+    return store[contactId] || [];
   }
 
   function getMessages(contactId) {

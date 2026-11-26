@@ -1,5 +1,5 @@
 /**
- * Nexus — Student Dashboard logic
+ * MAJID — Student Dashboard logic
  */
 (function () {
   'use strict';

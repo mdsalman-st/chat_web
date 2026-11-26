@@ -268,7 +268,7 @@
           } catch (err) {}
 
           btnText.textContent = 'Setup Complete ✓';
-          showToast('Welcome to Nexus 🚀', 'success');
+          showToast('Welcome to MAJID 🚀', 'success');
 
           setTimeout(() => {
             document.body.style.transition = 'opacity 0.35s ease';
