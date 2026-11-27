@@ -442,6 +442,24 @@
             <button type="submit" class="neu-btn px-8 py-4 text-sm text-blue-600">Update Profile</button>
         </form>
 
+        <!-- SOCIAL MEDIA LINKS -->
+        <div class="border-t border-slate-300/30 pt-8 mb-8">
+            <h3 class="text-lg font-bold text-slate-800 mb-2">Social Media Links</h3>
+            <p class="text-sm text-slate-500 mb-4">Student dashboard aur homepage par ye links dikhenge.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div>
+                <label class="text-xs font-bold text-slate-500 block mb-2 ml-1">YouTube Channel URL</label>
+                <input type="url" id="socialYoutube" placeholder="https://youtube.com/@yourchannel" class="neu-inner w-full px-4 py-3.5 text-sm">
+              </div>
+              <div>
+                <label class="text-xs font-bold text-slate-500 block mb-2 ml-1">Instagram Profile URL</label>
+                <input type="url" id="socialInstagram" placeholder="https://instagram.com/yourhandle" class="neu-inner w-full px-4 py-3.5 text-sm">
+              </div>
+            </div>
+            <button onclick="saveSocialLinks()" class="neu-btn px-8 py-4 text-sm text-blue-600">Save Social Links</button>
+        </div>
+
+        <!-- MAINTENANCE MODE -->
         <div class="border-t border-slate-300/30 pt-8">
             <h3 class="text-lg font-bold text-slate-800 mb-2">System Maintenance Mode</h3>
             <p class="text-sm text-slate-500 mb-4">Put the student platform into maintenance mode.</p>

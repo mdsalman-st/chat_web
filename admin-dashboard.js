@@ -91,6 +91,7 @@
     if (tabId === 'my-papers') window.loadAllPapers();
     if (tabId === 'audit') window.loadAuditLogs();
     if (tabId === 'ai-health') window.loadAiHealth();
+    if (tabId === 'profile') window.loadPlatformSettings();
   };
 
   // =========================================
