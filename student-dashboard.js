@@ -147,12 +147,12 @@
       const icon = sub.icon || '📚';
       
       html += `
-        <li class="flex justify-between items-center p-3 rounded-xl glass-inner mb-2 border border-white/5 hover:border-white/10 transition group cursor-pointer" onclick="window.location.href='test-select.html?subject=${encodeURIComponent(sub.code)}'">
+        <li class="flex justify-between items-center p-3 rounded-xl glass-inner mb-2 border border-white/5 hover:border-white/10 transition group cursor-pointer" style="border-color: var(--glass-border);" onclick="window.location.href='test-select.html?subject=${encodeURIComponent(sub.code)}'">
           <div class="flex items-center gap-3">
             <span class="text-xl">${icon}</span>
-            <span class="text-sm font-semibold text-white group-hover:text-cyan-400 transition-colors">${sub.name} — ${action}</span>
+            <span class="text-sm font-semibold group-hover:text-cyan-400 transition-colors" style="color: var(--text-main);">${sub.name} — ${action}</span>
           </div>
-          <span class="text-xs font-bold text-slate-400 bg-slate-800/50 px-2 py-1 rounded-md">${time}</span>
+          <span class="text-xs font-bold px-2 py-1 rounded-md shrink-0" style="color: var(--text-muted); background: var(--inner-glass-bg);">${time}</span>
         </li>
       `;
     }

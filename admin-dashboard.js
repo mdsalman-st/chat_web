@@ -15,15 +15,22 @@
   // 1. THEME LOGIC
   // =========================================
   function initTheme() {
-    const savedTheme = localStorage.getItem('nexus_admin_theme');
+    const savedTheme = window.NexusTheme ? window.NexusTheme.get() : localStorage.getItem('nexus_admin_theme');
     const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const themeBtn = $('themeBtn');
-    if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+    if (savedTheme === 'dark') {
       document.body.classList.add('dark-mode');
       if (themeBtn) themeBtn.textContent = '☀️';
     } else {
       document.body.classList.remove('dark-mode');
       if (themeBtn) themeBtn.textContent = '🌙';
+    }
+    if (window.NexusTheme) {
+      if (savedTheme) {
+        window.NexusTheme.apply(savedTheme);
+      } else {
+        window.NexusTheme.clearPreference();
+      }
     }
   }
   
@@ -33,9 +40,11 @@
     body.classList.toggle('dark-mode');
     if (body.classList.contains('dark-mode')) {
       localStorage.setItem('nexus_admin_theme', 'dark');
+      if (window.NexusTheme) window.NexusTheme.apply('dark');
       if (themeBtn) themeBtn.textContent = '☀️';
     } else {
       localStorage.setItem('nexus_admin_theme', 'light');
+      if (window.NexusTheme) window.NexusTheme.apply('light');
       if (themeBtn) themeBtn.textContent = '🌙';
     }
   };

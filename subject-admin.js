@@ -5,7 +5,7 @@
 
   // THEME LOGIC
   function initTheme() {
-    const savedTheme = localStorage.getItem('nexus_admin_theme');
+    const savedTheme = window.NexusTheme ? window.NexusTheme.get() : localStorage.getItem('nexus_admin_theme');
     const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const themeBtn = $('themeBtn');
 
@@ -16,18 +16,25 @@
       document.body.classList.add('dark-mode');
       if (themeBtn) themeBtn.textContent = '☀️';
     }
+    if (window.NexusTheme) {
+      if (savedTheme) {
+        window.NexusTheme.apply(savedTheme);
+      } else {
+        window.NexusTheme.clearPreference();
+      }
+    }
   }
 
   window.toggleTheme = function() {
     const themeBtn = $('themeBtn');
     if (themeBtn.textContent === '🌙') {
       themeBtn.textContent = '☀️';
-      document.body.style.background = '#eef2f6';
-      document.body.style.color = '#0f172a';
+      document.body.classList.add('dark-mode');
+      if (window.NexusTheme) window.NexusTheme.apply('dark');
     } else {
       themeBtn.textContent = '🌙';
-      document.body.style.background = '#05070d';
-      document.body.style.color = '#f8fafc';
+      document.body.classList.remove('dark-mode');
+      if (window.NexusTheme) window.NexusTheme.apply('light');
     }
   };
 

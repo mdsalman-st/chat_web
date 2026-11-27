@@ -1,10 +1,12 @@
-const CACHE_NAME = 'majid-v1';
+const CACHE_NAME = 'majid-v2';
 const STATIC_ASSETS = [
   './',
   './index.html',
   './logo.jpg',
   './favicon.svg',
   './human-polish.css',
+  './theme.css',
+  './theme.js',
   './manifest.json'
 ];
 
