@@ -152,6 +152,10 @@
     .nav-icon { width:18px; height:18px; flex-shrink:0; }
 
     .dropdown-panel { position:absolute; top:calc(100% + 8px); right:0; min-width:220px; background:var(--bg-color); border:1px solid var(--glass-border); border-radius:1rem; padding:0.5rem; box-shadow:0 20px 50px rgba(0,0,0,0.5); z-index:50; animation:slideInRight 0.2s forwards; }
+    #notifPanel { width:320px; max-width:calc(100vw - 24px); max-height:75vh; overflow-y:auto; }
+    @media (max-width: 640px) {
+      #notifPanel { position:fixed; top:68px; left:12px; right:12px; width:auto; min-width:0; }
+    }
     .dropdown-item { display:flex; align-items:center; gap:0.7rem; padding:0.6rem 0.75rem; border-radius:0.6rem; font-size:0.85rem; color:var(--text-muted); cursor:pointer; transition:all 0.15s ease; text-decoration:none; }
     .dropdown-item:hover { background:var(--inner-glass-bg); color:var(--text-main); }
 
@@ -244,7 +248,7 @@
                 <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 00-4-5.7V5a2 2 0 10-4 0v.3A6 6 0 006 11v3.2c0 .5-.2 1-.6 1.4L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                 <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-cyan-400 border-2" style="border-color: var(--bg-color);"></span>
               </button>
-              <div id="notifPanel" class="dropdown-panel hidden" style="min-width:320px">
+              <div id="notifPanel" class="dropdown-panel hidden">
                 <div class="flex items-center justify-between px-2 py-1.5 mb-1">
                   <p class="text-xs font-bold" style="color: var(--text-main);">Notifications</p>
                 </div>
