@@ -277,66 +277,199 @@
     <!-- ═══ PRIVACY ═══ -->
     <section id="tab-privacy" class="tab-panel hidden anim anim-1">
       <h1 class="text-3xl sm:text-4xl font-black text-white mb-3">Privacy <span class="grad-text">Policy</span></h1>
-      <p class="text-slate-400 text-sm mb-8">Last updated: November 2026</p>
+      <p class="text-slate-400 text-sm mb-8">Effective Date: 1 November 2026 &nbsp;|&nbsp; Last Revised: 27 November 2026</p>
 
       <div class="prose-custom nx-card p-6 sm:p-8">
-        <h2>1. Data We Collect</h2>
-        <p>Almost nothing. Your account data (name, email, phone) and preferences stay in your browser's local storage. We don't have a server that stores your personal information.</p>
 
-        <h2>2. How We Use It</h2>
-        <p>Your data is used only to personalize your workspace. We don't sell, share, or rent your information to anyone.</p>
+        <p>MAJID ("we", "our", "us") is committed to protecting the privacy of every student, teacher, and administrator who uses our platform. This Privacy Policy describes what information we collect, why we collect it, how we safeguard it, and what rights you have over your data. By using MAJID, you consent to the practices described herein.</p>
 
-        <h2>3. Security</h2>
-        <p>Passwords are hashed with bcrypt + salt + pepper before storage. The secret chat vault is session-bound and volatile — nothing is persisted.</p>
+        <h2>1. Information We Collect</h2>
+        <h3>1.1 Account Information</h3>
+        <p>When you register, we collect your full name, email address, mobile number, board/class selection, and chosen medium of instruction. This information is necessary to create and authenticate your account.</p>
 
-        <h2>4. Cookies</h2>
-        <p>We use minimal localStorage only for essential functionality. No third-party tracking cookies.</p>
+        <h3>1.2 Academic & Test Data</h3>
+        <p>We store your enrolled subjects, test responses, scores, AI-generated evaluations, study plans, notes, tasks, calendar events, and answer sheet uploads. This data powers your personalised learning experience, analytics, and progress tracking.</p>
 
-        <h2>5. Your Rights</h2>
+        <h3>1.3 Device & Usage Data</h3>
+        <p>We automatically collect limited technical information such as browser type, device type, screen resolution, IP address, and pages visited. This data is used solely for security monitoring, rate-limiting, and improving platform stability.</p>
+
+        <h3>1.4 Uploaded Content</h3>
+        <p>Handwritten answer sheets and documents you upload are stored securely on Cloudinary (a third-party cloud storage provider) and are associated with your account for the purpose of AI-based evaluation.</p>
+
+        <h2>2. How We Use Your Information</h2>
         <ul>
-          <li>Access your data anytime from Settings</li>
-          <li>Export or delete your data with one click</li>
-          <li>Opt out of any notifications</li>
+          <li><strong>Authentication & Security</strong> — To verify your identity, prevent unauthorised access, and protect against fraud.</li>
+          <li><strong>Personalised Learning</strong> — To generate AI-powered study plans, recommend practice tests, and provide performance analytics tailored to your board, class, and subject selections.</li>
+          <li><strong>AI Evaluation</strong> — To process your handwritten answer sheets using Google Gemini AI for automated scoring and feedback.</li>
+          <li><strong>Communication</strong> — To send essential notifications such as OTP codes, test results, and platform updates via email.</li>
+          <li><strong>Platform Improvement</strong> — To analyse aggregate (non-identifiable) usage patterns and enhance our features and performance.</li>
         </ul>
 
-        <h2>6. Contact</h2>
-        <p>Questions? Email <a>privacy@majid.app</a>.</p>
+        <h2>3. Data Sharing & Third Parties</h2>
+        <p>We do <strong>not</strong> sell, rent, or trade your personal data to any third party for advertising or marketing purposes. We share data only with the following service providers, strictly for operational purposes:</p>
+        <ul>
+          <li><strong>MongoDB Atlas</strong> — Secure cloud database hosting (data encrypted at rest and in transit).</li>
+          <li><strong>Cloudinary</strong> — Secure cloud storage for uploaded answer sheets and documents.</li>
+          <li><strong>Google Gemini API</strong> — AI-powered question generation and answer sheet evaluation (no personal data is sent; only academic content).</li>
+          <li><strong>Brevo (Sendinblue)</strong> — Transactional email delivery for OTPs and notifications.</li>
+          <li><strong>Render</strong> — Application hosting provider.</li>
+          <li><strong>Vercel</strong> — Frontend hosting provider.</li>
+        </ul>
+        <p>We may also disclose your information if required by Indian law, court order, or government authority.</p>
+
+        <h2>4. Data Security</h2>
+        <p>We implement industry-standard security measures to protect your data:</p>
+        <ul>
+          <li>Passwords are hashed using <strong>bcrypt</strong> with unique salt and pepper — we never store plain-text passwords.</li>
+          <li>All data transmission is encrypted via <strong>HTTPS/TLS</strong>.</li>
+          <li>API endpoints are protected by <strong>rate limiting</strong>, <strong>CORS whitelisting</strong>, <strong>Helmet security headers</strong>, and <strong>NoSQL injection sanitisation</strong>.</li>
+          <li>JWT authentication tokens are used for session management with automatic expiry.</li>
+          <li>Admin and Super Admin accounts have additional OTP-based verification for sensitive operations.</li>
+        </ul>
+
+        <h2>5. Data Retention</h2>
+        <p>We retain your personal and academic data for as long as your account is active. If you delete your account, all associated data (profile, test records, uploaded documents) will be permanently removed from our systems within 30 days. Anonymised, aggregate analytics may be retained indefinitely for research and improvement purposes.</p>
+
+        <h2>6. Your Rights</h2>
+        <p>Under applicable Indian data protection laws, you have the right to:</p>
+        <ul>
+          <li><strong>Access</strong> — View all personal data we hold about you, available through your account Settings page.</li>
+          <li><strong>Correction</strong> — Update or correct inaccurate personal information at any time.</li>
+          <li><strong>Deletion</strong> — Request permanent deletion of your account and all associated data.</li>
+          <li><strong>Data Portability</strong> — Export your test results and academic records.</li>
+          <li><strong>Withdraw Consent</strong> — Stop using the platform at any time; your continued use constitutes consent.</li>
+        </ul>
+
+        <h2>7. Children's Privacy</h2>
+        <p>MAJID is designed for students aged 14 and above. We do not knowingly collect personal data from children under 14. If we learn that a child under 14 has provided us with personal information, we will promptly delete that data. Parents or guardians who believe their child has submitted information may contact us at the email below.</p>
+
+        <h2>8. Cookies & Local Storage</h2>
+        <p>MAJID uses browser <strong>localStorage</strong> for essential functionality only (authentication tokens, theme preference, session data). We do <strong>not</strong> use third-party tracking cookies, advertising pixels, or analytics trackers beyond basic Google Tag Manager for aggregate traffic insights.</p>
+
+        <h2>9. Changes to This Policy</h2>
+        <p>We may update this Privacy Policy from time to time. The revised version will be posted on this page with an updated "Last Revised" date. We encourage you to review this policy periodically. Continued use of MAJID after changes constitutes your acceptance of the revised policy.</p>
+
+        <h2>10. Governing Law</h2>
+        <p>This Privacy Policy is governed by and construed in accordance with the laws of India, including the Information Technology Act, 2000 and the Digital Personal Data Protection Act, 2023, as applicable. Any disputes shall be subject to the exclusive jurisdiction of the courts in Bihar, India.</p>
+
+        <h2>11. Contact Us</h2>
+        <p>If you have any questions, concerns, or requests regarding this Privacy Policy or your personal data, please contact us:</p>
+        <ul>
+          <li><strong>Email:</strong> <a href="mailto:alimdrahul01@gmail.com" class="text-cyan-400 hover:underline">alimdrahul01@gmail.com</a></li>
+          <li><strong>Platform:</strong> MAJID — <a href="https://majidstudy.vercel.app" class="text-cyan-400 hover:underline">majidstudy.vercel.app</a></li>
+        </ul>
       </div>
     </section>
 
     <!-- ═══ TERMS ═══ -->
     <section id="tab-terms" class="tab-panel hidden anim anim-1">
-      <h1 class="text-3xl sm:text-4xl font-black text-white mb-3">Terms of <span class="grad-text">Service</span></h1>
-      <p class="text-slate-400 text-sm mb-8">Last updated: November 2026</p>
+      <h1 class="text-3xl sm:text-4xl font-black text-white mb-3">Terms &amp; <span class="grad-text">Conditions</span></h1>
+      <p class="text-slate-400 text-sm mb-8">Effective Date: 1 November 2026 &nbsp;|&nbsp; Last Revised: 27 November 2026</p>
 
       <div class="prose-custom nx-card p-6 sm:p-8">
-        <h2>1. Acceptance</h2>
-        <p>By using MAJID, you agree to these terms. If you don't agree, please don't use the service.</p>
 
-        <h2>2. Your Account</h2>
-        <p>You're responsible for maintaining the security of your account, including your password and secret unlock code.</p>
+        <p>Welcome to MAJID. These Terms and Conditions ("Terms") constitute a legally binding agreement between you ("User", "Student", "you") and MAJID ("we", "our", "us"). By accessing or using our platform at <a href="https://majidstudy.vercel.app" class="text-cyan-400 hover:underline">majidstudy.vercel.app</a>, you acknowledge that you have read, understood, and agree to be bound by these Terms. If you do not agree, you must discontinue use immediately.</p>
 
-        <h2>3. Acceptable Use</h2>
+        <h2>1. Eligibility</h2>
         <ul>
-          <li>Don't use MAJID for illegal activities</li>
-          <li>Don't attempt to reverse-engineer or exploit the service</li>
-          <li>Don't abuse, harass, or harm other users</li>
+          <li>You must be at least <strong>14 years of age</strong> to create an account on MAJID.</li>
+          <li>Users under 18 must have the consent of a parent or legal guardian.</li>
+          <li>You must provide accurate, current, and complete registration information.</li>
+          <li>MAJID is designed for students preparing for Indian board examinations (BSEB, CBSE, UP Board) and related academic purposes.</li>
         </ul>
 
-        <h2>4. Content</h2>
-        <p>You own all content you create. We claim no ownership over your data.</p>
+        <h2>2. Account Registration & Security</h2>
+        <ul>
+          <li>Each user may register only <strong>one account</strong> using a valid email address and mobile number.</li>
+          <li>You are solely responsible for safeguarding your login credentials, including your password and any OTP codes sent to your registered email or phone.</li>
+          <li>You must immediately notify us if you suspect any unauthorised access to your account.</li>
+          <li>We reserve the right to suspend or terminate accounts that are found to be duplicate, fraudulent, or in violation of these Terms.</li>
+        </ul>
 
-        <h2>5. Service Availability</h2>
-        <p>We aim for 99%+ uptime but don't guarantee uninterrupted service. Features may change over time.</p>
+        <h2>3. Permitted Use</h2>
+        <p>MAJID grants you a limited, non-exclusive, non-transferable, revocable licence to access and use the platform for personal, non-commercial, educational purposes. You agree to use MAJID only for:</p>
+        <ul>
+          <li>Practising board exam questions and mock tests.</li>
+          <li>Submitting handwritten answer sheets for AI-based evaluation.</li>
+          <li>Accessing AI-generated study plans, analytics, and academic resources.</li>
+          <li>Using the workspace tools (notes, tasks, calendar, file manager) for academic organisation.</li>
+        </ul>
 
-        <h2>6. Termination</h2>
-        <p>You can delete your account anytime. We may suspend accounts that violate these terms.</p>
+        <h2>4. Prohibited Conduct</h2>
+        <p>You shall not, under any circumstances:</p>
+        <ul>
+          <li>Share, distribute, screenshot, or commercially exploit test questions, answer keys, or AI-generated content from MAJID.</li>
+          <li>Use automated bots, scrapers, or scripts to access or extract content from the platform.</li>
+          <li>Attempt to reverse-engineer, decompile, or tamper with the platform's source code, APIs, or security measures.</li>
+          <li>Upload obscene, offensive, defamatory, or illegal content in any form.</li>
+          <li>Impersonate another user, administrator, or any MAJID representative.</li>
+          <li>Use the platform to harass, threaten, or harm other users.</li>
+          <li>Circumvent rate limits, CORS restrictions, or any other security mechanisms.</li>
+          <li>Share your account credentials with others or allow multiple persons to use a single account.</li>
+        </ul>
 
-        <h2>7. Limitation of Liability</h2>
-        <p>MAJID is provided "as-is". We're not liable for data loss or damages arising from use.</p>
+        <h2>5. Intellectual Property</h2>
+        <h3>5.1 Platform Content</h3>
+        <p>All content on MAJID — including but not limited to the user interface, design, logos, icons, AI-generated questions, evaluation algorithms, study plans, and documentation — is the intellectual property of MAJID and is protected under the Indian Copyright Act, 1957 and other applicable intellectual property laws. You may not reproduce, distribute, or create derivative works without our prior written consent.</p>
 
-        <h2>8. Changes</h2>
-        <p>We may update these terms. Continued use means acceptance of the new terms.</p>
+        <h3>5.2 User-Generated Content</h3>
+        <p>You retain ownership of all content you create or upload on MAJID (notes, tasks, uploaded answer sheets). By uploading content, you grant MAJID a limited, non-exclusive licence to process, store, and display that content solely for the purpose of providing the service (e.g., AI evaluation of your answer sheets). We will never use your content for advertising or share it with third parties beyond what is necessary for service delivery.</p>
+
+        <h2>6. AI-Generated Content Disclaimer</h2>
+        <p>MAJID uses Google Gemini AI to generate practice questions, evaluate handwritten answers, and create study plans. While we strive for accuracy:</p>
+        <ul>
+          <li>AI-generated questions and evaluations are for <strong>practice purposes only</strong> and should not be treated as official board exam material.</li>
+          <li>AI scoring is indicative and may differ from actual board examination scoring standards.</li>
+          <li>We do not guarantee that AI-generated content is free from errors or omissions.</li>
+          <li>Students should always cross-reference with official textbooks and board-prescribed syllabus.</li>
+        </ul>
+
+        <h2>7. Fees & Payment</h2>
+        <p>MAJID is currently offered <strong>free of charge</strong> for all students. We reserve the right to introduce paid features or subscription plans in the future, in which case users will be notified in advance and given the option to continue with free features or upgrade.</p>
+
+        <h2>8. Service Availability & Modifications</h2>
+        <ul>
+          <li>We aim to provide uninterrupted service but do not guarantee 100% uptime. Scheduled maintenance, server outages, or force majeure events may cause temporary disruptions.</li>
+          <li>We reserve the right to modify, update, or discontinue any feature of the platform at any time without prior notice.</li>
+          <li>We are not liable for any loss or inconvenience caused by service downtime or feature changes.</li>
+        </ul>
+
+        <h2>9. Account Termination</h2>
+        <ul>
+          <li><strong>By You:</strong> You may delete your account at any time through the Settings page. Upon deletion, all your personal data and academic records will be permanently removed within 30 days.</li>
+          <li><strong>By Us:</strong> We may suspend or permanently terminate your account without notice if you violate these Terms, engage in fraudulent activity, or compromise the security of the platform. No refund or compensation shall be provided in such cases.</li>
+        </ul>
+
+        <h2>10. Limitation of Liability</h2>
+        <p>To the fullest extent permitted by applicable Indian law:</p>
+        <ul>
+          <li>MAJID is provided on an <strong>"as-is"</strong> and <strong>"as-available"</strong> basis without any warranties, express or implied.</li>
+          <li>We shall not be liable for any direct, indirect, incidental, special, consequential, or punitive damages arising from your use of or inability to use the platform.</li>
+          <li>We shall not be liable for any loss of data, academic performance, or examination results.</li>
+          <li>Our total liability, in any case, shall not exceed the amount paid by you (if any) for using the platform in the preceding 12 months.</li>
+        </ul>
+
+        <h2>11. Indemnification</h2>
+        <p>You agree to indemnify and hold harmless MAJID, its founders, developers, and affiliates from and against any claims, liabilities, damages, losses, and expenses (including legal fees) arising out of your breach of these Terms, misuse of the platform, or violation of any applicable law.</p>
+
+        <h2>12. Third-Party Services</h2>
+        <p>MAJID integrates with third-party services (MongoDB Atlas, Cloudinary, Google Gemini API, Brevo, Render, Vercel) for operational purposes. We are not responsible for the terms, policies, or practices of these third-party providers. Your use of MAJID constitutes acceptance of their respective terms of service.</p>
+
+        <h2>13. Modifications to These Terms</h2>
+        <p>We reserve the right to revise these Terms at any time. The revised version will be posted on this page with an updated "Last Revised" date. It is your responsibility to review these Terms periodically. Continued use of MAJID after any modifications constitutes your acceptance of the updated Terms.</p>
+
+        <h2>14. Governing Law & Dispute Resolution</h2>
+        <p>These Terms shall be governed by and construed in accordance with the laws of India, including the Information Technology Act, 2000 and the Indian Contract Act, 1872. Any dispute arising out of or in connection with these Terms shall be subject to the exclusive jurisdiction of the courts located in Bihar, India.</p>
+
+        <h2>15. Severability</h2>
+        <p>If any provision of these Terms is found to be invalid or unenforceable by a court of competent jurisdiction, the remaining provisions shall continue in full force and effect.</p>
+
+        <h2>16. Contact Information</h2>
+        <p>For any questions, concerns, or grievances regarding these Terms, please contact us:</p>
+        <ul>
+          <li><strong>Email:</strong> <a href="mailto:alimdrahul01@gmail.com" class="text-cyan-400 hover:underline">alimdrahul01@gmail.com</a></li>
+          <li><strong>Platform:</strong> MAJID — <a href="https://majidstudy.vercel.app" class="text-cyan-400 hover:underline">majidstudy.vercel.app</a></li>
+        </ul>
       </div>
     </section>
 
