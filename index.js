@@ -224,10 +224,14 @@
      6. VIEWPORT HEIGHT FIX FOR MOBILE BROWSERS
      ------------------------------------------------------------------------ */
   function fixViewportHeight() {
-    // Set CSS custom property for dynamic viewport height
+    // Set CSS custom property for dynamic viewport height without forcing sync reflow
+    let rafId = 0;
     const setVH = () => {
-      const vh = window.innerHeight * 0.01;
-      document.documentElement.style.setProperty('--vh', `${vh}px`);
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+      });
     };
     
     setVH();

@@ -76,6 +76,7 @@ body {
   background-clip: unset !important;
   -webkit-text-fill-color: currentColor !important;
   color: #f8fafc !important;
+  animation: none !important;
 }
 
 @media (prefers-color-scheme: light) {

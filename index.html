@@ -1,11 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-MMWXJK9C"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
+    (function(){
+      var loaded = false;
+      function loadGTM() {
+        if (loaded) return;
+        loaded = true;
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-MMWXJK9C';
+        document.head.appendChild(s);
+      }
+      window.addEventListener('load', function(){ setTimeout(loadGTM, 1500); });
+      ['scroll','mousemove','touchstart','keydown'].forEach(function(ev){
+        window.addEventListener(ev, loadGTM, { once: true, passive: true });
+      });
+    })();
   </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -69,8 +83,8 @@
   </script>
 
   <!-- Preload critical resources -->
-  <link rel="preload" as="style" href="style.css">
-  <link rel="preload" as="script" href="index.js">
+  <link rel="preload" as="style" href="landing.min.css">
+  <link rel="preload" as="image" href="logo-sm.jpg">
   
   <!-- Fonts with preconnect for faster loading -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -78,8 +92,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="human-polish.css">
+  <link rel="stylesheet" href="landing.min.css">
 
   <!-- PWA Manifest & Icons -->
   <link rel="manifest" href="manifest.json">
@@ -133,7 +146,7 @@
   <header class="site-header" role="banner">
     <div class="site-header-inner">
       <a href="index.html" class="site-logo" aria-label="MAJID Home">
-        <img src="logo.jpg" alt="MAJID Logo" class="site-logo-img">
+        <img src="logo-sm.jpg" alt="MAJID Logo" width="56" height="31" class="site-logo-img">
         <span>MAJID</span>
       </a>
 
@@ -421,7 +434,7 @@
         <!-- Brand Col -->
         <div>
           <div class="footer-brand-title" style="display: flex; align-items: center; gap: 10px;">
-            <img src="logo.jpg" alt="MAJID Logo" style="width: 32px; height: 32px; border-radius: 8px; object-fit: contain; background: #fff; padding: 2px;">
+            <img src="logo-sm.jpg" alt="MAJID Logo" width="32" height="18" loading="lazy" style="width: 32px; height: 32px; border-radius: 8px; object-fit: contain; background: #fff; padding: 2px;">
             <span>MAJID</span>
           </div>
           <p class="footer-brand-desc">
@@ -490,7 +503,7 @@
   </footer>
 
   <!-- Scripts -->
-  <script src="api.js"></script>
+  <script src="api.js" defer></script>
   <script src="index.js" defer></script>
   <script src="feedback.js" defer></script>
 </body>
