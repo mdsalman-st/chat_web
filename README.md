@@ -211,7 +211,7 @@ MAJID is a Progressive Web App — students can:
   <a href="https://github.com/mdsalman-st"><img src="https://img.shields.io/badge/GitHub-mdsalman--st-181717?style=for-the-badge&logo=github" alt="GitHub" /></a>
   <a href="https://youtube.com/@MAJID.EdTech"><img src="https://img.shields.io/badge/YouTube-MAJID.EdTech-FF0000?style=for-the-badge&logo=youtube" alt="YouTube" /></a>
   <a href="https://instagram.com/majid.edtech"><img src="https://img.shields.io/badge/Instagram-majid.edtech-E4405F?style=for-the-badge&logo=instagram&logoColor=white" alt="Instagram" /></a>
-  <a href="mailto:alimdrahul01@gmail.com"><img src="https://img.shields.io/badge/Email-alimdrahul01-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" /></a>
+  <a href="mailto:majid.edtech@gmail.com"><img src="https://img.shields.io/badge/Email-majid.edtech-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" /></a>
 </p>
 
 ---
