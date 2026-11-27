@@ -604,4 +604,44 @@
 
   console.log('%c🔗 API Client Ready', 'color:#22d3ee;font-weight:bold', API_BASE);
 
+  /* --------------------------------------------------------------------------
+     PWA SERVICE WORKER + OFFLINE BANNER + GLOBAL ERROR GUARD
+     -------------------------------------------------------------------------- */
+  if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    });
+  }
+
+  function updateOnlineStatus() {
+    let banner = document.getElementById('majidOfflineBanner');
+    if (!navigator.onLine) {
+      if (!banner && document.body) {
+        banner = document.createElement('div');
+        banner.id = 'majidOfflineBanner';
+        banner.setAttribute('role', 'status');
+        banner.style.cssText = 'position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:99999;background:#0f172a;color:#f8fafc;border:1px solid rgba(248,113,113,0.4);padding:10px 18px;border-radius:999px;font-size:13px;font-weight:600;box-shadow:0 12px 32px rgba(0,0,0,0.45);display:flex;align-items:center;gap:8px;white-space:nowrap;';
+        banner.innerHTML = '<span style="width:8px;height:8px;border-radius:50%;background:#ef4444;display:inline-block;"></span> No internet connection';
+        document.body.appendChild(banner);
+      }
+    } else if (banner) {
+      banner.remove();
+    }
+  }
+
+  window.addEventListener('offline', updateOnlineStatus);
+  window.addEventListener('online', updateOnlineStatus);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', updateOnlineStatus);
+  } else {
+    updateOnlineStatus();
+  }
+
+  window.addEventListener('error', (e) => {
+    console.warn('[MAJID Guard] Caught error:', e?.message || e);
+  });
+  window.addEventListener('unhandledrejection', (e) => {
+    console.warn('[MAJID Guard] Unhandled promise:', e?.reason?.message || e?.reason || e);
+  });
+
 })(window);

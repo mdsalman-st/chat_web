@@ -4,4 +4,4 @@ Disallow: /admin-dashboard.html
 Disallow: /subject-admin.html
 Disallow: /credentials.html
 
-Sitemap: https://chatweb-olive-theta.vercel.app/sitemap.xml
+Sitemap: https://majidstudy.vercel.app/sitemap.xml

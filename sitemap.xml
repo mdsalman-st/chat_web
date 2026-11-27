@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://chatweb-olive-theta.vercel.app/</loc>
+    <loc>https://majidstudy.vercel.app/</loc>
     <lastmod>2026-11-14</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://chatweb-olive-theta.vercel.app/test-select.html</loc>
+    <loc>https://majidstudy.vercel.app/test-select.html</loc>
     <lastmod>2026-11-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://chatweb-olive-theta.vercel.app/profession.html</loc>
+    <loc>https://majidstudy.vercel.app/profession.html</loc>
     <lastmod>2026-11-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://chatweb-olive-theta.vercel.app/auth.html</loc>
+    <loc>https://majidstudy.vercel.app/auth.html</loc>
     <lastmod>2026-11-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://chatweb-olive-theta.vercel.app/student-dashboard.html</loc>
+    <loc>https://majidstudy.vercel.app/student-dashboard.html</loc>
     <lastmod>2026-11-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://chatweb-olive-theta.vercel.app/pages.html</loc>
+    <loc>https://majidstudy.vercel.app/pages.html</loc>
     <lastmod>2026-11-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
